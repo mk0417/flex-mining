@@ -47,6 +47,19 @@ tab_risk_or_mispricingTop3 = czsum %>%
   select(theory, Any, Top3) %>% 
   arrange(desc(theory))
 
+### Top 3 accounting
+acctlist = c('AR','JAE','JAR')
+tab_risk_or_mispricingTop3acct = czsum %>% 
+  filter(rbar_ok, n_ok, main_signal == 'main') %>% 
+  left_join(czcat, by = 'signalname') %>% 
+  mutate(Top3Acct = ifelse(Journal %in% acctlist, 'Top3Acct', 'Other')) %>%
+  group_by(Top3Acct, theory) %>%
+  count() %>% 
+  pivot_wider(names_from = Top3Acct, values_from = n, values_fill = 0) %>% 
+  mutate(Any = Other + Top3Acct) %>% 
+  select(theory, Top3Acct) %>% 
+  arrange(desc(theory))
+
 ### Finance and accounting
 tab_risk_or_mispricingJournal = czsum %>% 
   filter(rbar_ok, n_ok, main_signal == 'main') %>% 
@@ -61,10 +74,11 @@ tab_risk_or_mispricingJournal = czsum %>%
   select(theory, Finance, Accounting) %>% 
   arrange(desc(theory))
 
-## Combine the two tables and save as tex
+## Combine the three tables and save as tex
 tab_risk_or_mispricing = tab_risk_or_mispricingTop3 %>% 
-  left_join(tab_risk_or_mispricingJournal, by = 'theory') %>% 
-  select(theory, Any, Top3, Finance, Accounting) %>% 
+  left_join(tab_risk_or_mispricingTop3acct, by = 'theory') %>% 
+  left_join(tab_risk_or_mispricingJournal,  by = 'theory') %>% 
+  select(theory, Any, Top3, Top3Acct, Finance, Accounting) %>% 
   arrange(desc(theory)) %>% 
   mutate(theory = str_to_title(theory))
 
@@ -92,6 +106,17 @@ tab_modeltypeTop3 = czsum %>%
   arrange(modeltype)
 
 
+### Top 3 accounting
+tab_modeltypeTop3acct = czsum %>% 
+  filter(rbar_ok, n_ok, main_signal == 'main') %>% 
+  left_join(czcat, by = 'signalname') %>% 
+  mutate(Top3acct = ifelse(Journal %in% acctlist, 'Top3acct', 'Other')) %>%
+  group_by(Top3acct, modeltype) %>%
+  count() %>% 
+  pivot_wider(names_from = Top3acct, values_from = n, values_fill = 0) %>% 
+  select(modeltype, Top3acct) %>% 
+  arrange(modeltype)
+
 ### Finance and accounting
 tab_modeltypeJournal = czsum %>% 
   filter(rbar_ok, n_ok, main_signal == 'main') %>% 
@@ -106,10 +131,11 @@ tab_modeltypeJournal = czsum %>%
   select(modeltype, Finance, Accounting) %>% 
   arrange(modeltype)
 
-## Combine the two tables and save as tex
+## Combine the three tables and save as tex
 tab_modeltype = tab_modeltypeTop3 %>% 
+  left_join(tab_modeltypeTop3acct, by = 'modeltype') %>% 
   left_join(tab_modeltypeJournal, by = 'modeltype') %>% 
-  select(modeltype, Any, Top3, Finance, Accounting) %>% 
+  select(modeltype, Any, Top3, Top3acct, Finance, Accounting) %>% 
   arrange(modeltype) 
 
 tab_modeltype %>% 
