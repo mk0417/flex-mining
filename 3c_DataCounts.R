@@ -35,7 +35,7 @@ czcat = fread('DataInput/SignalsTheoryChecked.csv') %>%
 ## for main paper: Risk/Mispricing and Model counts 
 
 ### Top 3 finance
-finlist = c('JF','RFS','JFE')
+finlist = globalSettings$top3Finance
 tab_risk_or_mispricingTop3 = czsum %>% 
   filter(rbar_ok, n_ok, main_signal == 'main') %>% 
   left_join(czcat, by = 'signalname') %>% 
@@ -48,7 +48,7 @@ tab_risk_or_mispricingTop3 = czsum %>%
   arrange(desc(theory))
 
 ### Top 3 accounting
-acctlist = c('AR','JAE','JAR')
+acctlist = globalSettings$top3Accounting
 tab_risk_or_mispricingTop3acct = czsum %>% 
   filter(rbar_ok, n_ok, main_signal == 'main') %>% 
   left_join(czcat, by = 'signalname') %>% 
