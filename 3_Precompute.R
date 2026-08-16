@@ -12,7 +12,7 @@
 # Resolve versioned paths from the project settings.
 settings_env <- new.env(parent = globalenv())
 sys.source("config.R", envir = settings_env)
-version_prefix <- file.path("../Data/Processed", settings_env$globalSettings$dataVersion)
+version_prefix <- file.path("../Data/Processed", settings_env$globalSettings$universe$dataVersion)
 required_files <- c(
   "../Data/Processed/czsum_allpredictors.RDS",
   "../Data/Processed/czret_keeponly.RDS",

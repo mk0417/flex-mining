@@ -11,7 +11,7 @@ source("0_Environment.R")
 
 DMname <- paste0(
     "../Data/Processed/",
-    globalSettings$dataVersion,
+    globalSettings$universe$dataVersion,
     " LongShort.RData"
 )
 

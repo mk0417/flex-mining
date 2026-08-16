@@ -86,13 +86,13 @@ local({
   }, error = function(e) NA_real_)
 
   if (!is.na(total_gb)) {
-    needed_gb <- globalSettings$num_cores * gb_per_worker
+    needed_gb <- globalSettings$compute$num_cores * gb_per_worker
     if (needed_gb > total_gb) {
       warning(sprintf(
-        paste0("globalSettings$num_cores = %d budgets ~%.0f GB (%d x %d GB/worker) ",
+        paste0("globalSettings$compute$num_cores = %d budgets ~%.0f GB (%d x %d GB/worker) ",
                "but only ~%.0f GB RAM detected; consider lowering num_cores to ",
                "avoid an out-of-memory kill."),
-        globalSettings$num_cores, needed_gb, globalSettings$num_cores,
+        globalSettings$compute$num_cores, needed_gb, globalSettings$compute$num_cores,
         gb_per_worker, total_gb), call. = FALSE)
     }
   }

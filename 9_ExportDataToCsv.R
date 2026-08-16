@@ -66,7 +66,7 @@ rdata_to_csv = function(rdataname, csvname){
 # Compustat Mining ---------------------------------------------------------------
 
 rdataname = paste0('../Data/Processed/',
-                   globalSettings$dataVersion, 
+                   globalSettings$universe$dataVersion, 
                    ' LongShort.RData')
 csvname = '../Data/Export/DataMinedLongShortReturns'
 

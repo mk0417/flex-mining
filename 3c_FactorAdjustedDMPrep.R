@@ -440,7 +440,7 @@ out_dir <- Sys.getenv("FACTOR_DM_OUT_DIR", unset = "../Data/Processed")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 cache_path <- file.path(out_dir, "factor_adjusted_dm_benchmarks.RDS")
 dm_path <- paste0(
-  "../Data/Processed/", globalSettings$dataVersion, " LongShort.RData"
+  "../Data/Processed/", globalSettings$universe$dataVersion, " LongShort.RData"
 )
 
 minimum_observations <- 60L
@@ -448,8 +448,8 @@ raw_t_threshold <- 2
 alpha_t_threshold <- 2
 
 incl_signals <- restrictInclSignals(
-  restrictType = globalSettings$restrictType,
-  topT = globalSettings$topT
+  restrictType = globalSettings$inclusion$restrictType,
+  topT = globalSettings$inclusion$topT
 )
 raw_contract <- readRDS("../Data/Processed/raw_dm_benchmarks.RDS")
 if (is.null(raw_contract$metadata$accounting_t2$pair_fingerprint_sha256)) {
@@ -461,7 +461,7 @@ if (is.null(raw_contract$metadata$accounting_t2$pair_fingerprint_sha256)) {
 dm_summary <- readRDS("../Data/Processed/dmcomp_sumstats.RDS")$insampsum
 base_pairs <- select_accounting_t2_pairs(
   dm_summary,
-  min_num_stocks = globalSettings$minNumStocks,
+  min_num_stocks = globalSettings$benchmark$minNumStocks,
   t_threshold = raw_t_threshold,
   minimum_months = 60L,
   required_final_year_months = 12L,

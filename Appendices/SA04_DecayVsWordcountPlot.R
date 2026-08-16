@@ -17,8 +17,8 @@ czret <- readRDS("../Data/Processed/czret_keeponly.RDS") %>%
 wordcount = fread('DataIntermediate/TextClassification.csv') %>% 
   select(signalname, theory, misprice_risk_ratio)
 
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 # calc decay
 czdecay = czret %>% 

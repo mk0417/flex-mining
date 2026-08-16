@@ -15,8 +15,8 @@ round_numbers_in_strings <- function(strings) {
 
 # Load and prep data ------------------------------------------------------
 
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 signalcat = fread('DataInput/SignalsTheoryChecked.csv') %>% 
   filter(signalname %in% inclSignals) 

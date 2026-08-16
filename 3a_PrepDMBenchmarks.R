@@ -16,15 +16,15 @@ library(doParallel)
 dmcomp <- list()
 dmtic <- list()
 dmcomp$name <- paste0('../Data/Processed/',
-                      globalSettings$dataVersion,
+                      globalSettings$universe$dataVersion,
                       ' LongShort.RData')
 dmtic$name <- "../Data/Processed/ticker_Harvey2017JF.RDS"
 
 ## Load Global Data -------------------------------------------
 
 # these are treated as globals (don't modify pls)
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType,
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType,
+                                  topT = globalSettings$inclusion$topT)
 
 czsum <- readRDS("../Data/Processed/czsum_allpredictors.RDS") %>%
   filter(Keep) %>%
@@ -81,16 +81,16 @@ npubmax <- Inf
 use_sign_info <- TRUE
 accounting_t2_screen <- list(
   # tolerance in levels
-  t_tol = globalSettings$t_tol,
-  r_tol = globalSettings$r_tol,
+  t_tol = globalSettings$benchmark$t_tol,
+  r_tol = globalSettings$benchmark$r_tol,
   # tolerance relative to op stat
-  t_reltol = globalSettings$t_reltol,
-  r_reltol = globalSettings$r_reltol,
+  t_reltol = globalSettings$benchmark$t_reltol,
+  r_reltol = globalSettings$benchmark$r_reltol,
   # alternative filtering
-  t_min = globalSettings$t_min,
-  t_max = globalSettings$t_max,
-  t_rankpct_min = globalSettings$t_rankpct_min,
-  minNumStocks = globalSettings$minNumStocks
+  t_min = globalSettings$benchmark$t_min,
+  t_max = globalSettings$benchmark$t_max,
+  t_rankpct_min = globalSettings$benchmark$t_rankpct_min,
+  minNumStocks = globalSettings$benchmark$minNumStocks
 )
 
 ## Shared data prep --------------------------------------------------
@@ -99,8 +99,8 @@ accounting_t2_screen <- list(
 # make event time returns for Compustat DM
 accounting_t2_matched <- select_accounting_t2_pairs(
   dmcomp$insampsum,
-  min_num_stocks = globalSettings$minNumStocks,
-  t_threshold = globalSettings$t_min,
+  min_num_stocks = globalSettings$benchmark$minNumStocks,
+  t_threshold = globalSettings$benchmark$t_min,
   minimum_months = 60L,
   required_final_year_months = 12L,
   pubnames = czsum$signalname
@@ -115,8 +115,8 @@ accounting_t2_metadata <- list(
     accounting_t2_matched
   ),
   specification = list(
-    oriented_raw_t_threshold = globalSettings$t_min,
-    minimum_stocks_per_leg = globalSettings$minNumStocks / 2,
+    oriented_raw_t_threshold = globalSettings$benchmark$t_min,
+    minimum_stocks_per_leg = globalSettings$benchmark$minNumStocks / 2,
     minimum_insample_months = 60L,
     required_final_year_months = 12L,
     published_mean_return_tolerance = Inf,
@@ -142,7 +142,7 @@ print(stop_time - start_time)
 # significant, non-redundant mined strategies rather than a handful of
 # look-alikes.
 accounting_t2_uncorr_matched <- accounting_t2_matched[
-  !is.na(cor) & cor * sign(rbar) <= globalSettings$matched_uncorr_corr_max
+  !is.na(cor) & cor * sign(rbar) <= globalSettings$benchmark$matched_uncorr_corr_max
 ]
 
 print("Making t>2 & uncorrelated event time returns")
@@ -282,10 +282,10 @@ matched_panel <- ret_for_plot0 %>%
 
 matched_metadata <- list(
   specification = list(
-    tstat_relative_tolerance = globalSettings$matched_uncorr_t_reltol,
-    mean_return_relative_tolerance = globalSettings$matched_uncorr_r_reltol,
-    minimum_insample_months = globalSettings$match_nmonth_min,
-    maximum_pairwise_correlation = globalSettings$matched_uncorr_corr_max,
+    tstat_relative_tolerance = globalSettings$benchmark$matched_uncorr_t_reltol,
+    mean_return_relative_tolerance = globalSettings$benchmark$matched_uncorr_r_reltol,
+    minimum_insample_months = globalSettings$benchmark$match_nmonth_min,
+    maximum_pairwise_correlation = globalSettings$benchmark$matched_uncorr_corr_max,
     normalization = "each matched strategy by its own in-sample mean"
   ),
   pair_count = nrow(matched_uncorr_pairs),
@@ -391,11 +391,11 @@ accounting_t2_uncorr_benchmark <- ret_for_plot0 %>%
 
 accounting_t2_uncorr_metadata <- list(
   specification = list(
-    oriented_raw_t_threshold = globalSettings$t_min,
-    minimum_stocks_per_leg = globalSettings$minNumStocks / 2,
+    oriented_raw_t_threshold = globalSettings$benchmark$t_min,
+    minimum_stocks_per_leg = globalSettings$benchmark$minNumStocks / 2,
     minimum_insample_months = 60L,
     required_final_year_months = 12L,
-    maximum_pairwise_correlation = globalSettings$matched_uncorr_corr_max,
+    maximum_pairwise_correlation = globalSettings$benchmark$matched_uncorr_corr_max,
     normalization = "100 times return divided by the strategy in-sample mean"
   ),
   pair_count = nrow(accounting_t2_uncorr_matched),

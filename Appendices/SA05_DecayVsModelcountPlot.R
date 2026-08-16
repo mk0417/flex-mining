@@ -2,8 +2,8 @@
 source('0_Environment.R')
 source("helpers/stats.R")
 
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 czsum <- readRDS("../Data/Processed/czsum_allpredictors.RDS") %>% 
   filter(Keep) %>% 

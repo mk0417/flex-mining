@@ -41,8 +41,8 @@ stopifnot(identical(
 ))
 
 incl_signals <- restrictInclSignals(
-  restrictType = globalSettings$restrictType,
-  topT = globalSettings$topT
+  restrictType = globalSettings$inclusion$restrictType,
+  topT = globalSettings$inclusion$topT
 )
 mappings <- load_signal_mappings(
   "DataInput/SignalsTheoryChecked.csv", incl_signals

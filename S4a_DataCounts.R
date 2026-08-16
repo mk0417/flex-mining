@@ -5,8 +5,8 @@
 
 source('0_Environment.R')
 
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 czsum = readRDS('../Data/Processed/czsum_allpredictors.RDS') %>% 
   select(signalname,rbar,nobs_postsamp,rbar_ok,n_ok,Keep) %>% 
@@ -35,7 +35,7 @@ czcat = fread('DataInput/SignalsTheoryChecked.csv') %>%
 ## for main paper: Risk/Mispricing and Model counts 
 
 ### Top 3 finance
-finlist = globalSettings$top3Finance
+finlist = globalSettings$journals$top3Finance
 tab_risk_or_mispricingTop3 = czsum %>% 
   filter(rbar_ok, n_ok, main_signal == 'main') %>% 
   left_join(czcat, by = 'signalname') %>% 
@@ -48,7 +48,7 @@ tab_risk_or_mispricingTop3 = czsum %>%
   arrange(desc(theory))
 
 ### Top 3 accounting
-acctlist = globalSettings$top3Accounting
+acctlist = globalSettings$journals$top3Accounting
 tab_risk_or_mispricingTop3acct = czsum %>% 
   filter(rbar_ok, n_ok, main_signal == 'main') %>% 
   left_join(czcat, by = 'signalname') %>% 
@@ -65,8 +65,8 @@ tab_risk_or_mispricingJournal = czsum %>%
   filter(rbar_ok, n_ok, main_signal == 'main') %>% 
   left_join(czcat, by = 'signalname') %>% 
   mutate(JournalCat = case_when(
-    Journal %in% globalSettings$finlistAll  ~ 'Finance',
-    Journal %in% globalSettings$acctlistAll ~ 'Accounting',
+    Journal %in% globalSettings$journals$finlistAll  ~ 'Finance',
+    Journal %in% globalSettings$journals$acctlistAll ~ 'Accounting',
     TRUE                     ~ 'Other')) %>%
   group_by(JournalCat, theory) %>%
   count() %>% 
@@ -122,8 +122,8 @@ tab_modeltypeJournal = czsum %>%
   filter(rbar_ok, n_ok, main_signal == 'main') %>% 
   left_join(czcat, by = 'signalname') %>% 
   mutate(JournalCat = case_when(
-    Journal %in% globalSettings$finlistAll  ~ 'Finance',
-    Journal %in% globalSettings$acctlistAll ~ 'Accounting',
+    Journal %in% globalSettings$journals$finlistAll  ~ 'Finance',
+    Journal %in% globalSettings$journals$acctlistAll ~ 'Accounting',
     TRUE                     ~ 'Other')) %>%
   group_by(JournalCat, modeltype) %>%
   count() %>% 
@@ -242,7 +242,7 @@ n1 <- length(compnames$yz.numer)
 n2 <- length(compnames$yz.denom)
 
 dmdat = readRDS(paste0('../Data/Processed/',
-                       globalSettings$dataVersion, 
+                       globalSettings$universe$dataVersion, 
                        ' LongShort.RData'))
 
 

@@ -14,8 +14,8 @@ global_xh = 300   # x-axis upper bound
 # Import and Clean Matched Data ------------------------------------------------------
 
 # CZ data
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 czcat = fread('DataInput/SignalsTheoryChecked.csv') %>% 
   select(signalname, theory) %>% 
@@ -36,7 +36,7 @@ czret = readRDS('../Data/Processed/czret_keeponly.RDS') %>%
 
 # Materialize only the matched pair-month returns required by this appendix.
 DMname <- paste0(
-  "../Data/Processed/", globalSettings$dataVersion, " LongShort.RData"
+  "../Data/Processed/", globalSettings$universe$dataVersion, " LongShort.RData"
 )
 pairCatalog <- select_matched_dm_pairs(
   readRDS("../Data/Processed/dmcomp_sumstats.RDS")$insampsum,

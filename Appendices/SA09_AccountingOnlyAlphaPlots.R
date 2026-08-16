@@ -19,8 +19,8 @@ if (!identical(factor_benchmarks$metadata$schema_version, 2L)) {
 }
 
 incl_signals <- restrictInclSignals(
-  restrictType = globalSettings$restrictType,
-  topT = globalSettings$topT
+  restrictType = globalSettings$inclusion$restrictType,
+  topT = globalSettings$inclusion$topT
 )
 accounting_signals <- readRDS("../Data/Processed/czsum_allpredictors.RDS") %>%
   left_join(

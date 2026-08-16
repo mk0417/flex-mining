@@ -14,17 +14,17 @@ source("helpers/stats.R")
 library(doParallel)
 
 # settings
-ncores <- globalSettings$num_cores
-minShareTG2 = globalSettings$minShareTG2
-TG2Set = globalSettings$TG2Set
+ncores <- globalSettings$compute$num_cores
+minShareTG2 = globalSettings$evaluation$minShareTG2
+TG2Set = globalSettings$evaluation$TG2Set
 
 DMname = paste0('../Data/Processed/',
-                globalSettings$dataVersion, 
+                globalSettings$universe$dataVersion, 
                 ' LongShort.RData')
 
 dmcomp <- list()
 dmcomp$name <- paste0('../Data/Processed/',
-                      globalSettings$dataVersion, 
+                      globalSettings$universe$dataVersion, 
                       ' LongShort.RData')
 
 

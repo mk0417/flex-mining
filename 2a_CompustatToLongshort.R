@@ -394,38 +394,38 @@ user = list()
 # user$name = Sys.time() %>% substr(1,17) 
 # substr(user$name, 17,17) = 'm'
 # substr(user$name, 14,14) = 'h'
-user$name = globalSettings$dataVersion
+user$name = globalSettings$universe$dataVersion
 
 # signal choices
 user$signal = list(
-  signalnum = globalSettings$signalnum
-  , form    = globalSettings$form
-  , denom_min_fobs = globalSettings$denom_min_fobs
+  signalnum = globalSettings$inclusion$signalnum
+  , form    = globalSettings$universe$form
+  , denom_min_fobs = globalSettings$universe$denom_min_fobs
 )
 
 # portfolio choices
 user$port = list(
-  longshort_form = globalSettings$longshort_form
-  , portnum = globalSettings$portnum
-  , sweight = globalSettings$sweight 
-  , trim    = globalSettings$trim
+  longshort_form = globalSettings$universe$longshort_form
+  , portnum = globalSettings$universe$portnum
+  , sweight = globalSettings$universe$sweight 
+  , trim    = globalSettings$universe$trim
 )
 
 # data basic choices
 user$data = list(
-  backfill_dropyears = globalSettings$backfill_dropyears
-  , reup_months     = globalSettings$reup_months
-  , data_avail_lag  = globalSettings$data_avail_lag
-  , toostale_months = globalSettings$toostale_months   
-  , delist_adj      = globalSettings$delist_adj
-  , crsp_filter     = globalSettings$crsp_filter 
+  backfill_dropyears = globalSettings$universe$backfill_dropyears
+  , reup_months     = globalSettings$universe$reup_months
+  , data_avail_lag  = globalSettings$universe$data_avail_lag
+  , toostale_months = globalSettings$universe$toostale_months   
+  , delist_adj      = globalSettings$universe$delist_adj
+  , crsp_filter     = globalSettings$universe$crsp_filter 
 )
 
 # debugging
 debugset = list(
-  prep_data   = globalSettings$prep_data
-  , num_cores = globalSettings$num_cores
-  , shortlist = globalSettings$shortlist
+  prep_data   = globalSettings$compute$prep_data
+  , num_cores = globalSettings$compute$num_cores
+  , shortlist = globalSettings$compute$shortlist
 )
 
 ## prep varlist ------------------------------------------------------------
@@ -496,7 +496,7 @@ print(n1 * n2 + (n1-n2)*n2 + choose(n2,2))
 print(n1)
 print(n2)
 print(user$name) 
-if (globalSettings$interactive_mode) {
+if (globalSettings$compute$interactive_mode) {
   keyin = readline('type q to abort')
   if (keyin == 'q') stop('stopping')
 }

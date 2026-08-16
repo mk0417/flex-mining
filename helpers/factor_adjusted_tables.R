@@ -614,13 +614,13 @@ load_signal_mappings <- function(signals_checked_csv, incl_signals) {
       # Discipline uses the complete accounting-journal list. Journal rank is
       # deliberately narrower and continues to use the top-three lists below.
       discipline = case_when(
-        Journal %in% globalSettings$acctlistAll ~ "Accounting",
+        Journal %in% globalSettings$journals$acctlistAll ~ "Accounting",
         Journal %in% c("QJE", "JPE") ~ "Economics",
         TRUE ~ "Finance"
       ),
       journal_rank = case_when(
-        Journal %in% globalSettings$top3Finance ~ "JF, JFE, RFS",
-        Journal %in% globalSettings$top3Accounting ~ "AR, JAR, JAE",
+        Journal %in% globalSettings$journals$top3Finance ~ "JF, JFE, RFS",
+        Journal %in% globalSettings$journals$top3Accounting ~ "AR, JAR, JAE",
         Journal %in% c("QJE", "JPE") ~ "Economics",
         TRUE ~ "Other"
       )

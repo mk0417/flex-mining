@@ -1,8 +1,8 @@
 # Appendix exhibit: decay-versus-journal plots.
 source('0_Environment.R')
 
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 czcat = fread('DataInput/SignalsTheoryChecked.csv') %>% 
   select(signalname, Year, Journal, theory, NoModel, Stylized, Dynamic, Quantitative) 
@@ -10,9 +10,9 @@ czcat = fread('DataInput/SignalsTheoryChecked.csv') %>%
 czcat %>% select(Journal) %>% distinct()
 
 # Use journal definitions from globalSettings
-top_finance = globalSettings$top3Finance
+top_finance = globalSettings$journals$top3Finance
 top_econ = c('QJE', 'JPE')  # Note: AER, Econometrica, REStud not in data
-top_accounting = globalSettings$top3Accounting
+top_accounting = globalSettings$journals$top3Accounting
 
 # Add journal type classifications
 czcat[, journaltype := case_when(

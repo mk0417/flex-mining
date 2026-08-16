@@ -11,8 +11,8 @@ library(doParallel)
 ## Load Global Data -------------------------------------------
 
 # these are treated as globals (don't modify pls)
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 czsum <- readRDS("../Data/Processed/czsum_allpredictors.RDS") %>%
   filter(Keep) %>% 
@@ -396,8 +396,8 @@ ggsave(paste0("../Results/Fig_DM_t_top5Pct_AccountingOnly_CalendarSE.pdf"), widt
 
 
 # Use journal definitions from globalSettings ------------------------
-top_finance = globalSettings$top3Finance
-top_accounting = globalSettings$top3Accounting
+top_finance = globalSettings$journals$top3Finance
+top_accounting = globalSettings$journals$top3Accounting
 
 # Add journal classifications to ret_for_plot0
 ret_for_plot_journal <- ret_for_plot0 %>%

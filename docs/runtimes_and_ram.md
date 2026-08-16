@@ -5,7 +5,8 @@ you can tell a slow stage from a hung one and size parallel work safely.
 
 The measured baseline below comes from a full end-to-end run of Chapters 2-9 on a
 24-core / 62 GB machine with **effectively no swap**, using
-`globalSettings$num_cores = 4` and `dataVersion = 'CZ-style-v8b'`. Total wall
+`globalSettings$compute$num_cores = 4` and
+`globalSettings$universe$dataVersion = 'CZ-style-v8b'`. Total wall
 time is **~6h 14m**. Runtimes come from output-file mtimes and a stage monitor;
 treat sub-minute figures as approximate. Chapter 1 re-pulls external data and is
 run only when refreshing the vintage, so it is not part of these figures. Later
@@ -106,7 +107,7 @@ sequentially (`%do%`), so it is not parallel.
 
 ### Sizing parallelism
 
-Parallel work uses `globalSettings$num_cores`, currently 4. A conservative
+Parallel work uses `globalSettings$compute$num_cores`, currently 4. A conservative
 planning heuristic is to budget roughly 5 GB of RAM per worker and keep the total
 within available memory: for example, 4 workers on a machine with about 20 GB
 free. The default `num_cores = 4` follows this rule, and the observed

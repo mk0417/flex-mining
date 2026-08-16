@@ -112,8 +112,8 @@ extract_beta <- function(x, y) {
 
 czsum = readRDS('../Data/Processed/czsum_allpredictors.RDS')
 
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 czcat = fread('DataInput/SignalsTheoryChecked.csv') %>% 
   select(signalname, Year, theory) %>% 

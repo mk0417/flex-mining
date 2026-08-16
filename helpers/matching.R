@@ -56,10 +56,10 @@ restrictInclSignals = function(restrictType = NULL, topT = 2) {
 # function for computing DM strat sumstats in pub samples
 sumstats_for_DM_Strats <- function(
     DMname = paste0('../Data/Processed/',
-                    globalSettings$dataVersion, 
+                    globalSettings$universe$dataVersion, 
                     ' LongShort.RData'),
     nsampmax = Inf,
-    ncores = globalSettings$num_cores) {
+    ncores = globalSettings$compute$num_cores) {
   
   # convert czsum to data.table (this should be done more globally)
   setDT(czsum)
@@ -266,7 +266,7 @@ SelectDMStrats <- function(insampsum, settings) {
 # as the raw benchmark.
 select_accounting_t2_pairs <- function(
     insampsum,
-    min_num_stocks = globalSettings$minNumStocks,
+    min_num_stocks = globalSettings$benchmark$minNumStocks,
     t_threshold = 2,
     minimum_months = 60L,
     required_final_year_months = 12L,
@@ -324,11 +324,11 @@ accounting_t2_pair_fingerprint <- function(pairs) {
 # compact replacement for the pair keys formerly implicit in MatchPub.RData.
 select_matched_dm_pairs <- function(
     insampsum,
-    t_tol = globalSettings$t_tol,
-    r_tol = globalSettings$r_tol,
-    t_reltol = globalSettings$matched_uncorr_t_reltol,
-    r_reltol = globalSettings$matched_uncorr_r_reltol,
-    min_num_stocks = globalSettings$minNumStocks,
+    t_tol = globalSettings$benchmark$t_tol,
+    r_tol = globalSettings$benchmark$r_tol,
+    t_reltol = globalSettings$benchmark$matched_uncorr_t_reltol,
+    r_reltol = globalSettings$benchmark$matched_uncorr_r_reltol,
+    min_num_stocks = globalSettings$benchmark$minNumStocks,
     pubnames = NULL) {
   pairs <- data.table::copy(data.table::as.data.table(insampsum))
   required <- c(
@@ -428,8 +428,8 @@ build_matched_uncorr_pair_data <- function(
     insampsum,
     published_metadata,
     DMname,
-    minimum_insample_months = globalSettings$match_nmonth_min,
-    maximum_pairwise_correlation = globalSettings$matched_uncorr_corr_max) {
+    minimum_insample_months = globalSettings$benchmark$match_nmonth_min,
+    maximum_pairwise_correlation = globalSettings$benchmark$matched_uncorr_corr_max) {
   published_metadata <- data.table::copy(
     data.table::as.data.table(published_metadata)
   )
@@ -528,12 +528,12 @@ matched_pair_fingerprint <- function(pairs) {
 make_DM_event_returns <- function(
     match_strats,
     DMname = paste0('../Data/Processed/',
-                    globalSettings$dataVersion, 
+                    globalSettings$universe$dataVersion, 
                     ' LongShort.RData'),
     npubmax = Inf,
     czsum,
     use_sign_info = TRUE,
-    ncores = globalSettings$num_cores
+    ncores = globalSettings$compute$num_cores
 ) {
   # input: match_strats = summary stats for each selected pubname, dmname pair
   #     outname = name of RDS output
@@ -647,10 +647,10 @@ make_DM_event_returns <- function(
 
 adj_R2_with_PPCA <- function(
     DMname = paste0('../Data/Processed/',
-                    globalSettings$dataVersion, 
+                    globalSettings$universe$dataVersion, 
                     ' LongShort.RData'),
     nsampmax = Inf,
-    ncores = globalSettings$num_cores) {
+    ncores = globalSettings$compute$num_cores) {
   # convert czsum to data.table (this should be done more globally)
   setDT(czsum)
   

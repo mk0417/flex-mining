@@ -236,8 +236,8 @@ fig2_overlay_plot = function(agg, series_labels, colors, linetypes,
 }
 
 inclSignals = restrictInclSignals(
-  restrictType = globalSettings$restrictType,
-  topT = globalSettings$topT
+  restrictType = globalSettings$inclusion$restrictType,
+  topT = globalSettings$inclusion$topT
 )
 czcat = fread('DataInput/SignalsTheoryChecked.csv') %>%
   select(signalname, Year) %>%

@@ -10,8 +10,8 @@ source("0_Environment.R")
 library(kableExtra)
 
 ## Load CZ ----------------------------------------------------
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 # published
 czsum <- readRDS("../Data/Processed/czsum_allpredictors.RDS") %>%
@@ -31,12 +31,12 @@ czret <- readRDS("../Data/Processed/czret_keeponly.RDS") %>%
 ## User Settings ------------------------------------------------
 
 # define predictor
-pred_min_tabs = globalSettings$t_min # min abs(tstat)
-pred_top_n = globalSettings$t_rankpct_min  # min t-stat rank
+pred_min_tabs = globalSettings$benchmark$t_min # min abs(tstat)
+pred_top_n = globalSettings$benchmark$t_rankpct_min  # min t-stat rank
 
 # min data requirements
-nstock_min = globalSettings$minNumStocks/2
-nmonth_min = globalSettings$nmonth_min
+nstock_min = globalSettings$benchmark$minNumStocks/2
+nmonth_min = globalSettings$journals$nmonth_min
 
 # sample periods
 # Stattman publishes B/M in 1980, seems like a good place to start
@@ -71,7 +71,7 @@ pubselect = c('BM', 'Beta', 'DivYieldST', 'EP', 'Price') # stuff published befor
 # name of compustat LS file
 dmcomp <- list()
 dmcomp$name <- paste0('../Data/Processed/'
-  , globalSettings$dataVersion, ' LongShort.RData')
+  , globalSettings$universe$dataVersion, ' LongShort.RData')
 
 # Data load -----------------------------------------------------
 
@@ -81,7 +81,7 @@ tic0 = Sys.time()
 # read in DM strats (only used in this section)
 DMname <- paste0(
     "../Data/Processed/",
-    globalSettings$dataVersion,
+    globalSettings$universe$dataVersion,
     " LongShort.RData"
 )
 
