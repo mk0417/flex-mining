@@ -31,7 +31,8 @@ source('0_Environment.R')
 fig2_assemble_long = function(raw_benchmarks, factor_benchmarks, accounting_signals,
                               pre2003_signals) {
   required_raw <- c(
-    "published", "accounting_t2", "accounting_top5", "ticker_top5", "matched"
+    "published", "accounting_t2", "accounting_top5", "ticker_top5",
+    "matched", "accounting_t2_uncorr"
   )
   if (!all(required_raw %in% names(raw_benchmarks))) {
     stop("Raw benchmark contract is missing: ",
@@ -68,18 +69,21 @@ fig2_assemble_long = function(raw_benchmarks, factor_benchmarks, accounting_sign
                  "Pub, Pre-2003 Only", "DM, Pre-2003 Pubs")
   ) %>% mutate(panel = "b")
 
-  panel_c_wide <- raw_benchmarks$matched
+  # Two data-mined benchmarks, both excluding correlated ratios: the broad
+  # t>2 population and the additionally performance-matched subset.
+  panel_c_broad <- raw_benchmarks$accounting_t2_uncorr
+  panel_c_matched <- raw_benchmarks$matched
   panel_c <- bind_rows(
-    panel_c_wide %>% transmute(
+    panel_c_broad %>% transmute(
       label = "Published", pubname, eventDate, calendarDate,
       return = published_ret_scaled
     ),
-    panel_c_wide %>% transmute(
-      label = "Matched on t-stat and mean return", pubname, eventDate,
-      calendarDate, return = matched_ret_scaled
+    panel_c_broad %>% transmute(
+      label = "Data-Mined, Excluding Correlated", pubname, eventDate,
+      calendarDate, return = dm_ret_scaled
     ),
-    panel_c_wide %>% transmute(
-      label = "Matched and excluding correlated", pubname, eventDate,
+    panel_c_matched %>% transmute(
+      label = "DM, Excl. Corr, Matched Stats", pubname, eventDate,
       calendarDate, return = matched_uncorr_ret_scaled
     )
   ) %>% mutate(panel = "c")
@@ -323,10 +327,10 @@ panels = list(
     file = 'Fig2b_PubSampleLimits'
   ),
   c = list(
-    series = c('Published', 'Matched on t-stat and mean return',
-               'Matched and excluding correlated'),
+    series = c('Published', 'Data-Mined, Excluding Correlated',
+               'DM, Excl. Corr, Matched Stats'),
     colors = colors,
-    linetypes = c('solid', 'longdash', 'dashed'),
+    linetypes = c('solid', 'dashed', 'longdash'),
     yaxislab = ylaball,
     yl = -50, yh = 170, legendpos = c(40, 22) / 100,
     file = 'Fig2c_MatchedExclCorr'

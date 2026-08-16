@@ -134,6 +134,25 @@ accounting_t2_event_time <- make_DM_event_returns(
 stop_time <- Sys.time()
 print(stop_time - start_time)
 
+## t>2 & uncorrelated benchmark (learning section) ------------------------
+# Broad significant benchmark that additionally drops mined ratios correlated
+# with the published signal (correlation oriented by the ratio's in-sample
+# sign). Fig 2c and the Section 3 MP-style tables use this in place of the
+# magnitude-matched twin, so the comparison represents the full population of
+# significant, non-redundant mined strategies rather than a handful of
+# look-alikes.
+accounting_t2_uncorr_matched <- accounting_t2_matched[
+  !is.na(cor) & cor * sign(rbar) <= globalSettings$matched_uncorr_corr_max
+]
+
+print("Making t>2 & uncorrelated event time returns")
+start_time <- Sys.time()
+accounting_t2_uncorr_event_time <- make_DM_event_returns(
+  DMname = dmcomp$name, match_strats = accounting_t2_uncorr_matched,
+  npubmax = npubmax, czsum = czsum, use_sign_info = use_sign_info
+)
+print(Sys.time() - start_time)
+
 rm(accounting_t2_matched)
 
 ret_for_plot0 = czret %>%
@@ -344,12 +363,58 @@ ticker_top5_benchmark <- ticker_top5_event_time %>%
   ) %>%
   select(pubname, eventDate, calendarDate, return, n_matches_available)
 
+accounting_t2_uncorr_benchmark <- ret_for_plot0 %>%
+  transmute(
+    pubname, eventDate, calendarDate,
+    published_ret_scaled = ret,
+    published_ret_unscaled = ret_unscaled
+  ) %>%
+  inner_join(
+    accounting_t2_uncorr_event_time %>%
+      transmute(
+        pubname, eventDate,
+        dm_ret_scaled = dm_mean,
+        dm_ret_unscaled = dm_mean_unscaled,
+        n_available = dm_n
+      ),
+    by = c("pubname", "eventDate")
+  ) %>%
+  left_join(
+    czsum %>% as_tibble() %>%
+      transmute(pubname = signalname, sampstart, sampend),
+    by = "pubname"
+  ) %>%
+  left_join(
+    czret %>% distinct(pubname = signalname, pubdate),
+    by = "pubname"
+  )
+
+accounting_t2_uncorr_metadata <- list(
+  specification = list(
+    oriented_raw_t_threshold = globalSettings$t_min,
+    minimum_stocks_per_leg = globalSettings$minNumStocks / 2,
+    minimum_insample_months = 60L,
+    required_final_year_months = 12L,
+    maximum_pairwise_correlation = globalSettings$matched_uncorr_corr_max,
+    normalization = "100 times return divided by the strategy in-sample mean"
+  ),
+  pair_count = nrow(accounting_t2_uncorr_matched),
+  predictor_count = dplyr::n_distinct(accounting_t2_uncorr_benchmark$pubname),
+  panel_observation_count = nrow(accounting_t2_uncorr_benchmark),
+  pair_fingerprint_sha256 = accounting_t2_pair_fingerprint(
+    accounting_t2_uncorr_matched
+  )
+)
+
+rm(accounting_t2_uncorr_matched, accounting_t2_uncorr_event_time)
+
 raw_dm_benchmarks <- list(
   published = published_benchmark,
   accounting_t2 = accounting_t2_benchmark,
   accounting_top5 = accounting_top5_benchmark,
   ticker_top5 = ticker_top5_benchmark,
   matched = matched_panel,
+  accounting_t2_uncorr = accounting_t2_uncorr_benchmark,
   metadata = list(
     schema_version = 1L,
     normalization = "100 times return divided by the strategy in-sample mean",
@@ -361,6 +426,7 @@ raw_dm_benchmarks <- list(
       ticker = dmtic$name
     ),
     matched = matched_metadata,
+    accounting_t2_uncorr = accounting_t2_uncorr_metadata,
     source_files = c(
       "../Data/Processed/czsum_allpredictors.RDS",
       "../Data/Processed/czret_keeponly.RDS",
@@ -373,7 +439,8 @@ stopifnot(
   !anyDuplicated(as.data.frame(published_benchmark)[c("pubname", "eventDate")]),
   !anyDuplicated(as.data.frame(accounting_t2_benchmark)[c("pubname", "eventDate")]),
   !anyDuplicated(as.data.frame(accounting_top5_benchmark)[c("pubname", "eventDate")]),
-  !anyDuplicated(as.data.frame(ticker_top5_benchmark)[c("pubname", "eventDate")])
+  !anyDuplicated(as.data.frame(ticker_top5_benchmark)[c("pubname", "eventDate")]),
+  !anyDuplicated(as.data.frame(accounting_t2_uncorr_benchmark)[c("pubname", "eventDate")])
 )
 
 rm(ticker_top5_event_time, ticker_top5_matched)
