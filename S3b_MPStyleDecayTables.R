@@ -119,28 +119,32 @@ write_combined_mp_tables <- function(panel_a, panel_b, n_signals_a, n_signals_b,
   )
 }
 
-# An override permits render-only validation without touching ../Results.
-output_dir <- Sys.getenv("MP_TABLE_OUTPUT_DIR", unset = "../Results")
-dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+# Sourcing with MP_TABLE_FUNCTIONS_ONLY=true exposes the renderer to appendix
+# variants without rewriting the main-text tables.
+if (!identical(Sys.getenv("MP_TABLE_FUNCTIONS_ONLY"), "true")) {
+  # An override permits render-only validation without touching ../Results.
+  output_dir <- Sys.getenv("MP_TABLE_OUTPUT_DIR", unset = "../Results")
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
-cache_path <- "../Data/Processed/mp_style_decay_models.RDS"
-if (!file.exists(cache_path)) {
-  stop("Missing MP-style model cache: ", cache_path, ". Run S3a_MPStyleDecayModels.R first.")
+  cache_path <- "../Data/Processed/mp_style_decay_models.RDS"
+  if (!file.exists(cache_path)) {
+    stop("Missing MP-style model cache: ", cache_path, ". Run S3a_MPStyleDecayModels.R first.")
+  }
+  models <- readRDS(cache_path)
+  stopifnot(
+    !is.null(models$metadata$panel_a$pair_fingerprint_sha256),
+    !is.null(models$metadata$panel_b$pair_fingerprint_sha256),
+    length(models$panel_a) == 6L,
+    length(models$panel_b) == 6L
+  )
+
+  # Manuscript Tables 3 and 4: the two benchmark panels side by side, without
+  # and with time fixed effects.
+  write_combined_mp_tables(
+    models$panel_a,
+    models$panel_b,
+    n_signals_a = models$metadata$panel_a$predictor_count,
+    n_signals_b = models$metadata$panel_b$predictor_count,
+    output_dir = output_dir
+  )
 }
-models <- readRDS(cache_path)
-stopifnot(
-  !is.null(models$metadata$panel_a$pair_fingerprint_sha256),
-  !is.null(models$metadata$panel_b$pair_fingerprint_sha256),
-  length(models$panel_a) == 6L,
-  length(models$panel_b) == 6L
-)
-
-# Manuscript Tables 3 and 4: the two benchmark panels side by side, without and
-# with time fixed effects.
-write_combined_mp_tables(
-  models$panel_a,
-  models$panel_b,
-  n_signals_a = models$metadata$panel_a$predictor_count,
-  n_signals_b = models$metadata$panel_b$predictor_count,
-  output_dir = output_dir
-)
