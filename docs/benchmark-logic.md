@@ -73,13 +73,7 @@ than the core benchmark hierarchy above.
    |t|, without an additional |t| > 2 requirement.
 - **D2. Top 5% ticker:** top 5% of ticker-mined strategies by raw in-sample
    |t|, without an additional |t| > 2 requirement.
-- **D3. Full-sample factor adjustment:** begin with A1, estimate one set of
-   factor loadings from the published sample start through the end of the data,
-   and apply the same raw-return and alpha-t screens as B1 and C1. The appendix
-   uses CAPM and FF3.
-- **D4. Tighter matched-return screen:** begin with A4 and additionally
-   require the absolute difference in in-sample mean returns to be <= 0.10.
-- **D5. Spanning splits:** begin with A1; classify ratios as spanned using
+- **D3. Spanning splits:** begin with A1; classify ratios as spanned using
    either signed correlation > 0.50 or principal-components adjusted R2 > 0.25
    (with more than 30 PCA observations); and divide unspanned ratios by whether
    their raw |t| exceeds the published strategy's t-statistic.
@@ -136,22 +130,10 @@ scripts implement the following benchmarks:
 - **D2. Top 5% ticker.** Defined using `SelectDMStrats()`; saved as
    `raw_dm_benchmarks.RDS$ticker_top5`.
     - Figure 2(d): top-5% ticker-mining series.
-- **D3. Full-sample factor adjustment.** Defined from A1 with full-sample
-   loadings and the alpha-t screen; saved as
-   `appendix_full_sample_dm_benchmarks.RDS$capm` and
-   `appendix_full_sample_dm_benchmarks.RDS$ff3`.
-    - Figure IA.1(a)--(b): full-sample CAPM- and FF3-alpha series.
-    - Table IA.6: factor adjustment by theory.
-    - Table IA.7: factor adjustment by discipline and journal.
-    - Table IA.11: factor adjustment by model use.
-- **D4. Tighter matched-return screen.** Defined in
-    `SA10_ResearchVsDMRobustnessCorrelationsEtc.R` from A4 plus the absolute
-    mean-return screen.
-    - Figure B.4(a)--(d): tighter matches overall and by theory category.
-- **D5. Spanning splits.** Defined in `SA11_DMSpanPCAPrep.R`; saved as
+- **D3. Spanning splits.** Defined in `SA11_DMSpanPCAPrep.R`; saved as
     `dm_span_analysis.RDS`.
-    - Figure B.5(a): principal-component spanning splits.
-    - Figure B.5(b): correlation spanning splits.
+    - Figure B.4(a): principal-component spanning splits.
+    - Figure B.4(b): correlation spanning splits.
 - **Other main-text panels.** These do not instantiate one of the benchmark
   screens above.
     - Table 1(a): mined-universe return summary.

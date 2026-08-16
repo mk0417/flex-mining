@@ -1,7 +1,6 @@
 # Shared inference and table helpers for factor-adjusted exhibits.
 #
-# How to run: source after 0_Environment.R from the Section 4 or SA07
-#   renderer.
+# How to run: source after 0_Environment.R from the Section 4 renderer.
 # Inputs: prepared published/DM panels, group mappings, and summary objects
 #   supplied to the functions below.
 # Outputs: in-memory clustered estimates and formatted tables; export and
@@ -354,33 +353,6 @@ build_tv_summary_table <- function(categories, groups, summaries, digits = 0) {
   return(result_df)
 }
 
-build_full_sample_summary_table <- function(categories, groups, summaries,
-                                            digits = 0) {
-  result_df <- data.frame(
-    Category = categories,
-    Group = groups,
-    stringsAsFactors = FALSE
-  )
-  metric_specs <- list(
-    Raw_Return = c("raw_pub_oos", "raw_pub_oos_se"),
-    Raw_Outperformance = c("raw_outperform", "raw_outperform_se"),
-    CAPM_Return = c("capm_fs_pub_oos", "capm_fs_pub_oos_se"),
-    CAPM_Outperformance = c("capm_fs_outperform", "capm_fs_outperform_se"),
-    FF3_Return = c("ff3_fs_pub_oos", "ff3_fs_pub_oos_se"),
-    FF3_Outperformance = c("ff3_fs_outperform", "ff3_fs_outperform_se")
-  )
-  for (column in names(metric_specs)) {
-    fields <- metric_specs[[column]]
-    result_df[[column]] <- vapply(
-      summaries,
-      function(summary) {
-        format_value_se(summary[[fields[1]]], summary[[fields[2]]], digits, FALSE)
-      },
-      character(1)
-    )
-  }
-  result_df
-}
 # Write the phase-one paper-source contract: a review CSV and a LaTeX tabular
 # fragment. Captions, labels, notes, and the table float belong to the writing
 # repository, so only the tabular environment is retained here.
@@ -403,16 +375,11 @@ export_audit_tabular <- function(table_data, base_filename, group_headers) {
   invisible(c(csv = csv_file, tex = tex_file))
 }
 
-# Render the paper-facing versions of Tables 6, 7, and IA.10. These functions
+# Render the paper-facing versions of Tables 6, 7, and IA.8. These functions
 # take the unrounded summary lists rather than the formatted audit data frames,
 # so the paper and audit outputs share estimands but own separate presentation.
-paper_summary_cells <- function(summary, adjustment = c("time_varying", "full_sample")) {
-  adjustment <- match.arg(adjustment)
-  adjusted_metrics <- if (adjustment == "time_varying") {
-    c("capm_tv", "ff4_tv")
-  } else {
-    c("capm_fs", "ff3_fs")
-  }
+paper_summary_cells <- function(summary) {
+  adjusted_metrics <- c("capm_tv", "ff4_tv")
   metric_names <- c(
     "raw_pub_oos", "raw_outperform",
     paste0(adjusted_metrics[1], c("_pub_oos", "_outperform")),
@@ -456,9 +423,8 @@ paper_table_header <- function(main_paper = TRUE, third_adjustment = "FF4",
   }
 }
 
-paper_standard_row <- function(label, summary, bold = FALSE,
-                               adjustment = "time_varying") {
-  cells <- paper_summary_cells(summary, adjustment)
+paper_standard_row <- function(label, summary, bold = FALSE) {
+  cells <- paper_summary_cells(summary)
   shown_label <- if (bold) paste0("\\textbf{", label, "}") else label
   c(
     paste0("   ", shown_label, " & ", paste(cells$values, collapse = " & "), " \\\\"),
@@ -521,69 +487,6 @@ write_paper_anymodel_tabular <- function(anymodel, file) {
   writeLines(lines, file)
   invisible(file)
 }
-
-write_paper_fullsample_theory_model_tabular <- function(theory, model, overall, file) {
-  row <- function(label, summary) {
-    paper_standard_row(label, summary, adjustment = "full_sample")
-  }
-  lines <- c(
-    paper_table_header(FALSE, third_adjustment = "FF3"),
-    "   \\multicolumn{7}{l}{\\textbf{Theoretical Explanation}} \\\\",
-    row("Risk", theory[["Risk"]]),
-    row("Mispricing", theory[["Mispricing"]]),
-    row("Agnostic", theory[["Agnostic"]]),
-    "   \\addlinespace",
-    "   \\multicolumn{7}{l}{\\textbf{Modeling Formalism}} \\\\",
-    row("No Model", model[["No Model"]]),
-    row("Stylized", model[["Stylized"]]),
-    row("Dynamic or Quantitative", model[["Dynamic or Quantitative"]]),
-    "   \\addlinespace",
-    "   \\multicolumn{7}{l}{\\textbf{Overall}} \\\\",
-    row("All", overall),
-    "   \\bottomrule",
-    "\\end{tabular}"
-  )
-  writeLines(lines, file)
-  invisible(file)
-}
-
-write_paper_fullsample_discipline_journal_tabular <- function(discipline, journal, file) {
-  row <- function(label, summary) {
-    paper_standard_row(label, summary, adjustment = "full_sample")
-  }
-  lines <- c(
-    paper_table_header(FALSE, third_adjustment = "FF3"),
-    "   \\multicolumn{7}{l}{\\textbf{Discipline}} \\\\",
-    row("Finance", discipline[["Finance"]]),
-    row("Accounting", discipline[["Accounting"]]),
-    "   \\addlinespace",
-    "   \\multicolumn{7}{l}{\\textbf{Journal Rank}} \\\\",
-    row("JF, JFE, RFS", journal[["JF, JFE, RFS"]]),
-    row("AR, JAR, JAE", journal[["AR, JAR, JAE"]]),
-    row("Other", journal[["Other"]]),
-    "   \\bottomrule",
-    "\\end{tabular}"
-  )
-  writeLines(lines, file)
-  invisible(file)
-}
-
-write_paper_fullsample_anymodel_tabular <- function(anymodel, file) {
-  lines <- c(
-    paper_table_header(FALSE, third_adjustment = "FF3"),
-    paper_standard_row(
-      "No Model", anymodel[["No Model"]], adjustment = "full_sample"
-    ),
-    paper_standard_row(
-      "Any Model", anymodel[["Any Model"]], adjustment = "full_sample"
-    ),
-    "   \\bottomrule",
-    "\\end{tabular}"
-  )
-  writeLines(lines, file)
-  invisible(file)
-}
-
 compute_overall_summary <- function(plot_data, ret_col, dm_col) {
   result <- summarize_outperformance_group(
     plot_data, ret_col, dm_col, "group=Overall"

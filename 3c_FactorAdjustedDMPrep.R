@@ -1,4 +1,4 @@
-# Prepare the main and appendix factor-adjusted DM benchmarks.
+# Prepare the sample-specific factor-adjusted DM benchmarks.
 #
 # How to run: normally run through 3_Precompute.R after
 #   3a_PrepDMBenchmarks.R. For validation, set FACTOR_DM_OUT_DIR to a temporary
@@ -6,11 +6,10 @@
 # Inputs:  dmcomp_sumstats.RDS, raw_dm_benchmarks.RDS, the versioned mined
 #          long-short universe, cleaned published returns, and FF factors
 # Outputs: factor_adjusted_dm_benchmarks.RDS
-#          appendix_full_sample_dm_benchmarks.RDS
 #
-# Sample-specific CAPM/FF4 and full-sample CAPM/FF3 begin from the exact broad
-# accounting |t| > 2 pair universe used by the raw benchmark; no published
-# mean-return or t-stat matching is applied.
+# Sample-specific CAPM/FF4 begins from the exact broad accounting |t| > 2 pair
+# universe used by the raw benchmark; no published mean-return or t-stat
+# matching is applied.
 
 rm(list = ls())
 source("0_Environment.R")
@@ -20,15 +19,6 @@ extract_beta <- function(ret, mktrf, minimum_observations = 60L) {
   observed <- stats::complete.cases(ret, mktrf)
   if (sum(observed) < minimum_observations) return(NA_real_)
   unname(stats::coef(stats::lm(ret[observed] ~ mktrf[observed]))[2L])
-}
-
-extract_ff3_coeffs <- function(
-    ret, mktrf, smb, hml, minimum_observations = 60L) {
-  observed <- stats::complete.cases(ret, mktrf, smb, hml)
-  if (sum(observed) < minimum_observations) return(rep(NA_real_, 3L))
-  unname(stats::coef(stats::lm(
-    ret[observed] ~ mktrf[observed] + smb[observed] + hml[observed]
-  ))[2:4])
 }
 
 extract_ff4_coeffs <- function(
@@ -335,105 +325,6 @@ build_broad_factor_adjusted_dm <- function(
   )
 }
 
-fit_dm_window_full_sample_models <- function(
-    return_store, factor_data, window_pairs,
-    minimum_observations = 60L, alpha_threshold = 2) {
-  window_pairs <- unique(data.table::as.data.table(window_pairs), by = c(
-    "sweight", "dmname"
-  ))
-  data.table::setorder(window_pairs, sweight, dmname)
-  key_lookup <- return_store$keys[window_pairs, on = c("sweight", "dmname")]
-  y <- return_store$returns[, key_lookup$column, drop = FALSE]
-  y <- sweep(y, 2L, window_pairs$orientation, "*")
-  dates <- return_store$dates
-  start <- as.numeric(window_pairs$sampstart[1L])
-  end <- as.numeric(window_pairs$sampend[1L])
-  original_rows <- dates >= start & dates <= end
-  full_rows <- dates >= start
-  factor_rows <- match(dates, as.numeric(factor_data$date))
-  factor_matrix <- as.matrix(factor_data[factor_rows, .(mktrf, smb, hml, umd)])
-  model_factors <- list(capm = "mktrf", ff3 = c("mktrf", "smb", "hml"))
-  panels <- list()
-  stats <- data.table::copy(window_pairs[, .(
-    sampstart, sampend, sweight, dmname, raw_mean = rbar,
-    raw_t = tstat, orientation
-  )])
-  for (model in names(model_factors)) {
-    f <- factor_matrix[, model_factors[[model]], drop = FALSE]
-    fit <- factor_model_slopes(
-      y[full_rows, , drop = FALSE], f[full_rows, , drop = FALSE],
-      minimum_observations
-    )
-    abnormal_original <- factor_abnormal_returns(
-      y[original_rows, , drop = FALSE],
-      f[original_rows, , drop = FALSE], fit$slopes
-    )
-    alpha <- factor_alpha_stats(abnormal_original)
-    stats[, paste0(model, c("_alpha_mean", "_alpha_sd", "_alpha_n", "_alpha_t")) :=
-      alpha]
-    stats[, paste0(model, "_eligible") :=
-      !is.na(alpha$alpha_t) & alpha$alpha_t > alpha_threshold]
-    panel <- aggregate_normalized_abnormal(
-      y, f, fit$slopes, fit$slopes,
-      full_rows, rep(FALSE, length(full_rows)),
-      alpha, alpha_threshold
-    )
-    panel[, `:=`(
-      calendarDate = dates,
-      eventDate = as.integer(round(12 * (dates - end)))
-    )]
-    panels[[model]] <- panel[, .(
-      eventDate, calendarDate, dm_return,
-      n_eligible_pairs, n_pairs_available
-    )]
-  }
-  list(panels = panels, stats = stats)
-}
-
-build_broad_full_sample_factor_adjusted_dm <- function(
-    selected_pairs, return_store, factors, minimum_observations = 60L,
-    alpha_threshold = 2L, progress = TRUE) {
-  pairs <- data.table::copy(data.table::as.data.table(selected_pairs))
-  pairs[, sweight := tolower(sweight)]
-  candidates <- unique(pairs[, .(
-    sampstart, sampend, sweight, dmname, rbar, tstat, orientation
-  )])
-  windows <- unique(pairs[, .(sampstart, sampend)])
-  data.table::setorder(windows, sampend, sampstart)
-  factors <- data.table::as.data.table(factors)
-  panels <- list(capm = vector("list", nrow(windows)),
-                 ff3 = vector("list", nrow(windows)))
-  window_stats <- vector("list", nrow(windows))
-  for (i in seq_len(nrow(windows))) {
-    start <- windows$sampstart[i]
-    end <- windows$sampend[i]
-    if (progress) {
-      message("Full-sample factor window ", i, "/", nrow(windows),
-              " (", start, " to ", end, ")")
-    }
-    fitted <- fit_dm_window_full_sample_models(
-      return_store, factors,
-      candidates[sampstart == start & sampend == end],
-      minimum_observations, alpha_threshold
-    )
-    publications <- unique(pairs[
-      sampstart == start & sampend == end, .(pubname)
-    ])
-    for (model in names(panels)) {
-      panels[[model]][[i]] <- cross_join_publications(
-        publications, fitted$panels[[model]]
-      )
-    }
-    window_stats[[i]] <- fitted$stats
-    rm(fitted)
-    gc(FALSE)
-  }
-  list(
-    panels = lapply(panels, data.table::rbindlist, use.names = TRUE),
-    window_stats = data.table::rbindlist(window_stats, use.names = TRUE)
-  )
-}
-
 # Pipeline setup ----------------------------------------------------------
 
 out_dir <- Sys.getenv("FACTOR_DM_OUT_DIR", unset = "../Data/Processed")
@@ -702,151 +593,4 @@ stopifnot(
 )
 saveRDS(result, cache_path)
 message("Wrote ", cache_path)
-
-# Appendix full-sample specification --------------------------------------
-
-# The appendix CAPM/FF3 specification shares the same selected strategies,
-# factor panel, and dense return matrix. It differs only in estimating one
-# coefficient vector from the published sample start through the end of data.
-rm(
-  dm_result, result, capm, ff4, published_stats, window_diagnostics,
-  model_pair_counts, build_model_contract
-)
-invisible(gc())
-
-raw_stats <- copy(published_raw)
-capm_fs <- czret[date >= sampstart, .(
-  beta_capm_fs = extract_beta(ret, mktrf)
-), by = signalname]
-czret <- merge(czret, capm_fs, by = "signalname", all.x = TRUE)
-czret[, abnormal_capm_fs := fifelse(
-  date >= sampstart, ret - beta_capm_fs * mktrf, NA_real_
-)]
-capm_fs_alpha <- czret[date >= sampstart & date <= sampend, .(
-  abar_capm_fs = mean(abnormal_capm_fs, na.rm = TRUE),
-  abar_capm_fs_t = {
-    n <- sum(!is.na(abnormal_capm_fs))
-    m <- mean(abnormal_capm_fs, na.rm = TRUE)
-    s <- sd(abnormal_capm_fs, na.rm = TRUE)
-    if (n > 1L && s > 0) m / s * sqrt(n) else NA_real_
-  }
-), by = signalname]
-czret <- merge(czret, capm_fs_alpha, by = "signalname", all.x = TRUE)
-czret[, abnormal_capm_fs_normalized := fifelse(
-  abs(abar_capm_fs) > 1e-10,
-  100 * abnormal_capm_fs / abar_capm_fs,
-  NA_real_
-)]
-
-ff3_fs <- czret[date >= sampstart, {
-  z <- extract_ff3_coeffs(ret, mktrf, smb, hml)
-  .(beta_ff3_fs = z[1], s_ff3_fs = z[2], h_ff3_fs = z[3])
-}, by = signalname]
-czret <- merge(czret, ff3_fs, by = "signalname", all.x = TRUE)
-czret[, abnormal_ff3_fs := fifelse(
-  date >= sampstart,
-  ret - (beta_ff3_fs * mktrf + s_ff3_fs * smb + h_ff3_fs * hml),
-  NA_real_
-)]
-ff3_fs_alpha <- czret[date >= sampstart & date <= sampend, .(
-  abar_ff3_fs = mean(abnormal_ff3_fs, na.rm = TRUE),
-  abar_ff3_fs_t = {
-    n <- sum(!is.na(abnormal_ff3_fs))
-    m <- mean(abnormal_ff3_fs, na.rm = TRUE)
-    s <- sd(abnormal_ff3_fs, na.rm = TRUE)
-    if (n > 1L && s > 0) m / s * sqrt(n) else NA_real_
-  }
-), by = signalname]
-czret <- merge(czret, ff3_fs_alpha, by = "signalname", all.x = TRUE)
-czret[, abnormal_ff3_fs_normalized := fifelse(
-  abs(abar_ff3_fs) > 1e-10,
-  100 * abnormal_ff3_fs / abar_ff3_fs,
-  NA_real_
-)]
-
-full_sample_published_stats <- Reduce(
-  function(x, y) merge(x, y, by = "signalname", all = TRUE),
-  list(raw_stats, capm_fs, capm_fs_alpha, ff3_fs, ff3_fs_alpha)
-)
-full_sample_published_stats[, `:=`(
-  eligible_raw_t2 = !is.na(rbar_t) & rbar_t > raw_t_threshold,
-  eligible_capm_t2 = !is.na(rbar_t) & rbar_t > raw_t_threshold &
-    !is.na(abar_capm_fs_t) & abar_capm_fs_t > alpha_t_threshold,
-  eligible_ff3_t2 = !is.na(rbar_t) & rbar_t > raw_t_threshold &
-    !is.na(abar_ff3_fs_t) & abar_ff3_fs_t > alpha_t_threshold
-)]
-
-full_sample_dm <- build_broad_full_sample_factor_adjusted_dm(
-  base_pairs, return_store, factors,
-  minimum_observations = minimum_observations,
-  alpha_threshold = alpha_t_threshold
-)
-
-build_full_sample_contract <- function(model) {
-  eligible_col <- paste0("eligible_", model, "_t2")
-  published_col <- paste0("abnormal_", model, "_fs_normalized")
-  eligible_signals <- full_sample_published_stats[
-    get(eligible_col), signalname
-  ]
-  published_panel <- czret[
-    signalname %in% eligible_signals & date >= sampstart,
-    .(
-      pubname = signalname, eventDate, calendarDate = date,
-      published_return = get(published_col)
-    )
-  ]
-  dm_panel <- full_sample_dm$panels[[model]][!is.na(dm_return)]
-  dm_panel[, calendarDate := NULL]
-  paired <- merge(
-    published_panel, dm_panel,
-    by = c("pubname", "eventDate"), all = FALSE
-  )
-  setorder(paired, pubname, eventDate)
-  list(
-    panel = as_tibble(paired),
-    published_panel = as_tibble(published_panel),
-    eligible_published_signals = sort(eligible_signals)
-  )
-}
-
-full_sample_window_diagnostics <- full_sample_dm$window_stats[, .(
-  base_candidates = .N,
-  capm_eligible_candidates = sum(capm_eligible, na.rm = TRUE),
-  ff3_eligible_candidates = sum(ff3_eligible, na.rm = TRUE)
-), by = .(sampstart, sampend)]
-full_sample_result <- list(
-  capm = build_full_sample_contract("capm"),
-  ff3 = build_full_sample_contract("ff3"),
-  published_stats = as_tibble(full_sample_published_stats),
-  window_diagnostics = as_tibble(full_sample_window_diagnostics),
-  metadata = list(
-    schema_version = 1L,
-    appendix_only = TRUE,
-    base_universe = "accounting_t2",
-    base_pair_count = nrow(base_pairs),
-    base_pair_fingerprint_sha256 = base_fingerprint,
-    coefficient_regime = "all observations from published sample start onward",
-    factor_models = list(capm = "Mkt-RF", ff3 = c("Mkt-RF", "SMB", "HML")),
-    minimum_factor_observations = minimum_observations,
-    raw_t_threshold = raw_t_threshold,
-    alpha_t_threshold = alpha_t_threshold
-  )
-)
-stopifnot(
-  !anyDuplicated(
-    as.data.frame(full_sample_result$capm$panel)[c("pubname", "eventDate")]
-  ),
-  !anyDuplicated(
-    as.data.frame(full_sample_result$ff3$panel)[c("pubname", "eventDate")]
-  ),
-  identical(
-    full_sample_result$metadata$base_pair_fingerprint_sha256,
-    raw_contract$metadata$accounting_t2$pair_fingerprint_sha256
-  )
-)
-full_sample_cache_path <- file.path(
-  out_dir, "appendix_full_sample_dm_benchmarks.RDS"
-)
-saveRDS(full_sample_result, full_sample_cache_path)
-message("Wrote ", full_sample_cache_path)
 rm(return_store)

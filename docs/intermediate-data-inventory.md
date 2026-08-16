@@ -61,7 +61,6 @@ from the same broad accounting `|t| > 2` selection as the raw benchmark.
 | dm_pca_table.RDS                          | <1 MB  | Appendix SA11 PCA prep     | appendix-only                       |
 | dm_correlation_quantiles.RDS              | <1 MB  | Appendix SA11 PCA prep     | appendix-only                       |
 | dm_span_analysis.RDS                      | 5 MB   | Appendix SA11 span prep    | appendix-only                       |
-| appendix_full_sample_dm_benchmarks.RDS    | 4 MB   | 3c_FactorAdjustedDMPrep.R  | SA07 figures/tables                 |
 | sumsignal_oos_30y_*.csv (6 files)         | <1 MB  | 3b_DataMiningSummary.R     | S2b / export; current               |
 ```
 
@@ -69,9 +68,8 @@ from the same broad accounting `|t| > 2` selection as the raw benchmark.
 and matched-uncorrelated event-time panel stored in `raw_dm_benchmarks.RDS`.
 The retained pair table is transient: Appendix Table B.1 recomputes it in
 memory using the same helper and validates its fingerprint against the raw
-benchmark metadata. `3c_FactorAdjustedDMPrep.R` writes both the sample-specific
-and full-sample broad-universe factor-adjusted benchmark caches from one shared
-mined-return matrix.
+benchmark metadata. `3c_FactorAdjustedDMPrep.R` writes the sample-specific
+broad-universe factor-adjusted benchmark cache.
 
 The in-memory matched-uncorrelated universe remains a separate robustness
 selection. The factor-adjusted benchmark starts from the 1,068,052-pair broad

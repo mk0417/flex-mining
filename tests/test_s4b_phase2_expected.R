@@ -1,4 +1,4 @@
-# Validate the corrected phase-two Tables 6, 7, and IA.10 outputs.
+# Validate the corrected phase-two Tables 6, 7, and IA.8 outputs.
 #
 # How to run: set the working directory to flex-mining/, run
 #   Rscript S4b_RVsDM_ByGroup.R
