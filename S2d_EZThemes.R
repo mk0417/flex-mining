@@ -35,7 +35,7 @@ pred_min_tabs = globalSettings$benchmark$t_min # min abs(tstat)
 pred_top_n = globalSettings$benchmark$t_rankpct_min  # min t-stat rank
 
 # min data requirements
-nstock_min = globalSettings$benchmark$minNumStocks/2
+nstock_min = globalSettings$benchmark$gates$minNumStocks/2
 nmonth_min = globalSettings$journals$nmonth_min
 
 # sample periods

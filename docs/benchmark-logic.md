@@ -25,6 +25,19 @@ robustness benchmarks also cover ticker mining and appendix specifications.
 - orientation from the in-sample mean
 - correlations signed using that orientation
 
+These five gates are imposed in exactly one place, `apply_common_gates()` in
+`helpers/matching.R`. Every selector below calls it before applying whatever
+screen distinguishes its benchmark, so no selector re-implements a gate. The
+three numeric thresholds are configured together as
+`globalSettings$benchmark$gates` in `config.R`; the remaining two are
+structural and are applied unconditionally, writing the orientation as
+`orientation` and the signed correlation as `rho`. Mined ratios with an exactly
+zero in-sample mean have no defined orientation and are dropped.
+
+The correlation screen that A2 and A4 share is likewise a single function,
+`apply_uncorrelated_screen()`, which reads `rho` and so cannot disagree with
+itself about signing.
+
 ### A. Raw-mean-return benchmarks
 
 These benchmarks select and evaluate accounting ratios using raw long-short
@@ -143,7 +156,9 @@ scripts implement the following benchmarks:
 
 The 10% t-stat and mean-return tolerances are defaults of
 `select_matched_dm_pairs()` and therefore apply whenever A3 or A4 is
-constructed. Some older variables named `matchRet` refer instead to benchmark
+constructed. `select_matched_dm_pairs()` is also the selector used by
+`S5a_InspectTables.R` to build the Section 5 example-match tables, so those
+tables draw on the same gated A3 universe. Some older variables named `matchRet` refer instead to benchmark
 A1, D1, or D2; the name alone does not imply matched statistics.
 `ret_for_plot0.RDS` and `ret_for_plot1.RDS` are compatibility artifacts; new
 consumers should use the saved outputs above.

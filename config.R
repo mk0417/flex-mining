@@ -65,6 +65,7 @@ inclusionSettings <- list(
 # Benchmarks are named with the labels used in docs/benchmark-logic.md, which is
 # the authoritative description of each screen and of the exhibits it feeds:
 #
+#   (all)                               gates (see below)
 #   A1  Significant                     t_min, t_max
 #   A2  Significant, uncorrelated       A1 + corr_max
 #   A3  Matched statistics              matched_uncorr_{t,r}_reltol
@@ -76,9 +77,16 @@ inclusionSettings <- list(
 #   D3  Spanning splits                 thresholds hardcoded in
 #                                       Appendices/SA11_DMSpanPCAPrep.R
 benchmarkSettings <- list(
-  # common gates applied to every mined ratio before any screen
-  minNumStocks     = 20, # min stocks per month over the in-sample period (ie minNumStocks/2 in each leg)
-  match_nmonth_min = 60, # minimum pair-level in-sample history (months)
+  # Common accounting-ratio gates, applied to every mined ratio before any
+  # benchmark-specific screen. These correspond one-to-one with the "Common
+  # accounting-ratio gates" list in docs/benchmark-logic.md and are imposed in
+  # exactly one place, apply_common_gates() in helpers/matching.R. No selector,
+  # chapter script, or appendix should re-implement them.
+  gates = list(
+    minNumStocks       = 20, # >= minNumStocks/2 stocks in each leg every in-sample month
+    nmonth_min         = 60, # minimum in-sample history (months)
+    nlastyear_required = 12  # months required in the final in-sample calendar year
+  ),
 
   # A1 significant screen: raw |t| > t_min. Also the base universe for A2, and
   # for the factor-adjusted B1 and C1.

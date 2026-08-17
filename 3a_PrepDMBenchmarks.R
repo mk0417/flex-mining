@@ -89,9 +89,10 @@ accounting_t2_screen <- list(
   # alternative filtering
   t_min = globalSettings$benchmark$t_min,
   t_max = globalSettings$benchmark$t_max,
-  t_rankpct_min = globalSettings$benchmark$t_rankpct_min,
-  minNumStocks = globalSettings$benchmark$minNumStocks
+  t_rankpct_min = globalSettings$benchmark$t_rankpct_min
 )
+# The common accounting-ratio gates are not listed here: SelectDMStrats() takes
+# them straight from globalSettings$benchmark$gates.
 
 ## Shared data prep --------------------------------------------------
 # here, matchRet uses accounting signals with t>2
@@ -99,10 +100,6 @@ accounting_t2_screen <- list(
 # make event time returns for Compustat DM
 accounting_t2_matched <- select_accounting_t2_pairs(
   dmcomp$insampsum,
-  min_num_stocks = globalSettings$benchmark$minNumStocks,
-  t_threshold = globalSettings$benchmark$t_min,
-  minimum_months = 60L,
-  required_final_year_months = 12L,
   pubnames = czsum$signalname
 )
 accounting_t2_metadata <- list(
@@ -116,9 +113,7 @@ accounting_t2_metadata <- list(
   ),
   specification = list(
     oriented_raw_t_threshold = globalSettings$benchmark$t_min,
-    minimum_stocks_per_leg = globalSettings$benchmark$minNumStocks / 2,
-    minimum_insample_months = 60L,
-    required_final_year_months = 12L,
+    common_gates = globalSettings$benchmark$gates,
     published_mean_return_tolerance = Inf,
     published_tstat_tolerance = Inf
   )
@@ -141,9 +136,7 @@ print(stop_time - start_time)
 # magnitude-matched twin, so the comparison represents the full population of
 # significant, non-redundant mined strategies rather than a handful of
 # look-alikes.
-accounting_t2_uncorr_matched <- accounting_t2_matched[
-  !is.na(cor) & cor * sign(rbar) <= globalSettings$benchmark$corr_max
-]
+accounting_t2_uncorr_matched <- apply_uncorrelated_screen(accounting_t2_matched)
 
 print("Making t>2 & uncorrelated event time returns")
 start_time <- Sys.time()
@@ -284,7 +277,7 @@ matched_metadata <- list(
   specification = list(
     tstat_relative_tolerance = globalSettings$benchmark$matched_uncorr_t_reltol,
     mean_return_relative_tolerance = globalSettings$benchmark$matched_uncorr_r_reltol,
-    minimum_insample_months = globalSettings$benchmark$match_nmonth_min,
+    common_gates = globalSettings$benchmark$gates,
     maximum_pairwise_correlation = globalSettings$benchmark$corr_max,
     normalization = "each matched strategy by its own in-sample mean"
   ),
@@ -392,9 +385,7 @@ accounting_t2_uncorr_benchmark <- ret_for_plot0 %>%
 accounting_t2_uncorr_metadata <- list(
   specification = list(
     oriented_raw_t_threshold = globalSettings$benchmark$t_min,
-    minimum_stocks_per_leg = globalSettings$benchmark$minNumStocks / 2,
-    minimum_insample_months = 60L,
-    required_final_year_months = 12L,
+    common_gates = globalSettings$benchmark$gates,
     maximum_pairwise_correlation = globalSettings$benchmark$corr_max,
     normalization = "100 times return divided by the strategy in-sample mean"
   ),

@@ -352,10 +352,7 @@ if (is.null(raw_contract$metadata$accounting_t2$pair_fingerprint_sha256)) {
 dm_summary <- readRDS("../Data/Processed/dmcomp_sumstats.RDS")$insampsum
 base_pairs <- select_accounting_t2_pairs(
   dm_summary,
-  min_num_stocks = globalSettings$benchmark$minNumStocks,
   t_threshold = raw_t_threshold,
-  minimum_months = 60L,
-  required_final_year_months = 12L,
   pubnames = raw_contract$published$pubname
 )
 base_fingerprint <- accounting_t2_pair_fingerprint(base_pairs)
