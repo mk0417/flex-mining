@@ -1,16 +1,13 @@
 # Assemble and render the reorganized Section 2 Figure 2 (Spec 3, meeting notes
-# 2026-07-23) from calculation-owned benchmark contracts. Main versions have
-# no confidence intervals; appendix variants shade one clustered SE.
+# 2026-07-23) from calculation-owned benchmark contracts. All series shade one
+# standard error, clustered by calendar month and published predictor.
 #
 # How to run: normally run through S2_ResearchVsDataMining.R from flex-mining/.
 # Inputs:  ../Data/Processed/{raw_dm_benchmarks,
 #          factor_adjusted_dm_benchmarks}.RDS plus
 #          published-signal metadata
-# Outputs (../Results/):
-#   Fig2a_FactorAdj.pdf            Fig2a_FactorAdj_CI.pdf
-#   Fig2b_PubSampleLimits.pdf      Fig2b_PubSampleLimits_CI.pdf
-#   Fig2c_MatchedExclCorr.pdf      Fig2c_MatchedExclCorr_CI.pdf
-#   Fig2d_AltMining.pdf            Fig2d_AltMining_CI.pdf
+# Outputs (../Results/): Fig2a_FactorAdj.pdf, Fig2b_PubSampleLimits.pdf,
+#   Fig2c_MatchedExclCorr.pdf, and Fig2d_AltMining.pdf
 
 rm(list = ls())
 pdf(NULL)
@@ -22,8 +19,8 @@ source('0_Environment.R')
 # Generalizes ReturnPlotsWithDM_std_errors_indicators (0_Environment.R) to any
 # number of overlaid series by splitting it in two: fig2_aggregate_series()
 # turns a long panel of individually-normalized returns into per-series rolling
-# means with clustered SEs, and fig2_overlay_plot() renders any subset of those
-# series with an optional confidence ribbon on one or all of them.
+# means with clustered SEs, and fig2_overlay_plot() renders those series with
+# standard-error ribbons.
 
 # Compose the four Figure 2 panels from calculation-owned benchmark contracts.
 # Signal classifications are presentation-sample choices and therefore enter
@@ -192,29 +189,20 @@ fig2_aggregate_series = function(dt_long, rollmonths = 60) {
 }
 
 # agg: output of fig2_aggregate_series (possibly several panels' worth).
-# series_labels: labels to plot, in legend order. ci: which series get ribbons.
+# series_labels: labels to plot, in legend order.
 fig2_overlay_plot = function(agg, series_labels, colors, linetypes,
-                             ci = c('none', 'first', 'all'),
                              xl = -360, xh = 300, yl = -10, yh = 130,
                              fontsize = 28, legendpos = c(30, 15) / 100,
                              yaxislab = 'Trailing 5-Year Return (bps pm)',
                              linesize = 1.5, ribbon_alpha = 0.10) {
-  ci = match.arg(ci)
-
   agg = agg %>%
     filter(label %in% series_labels) %>%
     mutate(label = factor(label, levels = series_labels))
 
-  ribbons = switch(ci,
-    none  = agg[0, ],
-    first = agg %>% filter(label == series_labels[1]),
-    all   = agg
-  )
-
   ggplot(agg, aes(x = eventDate, y = roll_rbar, color = label, linetype = label)) +
-    geom_ribbon(data = ribbons, aes(ymin = lower, ymax = upper, fill = label),
+    geom_ribbon(aes(ymin = lower, ymax = upper, fill = label),
                 alpha = ribbon_alpha, color = NA) +
-    geom_line(linewidth = linesize) +
+    geom_line(linewidth = linesize, na.rm = TRUE) +
     scale_color_manual(values = colors) +
     scale_fill_manual(values = colors) +
     scale_linetype_manual(values = linetypes) +
@@ -227,7 +215,8 @@ fig2_overlay_plot = function(agg, series_labels, colors, linetypes,
          color = '', linetype = '', fill = '') +
     theme_light(base_size = fontsize) +
     theme(
-      legend.position = legendpos,
+      legend.position = 'inside',
+      legend.position.inside = legendpos,
       legend.spacing.y = unit(0.1, units = 'cm'),
       legend.background = element_rect(fill = 'transparent'),
       legend.key.width = unit(1.5, units = 'cm')
@@ -314,7 +303,7 @@ panels = list(
     # Spec-3 styling: each published/data-mined pair shares a hue.
     linetypes = c('solid', 'dotted', 'solid', 'dotted'),
     yaxislab = 'Trailing 5-Year Alpha (bps pm)',
-    yl = 0, yh = 125, yh_ci = 150, legendpos = c(35, 20) / 100,
+    yl = 0, yh = 150, legendpos = c(35, 20) / 100,
     file = 'Fig2a_FactorAdj'
   ),
   b = list(
@@ -323,7 +312,7 @@ panels = list(
     colors = colors_paired,
     linetypes = c('solid', 'dotted', 'solid', 'dotted'),
     yaxislab = ylaball,
-    yl = 0, yh = 175, yh_ci = 200, legendpos = c(35, 20) / 100,
+    yl = 0, yh = 200, legendpos = c(35, 20) / 100,
     file = 'Fig2b_PubSampleLimits'
   ),
   c = list(
@@ -341,7 +330,7 @@ panels = list(
     colors = colors,
     linetypes = c('solid', 'longdash', 'dashed'),
     yaxislab = ylaball,
-    yl = -50, yh = 140, yh_ci = 145, legendpos = c(35, 18) / 100,
+    yl = -50, yh = 145, legendpos = c(35, 18) / 100,
     file = 'Fig2d_AltMining'
   )
 )
@@ -350,18 +339,13 @@ for (pk in names(panels)) {
   p = panels[[pk]]
   agg = fig2_agg %>% filter(panel == pk)
 
-  ci_variants = if (is.null(p$ci_variants)) c('none', 'all') else p$ci_variants
-  for (civ in ci_variants) {
-    # CI ribbons extend above the lines; give them extra headroom where set
-    yh_used = if (civ == 'all' && !is.null(p$yh_ci)) p$yh_ci else p$yh
-    plt = fig2_overlay_plot(
-      agg, series_labels = p$series, colors = p$colors, linetypes = p$linetypes,
-      ci = civ, xl = global_xl, xh = global_xh, yl = p$yl, yh = yh_used,
-      fontsize = fontsizeall, legendpos = p$legendpos,
-      yaxislab = p$yaxislab, linesize = linesizeall
-    )
-    fname = paste0(outdir, '/', p$file, if (civ == 'all') '_CI' else '', '.pdf')
-    ggsave(fname, plt, width = 10, height = 8)
-    print(paste('Saved', fname))
-  }
+  plt = fig2_overlay_plot(
+    agg, series_labels = p$series, colors = p$colors, linetypes = p$linetypes,
+    xl = global_xl, xh = global_xh, yl = p$yl, yh = p$yh,
+    fontsize = fontsizeall, legendpos = p$legendpos,
+    yaxislab = p$yaxislab, linesize = linesizeall
+  )
+  fname = file.path(outdir, paste0(p$file, '.pdf'))
+  ggsave(fname, plt, width = 10, height = 8)
+  print(paste('Saved', fname))
 }

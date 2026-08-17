@@ -56,21 +56,21 @@ broad accounting `|t| > 2` pair universe. It writes compact published and
 data-mined panels; no broad pair-month cache is written.
 `S2e_Fig2Plots.R` reads the raw and factor-adjusted benchmark files, imposes
 Figure-specific samples, computes rolling display statistics, and renders the
-four panels plus confidence-interval variants into `../Results/`.
+four panels with standard-error bands into `../Results/`.
 
 ### `S2e_Fig2Plots.R` outputs
 
-The normal run writes eight paper artifacts. The four files without `_CI` make
-up main-text Figure 2; the four `_CI` variants make up Appendix Figure B.1.
+The normal run writes the four panels of main-text Figure 2. Each panel shades
+one standard error around every series.
 
-| Panel | Main-text output                  | Appendix output                       | Comparison |
-| ----- | --------------------------------- | ------------------------------------- | ---------- |
-| a     | `Fig2a_FactorAdj.pdf`             | `Fig2a_FactorAdj_CI.pdf`              | CAPM and FF3+Mom factor-adjusted returns |
-| b     | `Fig2b_PubSampleLimits.pdf`       | `Fig2b_PubSampleLimits_CI.pdf`        | Annual-accounting and pre-2003 publication samples |
-| c     | `Fig2c_MatchedExclCorr.pdf`       | `Fig2c_MatchedExclCorr_CI.pdf`        | Matched data mining, with and without correlated matches |
-| d     | `Fig2d_AltMining.pdf`             | `Fig2d_AltMining_CI.pdf`              | Top-5% accounting and ticker-symbol mining |
+| Panel | Main-text output                  | Comparison |
+| ----- | --------------------------------- | ---------- |
+| a     | `Fig2a_FactorAdj.pdf`             | CAPM and FF3+Mom factor-adjusted returns |
+| b     | `Fig2b_PubSampleLimits.pdf`       | Annual-accounting and pre-2003 publication samples |
+| c     | `Fig2c_MatchedExclCorr.pdf`       | Matched data mining, with and without correlated matches |
+| d     | `Fig2d_AltMining.pdf`             | Top-5% accounting and ticker-symbol mining |
 
-For diagnostics, setting `FIG2_OUTPUT_DIR` redirects the eight PDFs away from
+For diagnostics, setting `FIG2_OUTPUT_DIR` redirects the four PDFs away from
 `../Results/`. Setting `FIG2_DATA_OUTPUT_DIR` additionally writes
 `fig2_panel_long.RDS` and `fig2_panel_agg.RDS` to the requested directory; these
 opt-in data files are validation artifacts, not manuscript exhibits.
@@ -134,15 +134,7 @@ Abbreviations used below to keep the columns narrow:
 | Exhibit           | Description                                       | Code Result                                      | Producer                                                  | Wired? |
 | ----------------- | ------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------- | ------ |
 | §B Tab B.1        | Decay regressions by DM predictor                 | Table_MPStyleRegsIndividualDM.tex                | Appendices/SA13_MPStyleRegsIndividualDM.R                 | yes    |
-| §B Fig B.1a       | Factor-adjusted decay with CIs                       | Fig2a_FactorAdj_CI.pdf                            | S2e_Fig2Plots.R                                           | yes    |
-| §B Fig B.1b       | Restricted publication samples with CIs             | Fig2b_PubSampleLimits_CI.pdf                      | S2e_Fig2Plots.R                                           | yes    |
-| §B Fig B.1c       | Matched decay excluding correlated DM, with CIs      | Fig2c_MatchedExclCorr_CI.pdf                      | S2e_Fig2Plots.R                                           | yes    |
-| §B Fig B.1d       | Alternative mining methods with CIs                  | Fig2d_AltMining_CI.pdf                            | S2e_Fig2Plots.R                                           | yes    |
-| §B Fig B.2a       | Accounting DM significant decay                   | Fig_DM_t_min_2_AccountingOnly_CalendarSE.pdf     | Appendices/SA08_AccountingOnlyPlots.R                     | yes    |
-| §B Fig B.2b       | Accounting DM top 5% decay                        | Fig_DM_t_top5Pct_AccountingOnly_CalendarSE.pdf   | S2a + Appendices/SA08_AccountingOnlyPlots.R               | yes    |
-| §B Fig B.2c–d     | Accounting DM factor-adjusted decay                 | Fig_DM_CAPM/FF4_tv_AccountingOnly_CalendarSE.pdf | Appendices/SA09_AccountingOnlyAlphaPlots.R                | yes    |
-| §B Fig B.3a–d     | Decay excluding correlated DM                     | Fig_PublicationsVsDataMining_*_Correlation10 (4) | Appendices/SA10_ResearchVsDMRobustnessCorrelationsEtc.R   | yes    |
-| §B Fig B.4a–b     | Unspanned DM PCA and correlations                 | Fig_DM_unspan_match_t_g_PCA/cor.pdf              | Appendices/SA11_DMSpanPCAPlots.R                          | yes    |
+| §B Fig B.1a–b     | Unspanned DM PCA and correlations                 | Fig_DM_unspan_match_t_g_PCA/cor.pdf              | Appendices/SA11_DMSpanPCAPlots.R                          | yes    |
 | §IA.1 Tab IA.1    | Post-2003 sum stats DM                            | dm-sortsPost2003.tex                             | S2b_DataMiningSummaryTables.R                             | yes    |
 | §IA.1 Tab IA.2a   | DM return correlations                            | quantilesCorDM.tex                               | Appendices/SA11_DMCorrelationsPCATables.R                | yes    |
 | §IA.1 Tab IA.2b   | DM PCA explained variance                         | DM_pca.tex                                       | Appendices/SA11_DMCorrelationsPCATables.R                | yes    |

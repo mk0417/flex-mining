@@ -15,10 +15,8 @@ required_files <- c(
   "../Data/Processed/czsum_allpredictors.RDS",
   "../Data/Processed/czret_keeponly.RDS",
   "../Data/Processed/ret_for_plot0.RDS",
-  "../Data/Processed/ret_for_plot1.RDS",
   "../Data/Processed/dmcomp_sumstats.RDS",
   "../Data/Processed/raw_dm_benchmarks.RDS",
-  "../Data/Processed/factor_adjusted_dm_benchmarks.RDS",
   paste0(version_prefix, " LongShort.RData")
 )
 rm(settings_env)
@@ -48,9 +46,6 @@ run_script("Appendices/SA03_StructuralBreak.R")
 run_script("Appendices/SA04_DecayVsWordcountPlot.R")
 run_script("Appendices/SA05_DecayVsModelcountPlot.R")
 run_script("Appendices/SA06_DecayVsJournal.R")
-run_script("Appendices/SA08_AccountingOnlyPlots.R")
-run_script("Appendices/SA09_AccountingOnlyAlphaPlots.R")
-run_script("Appendices/SA10_ResearchVsDMRobustnessCorrelationsEtc.R")
 run_script("Appendices/SA11_DMCorrelationsPCAPrep.R")
 run_script("Appendices/SA11_DMCorrelationsPCATables.R")
 run_script("Appendices/SA11_DMSpanPCAPrep.R")

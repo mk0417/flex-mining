@@ -20,7 +20,7 @@ incl_signals <- restrictInclSignals(
   topT = globalSettings$inclusion$topT
 )
 
-# Match the annual-Compustat definition used by Appendix Figure B.2: start
+# Match the annual-Compustat definition used by Figure 2(b): start
 # from SignalDoc's Accounting category, then remove quarterly, analyst-based,
 # discrete, and CRSP-only signals.
 annual_accounting_signals <- readRDS(

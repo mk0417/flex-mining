@@ -51,9 +51,9 @@ from the same broad accounting `|t| > 2` selection as the raw benchmark.
 | dmcomp_sumstats.RDS                       | 139 MB | 3a_PrepDMBenchmarks.R      | S2a; current                        |
 | dmtic_sumstats.RDS                        | 14 MB  | 3a_PrepDMBenchmarks.R      | S2a; current                        |
 | raw_dm_benchmarks.RDS                     | 8 MB   | 3a_PrepDMBenchmarks.R      | S2e, S3a; current                   |
-| factor_adjusted_dm_benchmarks.RDS           | 4 MB   | 3c_FactorAdjustedDMPrep.R  | S2e, S4b, SA09; current             |
+| factor_adjusted_dm_benchmarks.RDS           | 4 MB   | 3c_FactorAdjustedDMPrep.R  | S2e, S4b; current                   |
 | ret_for_plot0.RDS                         | 3 MB   | 3a_PrepDMBenchmarks.R      | S2a; current                        |
-| ret_for_plot1.RDS                         | 2 MB   | 3a_PrepDMBenchmarks.R      | S2a, SA08; current                  |
+| ret_for_plot1.RDS                         | 2 MB   | 3a_PrepDMBenchmarks.R      | S2a; current                        |
 | PairwiseCorrelationsDM_ew.RDS             | 241 MB | Appendix SA11 PCA prep     | appendix-only cache                 |
 | PairwiseCorrelationsDM_vw.RDS             | 18 MB  | Appendix SA11 PCA prep     | appendix-only cache                 |
 | Summary_StatisticsDM_ew.csv               | <1 MB  | 3b_DataMiningSummary.R     | S2b; current                        |

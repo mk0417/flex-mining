@@ -132,8 +132,8 @@ scripts implement the following benchmarks:
     - Figure 2(d): top-5% ticker-mining series.
 - **D3. Spanning splits.** Defined in `SA11_DMSpanPCAPrep.R`; saved as
     `dm_span_analysis.RDS`.
-    - Figure B.4(a): principal-component spanning splits.
-    - Figure B.4(b): correlation spanning splits.
+    - Figure B.1(a): principal-component spanning splits.
+    - Figure B.1(b): correlation spanning splits.
 - **Other main-text panels.** These do not instantiate one of the benchmark
   screens above.
     - Table 1(a): mined-universe return summary.
