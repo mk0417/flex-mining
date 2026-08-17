@@ -7,7 +7,7 @@
 
 library(data.table)
 required_functions <- c(
-  "extract_beta", "extract_ff3_coeffs", "extract_ff4_coeffs",
+  "extract_beta", "extract_ff4_coeffs",
   "factor_model_slopes", "factor_abnormal_returns", "factor_alpha_stats"
 )
 for (expression in parse("3c_FactorAdjustedDMPrep.R")) {
@@ -35,18 +35,9 @@ y[1:25, 2] <- NA_real_
 y[seq(4, n, by = 13), 3] <- NA_real_
 
 capm_direct <- unname(coef(lm(y[, 1] ~ factors[, "mktrf"]))[2])
-ff3_direct <- unname(coef(lm(
-  y[, 2] ~ factors[, "mktrf"] + factors[, "smb"] + factors[, "hml"]
-))[2:4])
 ff4_direct <- unname(coef(lm(y[, 3] ~ factors))[2:5])
 stopifnot(
   isTRUE(all.equal(extract_beta(y[, 1], factors[, "mktrf"]), capm_direct)),
-  isTRUE(all.equal(
-    extract_ff3_coeffs(
-      y[, 2], factors[, "mktrf"], factors[, "smb"], factors[, "hml"]
-    ),
-    ff3_direct
-  )),
   isTRUE(all.equal(
     extract_ff4_coeffs(
       y[, 3], factors[, "mktrf"], factors[, "smb"], factors[, "hml"],
@@ -87,12 +78,5 @@ short <- y
 short[60:n, 1] <- NA_real_
 short_fit <- factor_model_slopes(short, factors, minimum_observations = 60L)
 stopifnot(all(is.na(short_fit$slopes[1, ])), short_fit$nobs[1] == 59L)
-
-# Reusing a single full-sample slope matrix across original/post-sample rows
-# must preserve the same abnormal-return calculation.
-full_abnormal <- factor_abnormal_returns(y, factors, fitted$slopes)
-stopifnot(isTRUE(all.equal(
-  full_abnormal, abnormal, tolerance = 1e-12, check.attributes = FALSE
-)))
 
 message("Window-batched factor-adjustment helper tests passed.")

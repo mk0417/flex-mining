@@ -17,12 +17,12 @@ source("helpers/stats.R")
 var_types <- c('vw', 'ew')
 
 DMname = paste0('../Data/Processed/',
-                globalSettings$dataVersion, 
+                globalSettings$universe$dataVersion, 
                 ' LongShort.RData')
 
 dmcomp <- list()
 dmcomp$name <- paste0('../Data/Processed/',
-                      globalSettings$dataVersion, 
+                      globalSettings$universe$dataVersion, 
                       ' LongShort.RData')
 
 

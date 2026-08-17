@@ -17,7 +17,7 @@ library(doParallel)
 
 # Compustat mined-strategy file
 dm_path <- paste0(
-  "../Data/Processed/", globalSettings$dataVersion, " LongShort.RData"
+  "../Data/Processed/", globalSettings$universe$dataVersion, " LongShort.RData"
 )
 
 # maximum correlation (signed)
@@ -29,22 +29,22 @@ npubmax <- Inf
 use_sign_info <- TRUE
 match_screen <- list(
   # tolerance in levels
-  t_tol = globalSettings$t_tol,
-  r_tol = globalSettings$r_tol,
+  t_tol = globalSettings$benchmark$t_tol,
+  r_tol = globalSettings$benchmark$r_tol,
   # tolerance relative to op stat
-  t_reltol = globalSettings$t_reltol,
-  r_reltol = globalSettings$r_reltol,
+  t_reltol = globalSettings$benchmark$t_reltol,
+  r_reltol = globalSettings$benchmark$r_reltol,
   # alternative filtering
-  t_min = globalSettings$t_min, # Default = 0, minimum screened t-stat
-  t_max = globalSettings$t_max, # maximum screened t-stat
-  t_rankpct_min = globalSettings$t_rankpct_min, # top x% of data mined t-stats, 100% for off
-  minNumStocks = globalSettings$minNumStocks
+  t_min = globalSettings$benchmark$t_min, # Default = 0, minimum screened t-stat
+  t_max = globalSettings$benchmark$t_max, # maximum screened t-stat
+  t_rankpct_min = globalSettings$benchmark$t_rankpct_min, # top x% of data mined t-stats, 100% for off
+  minNumStocks = globalSettings$benchmark$minNumStocks
 )
 
 ## Load data ----------------------------------------------------
 
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 
 # published

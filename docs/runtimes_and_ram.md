@@ -5,7 +5,8 @@ you can tell a slow stage from a hung one and size parallel work safely.
 
 The measured baseline below comes from a full end-to-end run of Chapters 2-9 on a
 24-core / 62 GB machine with **effectively no swap**, using
-`globalSettings$num_cores = 4` and `dataVersion = 'CZ-style-v8b'`. Total wall
+`globalSettings$compute$num_cores = 4` and
+`globalSettings$universe$dataVersion = 'CZ-style-v8b'`. Total wall
 time is **~6h 14m**. Runtimes come from output-file mtimes and a stage monitor;
 treat sub-minute figures as approximate. Chapter 1 re-pulls external data and is
 run only when refreshing the vintage, so it is not part of these figures. Later
@@ -30,10 +31,10 @@ Measured at `num_cores = 4`.
 | **`2_DataMining.R`**                | needs remeasurement | Now owns only construction of the two mined universes; the prior total included matching and factor adjustment.                                                                                                                                                                                 |
 | ↳ `2a_CompustatToLongshort.R`       |         **~4h 05m** | See the phase breakdown below. Includes deriving valid-denominator metadata in memory (~2 min; formerly the standalone `1a_ValidDenoms.R`).                                                                                                                                                     |
 | ↳ `2c_TickerToLongshort.R`          |            ~1-2 min | Writes `ticker_Harvey2017JF.RDS`.                                                                                                                                                                                                                                                              |
-| **`3_Precompute.R`**                | needs remeasurement | Contains raw benchmark prep, DM summaries, and both broad-universe factor-adjustment regimes.                                                                                                                                                                                                  |
+| **`3_Precompute.R`**                | needs remeasurement | Contains raw benchmark prep, DM summaries, and the broad-universe sample-specific factor-adjustment regime.                                                                                                                                                                                    |
 | ↳ `3a_PrepDMBenchmarks.R`           |          ~9 min 20 s | Four-worker measurement; owns raw accounting/ticker variants, the matched event-time panel, and compact matched-uncorrelated pairs.                                                                                                                                                             |
 | ↳ `3b_DataMiningSummary.R`          |             ~24 min |                                                                                                                                                                                                                                                                                                |
-| ↳ `3c_FactorAdjustedDMPrep.R`       |          ~3 min 50 s | Fits sample-specific CAPM/FF4 and full-sample CAPM/FF3 across 127 windows. Both passes share one mined-return matrix and write 3.8 MB and 3.9 MB contracts.                                                                                                                                     |
+| ↳ `3c_FactorAdjustedDMPrep.R`       | needs remeasurement | Fits sample-specific CAPM/FF4 across 127 windows and writes the sample-specific factor-adjusted benchmark results.                                                                                                                                                                              |
 | Appendix SA11 PCA preparation       | ~66 min historical | The former Chapter 3 correlation/PCA and PCA-span stages now run only with `SA_Appendices.R`.                                                                                                                                                                                                  |
 | **Sections S2-S4**                  | **~7 min baseline** | Main-text exhibit stages; each child is a fresh R process reading upstream caches. Section 3 estimates the main MP-style decay models in `S3a_MPStyleDecayModels.R` (writes `mp_style_decay_models.RDS`, ~31 MB), then `S3b_MPStyleDecayTables.R` renders them. Appendix runtimes are listed separately because SA11 dominates them.                               |
 | **`9_ExportDataToCsv.R`**           |              ~1 min | Reads chapter-2 caches; writes `../Data/Export`.                                                                                                                                                                                                                                               |
@@ -106,7 +107,7 @@ sequentially (`%do%`), so it is not parallel.
 
 ### Sizing parallelism
 
-Parallel work uses `globalSettings$num_cores`, currently 4. A conservative
+Parallel work uses `globalSettings$compute$num_cores`, currently 4. A conservative
 planning heuristic is to budget roughly 5 GB of RAM per worker and keep the total
 within available memory: for example, 4 workers on a machine with about 20 GB
 free. The default `num_cores = 4` follows this rule, and the observed

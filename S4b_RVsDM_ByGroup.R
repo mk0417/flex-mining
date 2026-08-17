@@ -41,8 +41,8 @@ stopifnot(identical(
 ))
 
 incl_signals <- restrictInclSignals(
-  restrictType = globalSettings$restrictType,
-  topT = globalSettings$topT
+  restrictType = globalSettings$inclusion$restrictType,
+  topT = globalSettings$inclusion$topT
 )
 mappings <- load_signal_mappings(
   "DataInput/SignalsTheoryChecked.csv", incl_signals
@@ -243,4 +243,4 @@ write_paper_anymodel_tabular(
   ))
 )
 
-message("Wrote corrected sample-specific source artifacts for Tables 6, 7, and IA.10.")
+message("Wrote corrected sample-specific source artifacts for Tables 6, 7, and IA.8.")

@@ -18,7 +18,7 @@ czret <- readRDS("../Data/Processed/czret_keeponly.RDS") %>%
   mutate(retOrig = ret)
 
 DMname = paste0('../Data/Processed/',
-                globalSettings$dataVersion, 
+                globalSettings$universe$dataVersion, 
                 ' LongShort.RData')
 
 pair_catalog <- select_matched_dm_pairs(
@@ -33,8 +33,8 @@ rm(pair_catalog); gc()
 stratdat = readRDS(DMname) # only really need the signal_list from here
 
 # load pub stuff, add author info
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 czsum2 = czsum %>% left_join(
   fread('../Data/Raw/SignalDoc.csv') %>% 

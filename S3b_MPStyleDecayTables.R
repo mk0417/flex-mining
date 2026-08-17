@@ -11,16 +11,23 @@ source("0_Environment.R")
 # Helpers for rendering the manuscript's MP-style decay tables.
 #
 # How to run: source this file from an R script.
-# Inputs: six fixest models ordered as scaled pub/DM/difference, then unscaled
-#         pub/DM/difference, plus n_signals (distinct published signals in the
-#         estimation sample).
+# Inputs: six fixest models ordered as Panel (a) academic/DM/difference then
+#         Panel (b) academic/DM/difference (Panel (a) scaled, Panel (b)
+#         unscaled), plus a length-six vector of distinct published-signal
+#         counts per column.
 # Outputs: make_combined_table() writes one six-column TeX table.
 
-# Preserve the manuscript's combined six-column layout: columns (1)--(3) are
-# scaled published/DM/difference returns, and columns (4)--(6) are unscaled.
+# Two panels side by side: columns (1)--(3) are SCALED returns versus the broad
+# "excluding correlated" data-mined benchmark; columns (4)--(6) are UNSCALED
+# returns versus the performance-matched benchmark (matching on in-sample stats
+# controls for magnitude in place of scaling).
 make_combined_table <- function(fits, n_signals, timeFE, file) {
   if (length(fits) != 6L) {
     stop("Combined MP table requires exactly six models; got ", length(fits), ".")
+  }
+  if (length(n_signals) != 6L) {
+    stop("Combined MP table requires six per-column signal counts; got ",
+         length(n_signals), ".")
   }
 
   # Three significant digits, retaining meaningful trailing zeros so the
@@ -29,7 +36,7 @@ make_combined_table <- function(fits, n_signals, timeFE, file) {
     sub("\\.$", "", formatC(signif(x, 3), format = "fg", flag = "#", digits = 3))
   }
   fmt3 <- function(x) formatC(x, format = "f", digits = 3)
-  cells <- sapply(fits, function(fit) {
+  cells <- mapply(function(fit, nsig) {
     ct <- fixest::coeftable(fit)
     c(
       ps = fmt(ct["postSample", "Estimate"]),
@@ -38,13 +45,14 @@ make_combined_table <- function(fits, n_signals, timeFE, file) {
       pp_se = paste0("(", fmt(ct["postPub", "Std. Error"]), ")"),
       n = formatC(as.numeric(fixest::fitstat(fit, "n")$n), format = "d", big.mark = ","),
       # Distinct published signals in the estimation sample. A property of the
-      # sample, so it is the same across all six columns; passed in rather than
-      # read off each fit because the DM-benchmark columns cluster on dmname.
-      signals = formatC(n_signals, format = "d", big.mark = ","),
+      # sample rather than the fit (the DM-benchmark columns cluster on dmname),
+      # so it is passed in per column; it differs across the two benchmark
+      # panels because they retain different predictors.
+      signals = formatC(nsig, format = "d", big.mark = ","),
       r2 = fmt3(as.numeric(fixest::fitstat(fit, "r2")$r2)),
       wr2 = fmt3(as.numeric(fixest::fitstat(fit, "wr2")$wr2))
     )
-  })
+  }, fits, n_signals)
   row <- function(label, key) {
     paste0(
       "   ", format(label, width = 16), " & ",
@@ -87,50 +95,56 @@ make_combined_table <- function(fits, n_signals, timeFE, file) {
   message("Wrote ", file)
 }
 
-# Convert etable's adjacent no-time-FE/time-FE ordering into the manuscript
-# ordering, then write the two official presentation tables.
-write_combined_mp_tables <- function(scaled_fits, unscaled_fits, n_signals, output_dir) {
-  if (length(scaled_fits) != 6L || length(unscaled_fits) != 6L) {
-    stop("Each MP table variant requires six scaled and six unscaled models.")
+# Each benchmark supplies six models (academic/DM/difference, without and with
+# time FE). Table 3 takes the no-time-FE set from both benchmarks; Table 4 the
+# time-FE set. Columns (1)--(3) are Panel (a), columns (4)--(6) Panel (b).
+write_combined_mp_tables <- function(panel_a, panel_b, n_signals_a, n_signals_b,
+                                     output_dir) {
+  if (length(panel_a) != 6L || length(panel_b) != 6L) {
+    stop("Each benchmark panel requires six models.")
   }
+  sig6 <- c(rep(n_signals_a, 3), rep(n_signals_b, 3))
 
   make_combined_table(
-    c(scaled_fits[c(1, 3, 5)], unscaled_fits[c(1, 3, 5)]),
-    n_signals,
+    c(panel_a[c(1, 3, 5)], panel_b[c(1, 3, 5)]),
+    sig6,
     timeFE = FALSE,
     file = file.path(output_dir, "Table_MPStyleRegsNoTimeFE.tex")
   )
   make_combined_table(
-    c(scaled_fits[c(2, 4, 6)], unscaled_fits[c(2, 4, 6)]),
-    n_signals,
+    c(panel_a[c(2, 4, 6)], panel_b[c(2, 4, 6)]),
+    sig6,
     timeFE = TRUE,
     file = file.path(output_dir, "Table_MPStyleRegsTimeFE.tex")
   )
 }
 
-# An override permits render-only validation without touching ../Results.
-output_dir <- Sys.getenv("MP_TABLE_OUTPUT_DIR", unset = "../Results")
-dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+# Sourcing with MP_TABLE_FUNCTIONS_ONLY=true exposes the renderer to appendix
+# variants without rewriting the main-text tables.
+if (!identical(Sys.getenv("MP_TABLE_FUNCTIONS_ONLY"), "true")) {
+  # An override permits render-only validation without touching ../Results.
+  output_dir <- Sys.getenv("MP_TABLE_OUTPUT_DIR", unset = "../Results")
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
-cache_path <- "../Data/Processed/mp_style_decay_models.RDS"
-if (!file.exists(cache_path)) {
-  stop("Missing MP-style model cache: ", cache_path, ". Run S3a_MPStyleDecayModels.R first.")
+  cache_path <- "../Data/Processed/mp_style_decay_models.RDS"
+  if (!file.exists(cache_path)) {
+    stop("Missing MP-style model cache: ", cache_path, ". Run S3a_MPStyleDecayModels.R first.")
+  }
+  models <- readRDS(cache_path)
+  stopifnot(
+    !is.null(models$metadata$panel_a$pair_fingerprint_sha256),
+    !is.null(models$metadata$panel_b$pair_fingerprint_sha256),
+    length(models$panel_a) == 6L,
+    length(models$panel_b) == 6L
+  )
+
+  # Manuscript Tables 3 and 4: the two benchmark panels side by side, without
+  # and with time fixed effects.
+  write_combined_mp_tables(
+    models$panel_a,
+    models$panel_b,
+    n_signals_a = models$metadata$panel_a$predictor_count,
+    n_signals_b = models$metadata$panel_b$predictor_count,
+    output_dir = output_dir
+  )
 }
-models <- readRDS(cache_path)
-main_nobs <- vapply(c(models$main_scaled, models$main_unscaled),
-                    stats::nobs, numeric(1))
-stopifnot(
-  !is.null(models$metadata$pair_fingerprint_sha256),
-  length(unique(main_nobs)) == 1L,
-  main_nobs[[1]] == models$metadata$regression_observation_count,
-  length(models$metadata$regression_predictors) == models$metadata$predictor_count
-)
-
-# Manuscript Tables 3 and 4: combine the alternating no-time-FE/time-FE
-# specifications from the scaled and unscaled model lists.
-write_combined_mp_tables(
-  models$main_scaled,
-  models$main_unscaled,
-  n_signals = models$metadata$predictor_count,
-  output_dir = output_dir
-)

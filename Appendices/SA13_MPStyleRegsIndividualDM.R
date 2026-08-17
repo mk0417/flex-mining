@@ -18,14 +18,14 @@ dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 benchmark_path <- "../Data/Processed/raw_dm_benchmarks.RDS"
 dmcomp_path <- "../Data/Processed/dmcomp_sumstats.RDS"
 dm_path <- paste0(
-  "../Data/Processed/", globalSettings$dataVersion, " LongShort.RData"
+  "../Data/Processed/", globalSettings$universe$dataVersion, " LongShort.RData"
 )
 
 benchmark_metadata <- readRDS(benchmark_path)$metadata$matched
 dmcomp <- readRDS(dmcomp_path)
 inclSignals <- restrictInclSignals(
-  restrictType = globalSettings$restrictType,
-  topT = globalSettings$topT
+  restrictType = globalSettings$inclusion$restrictType,
+  topT = globalSettings$inclusion$topT
 )
 czsum <- readRDS("../Data/Processed/czsum_allpredictors.RDS") %>%
   filter(Keep, signalname %in% inclSignals) %>%

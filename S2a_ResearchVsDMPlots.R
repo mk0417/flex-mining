@@ -11,8 +11,8 @@ library(doParallel)
 ## Load Global Data -------------------------------------------
 
 # these are treated as globals (don't modify pls)
-inclSignals = restrictInclSignals(restrictType = globalSettings$restrictType, 
-                                  topT = globalSettings$topT)
+inclSignals = restrictInclSignals(restrictType = globalSettings$inclusion$restrictType, 
+                                  topT = globalSettings$inclusion$topT)
 
 czsum <- readRDS("../Data/Processed/czsum_allpredictors.RDS") %>%
   filter(Keep) %>% 
@@ -312,92 +312,9 @@ for (n_year_roll in n_year_list) {
            width = 10, height = 8)
 } # end loop over n_year_roll
 
-# Accounting variables only plot  ----------------------------
-
-# get accounting signals
-czacct = readRDS('../Data/Processed/czsum_allpredictors.RDS') %>% 
-  left_join(fread('../Data/Raw/SignalDoc.csv') %>% 
-    transmute(Acronym, Cat.Data, Cat.Form, Def = tolower(`Detailed Definition`)) 
-    , by = c('signalname' = 'Acronym')) %>% 
-  filter(signalname %in% inclSignals & Cat.Data == 'Accounting')
-
-# find accounting signals to drop
-czacct = czacct %>% 
-  mutate(
-    drop = FALSE
-    # drop quarterly compustat
-    , drop = if_else(grepl('quarter', Def), TRUE, drop)
-    # drop analyst forecasts
-    , drop = if_else(grepl('analyst|meanest|earningssurprise',
-                           paste(tolower(signalname), Def)), TRUE, drop)
-    # drop discrete signals
-    , drop = if_else(Cat.Form == 'discrete', TRUE, drop)
-    # drop ShareIss1Y and ShareIss5Y because they use only crsp data
-    , drop = if_else(signalname %in% c('ShareIss1Y', 'ShareIss5Y'), TRUE, drop)
-  ) %>% 
-  select(signalname, drop, everything()) %>% 
-  arrange(-drop) 
-
-
-ret_for_plottingAnnualAccounting = ret_for_plot1 %>% 
-  # keep only published signals that use annual compustat, no double sorts, no weird discrete signals
-  filter(pubname %in% czacct[czacct$drop==FALSE, ]$signalname) %>% 
-  select(-matchRet) %>% 
-  # select top 5% t-stats as the matchRet (bad notation, sorry)
-  rename(matchRet = matchRetAlt) %>%
-  filter(!is.na(matchRet))
-
-
-# Add calendar date to the dataset for clustering standard errors
-ret_for_plottingAnnualAccounting = ret_for_plottingAnnualAccounting %>%
-  left_join(
-    czret %>% select(signalname, eventDate, date),
-    by = c("pubname" = "signalname", "eventDate" = "eventDate")
-  ) %>%
-  rename(calendarDate = date)
-
-# Use the calendar time-based standard errors function
-printme = ReturnPlotsWithDM_std_errors_indicators(
-  dt = ret_for_plottingAnnualAccounting,
-  basepath = "../Results/Fig_DM",
-  suffix = "t_top5Pct_AccountingOnly_CalendarSE",
-  rollmonths = 60,
-  colors = colors,
-  labelmatch = FALSE,
-  yl = -0,
-  yh = 125,
-  xl = global_xl,
-  xh = global_xh,
-  legendlabels =
-    c(
-      paste0("Pub Compustat Annual"),
-      paste0("Data-Mined for Top 5% |t| in Original Sample"),
-      'N/A'
-    ),
-  legendpos = c(42,20)/100,
-  fontsize = fontsizeall,
-  yaxislab = ylaball,
-  linesize = linesizeall
-)
-
-# custom edits 
-printme2 = printme + theme(
-  legend.background = element_rect(fill = "white", color = "black", size = 0.3),
-  # remove space where legend would be
-  legend.margin = margin(-0.7, 0.5, 0.5, 0.5, "cm"),
-  legend.position = c(44,15)/100,
-  # add space between legend items
-  legend.spacing.y = unit(0.2, "cm")
-) +
-  guides(color = guide_legend(byrow = TRUE))
-
-# save
-ggsave(paste0("../Results/Fig_DM_t_top5Pct_AccountingOnly_CalendarSE.pdf"), width = 10, height = 8)
-
-
 # Use journal definitions from globalSettings ------------------------
-top_finance = globalSettings$top3Finance
-top_accounting = globalSettings$top3Accounting
+top_finance = globalSettings$journals$top3Finance
+top_accounting = globalSettings$journals$top3Accounting
 
 # Add journal classifications to ret_for_plot0
 ret_for_plot_journal <- ret_for_plot0 %>%
