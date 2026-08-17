@@ -7,8 +7,8 @@
 
 library(data.table)
 required_functions <- c(
-  "extract_beta", "extract_ff4_coeffs",
-  "factor_model_slopes", "factor_abnormal_returns", "factor_alpha_stats"
+  "factor_fit", "factor_model_fits", "factor_abnormal_returns",
+  "factor_alpha_stats"
 )
 for (expression in parse("3c_FactorAdjustedDMPrep.R")) {
   if (is.call(expression) &&
@@ -34,49 +34,75 @@ y <- factors %*% t(slopes) + matrix(rnorm(n * 3L, sd = 0.7), ncol = 3L)
 y[1:25, 2] <- NA_real_
 y[seq(4, n, by = 13), 3] <- NA_real_
 
-capm_direct <- unname(coef(lm(y[, 1] ~ factors[, "mktrf"]))[2])
-ff4_direct <- unname(coef(lm(y[, 3] ~ factors))[2:5])
+# Single-series fits: slopes, intercept, and the intercept's standard error.
+capm_direct <- summary(lm(y[, 1] ~ factors[, "mktrf"]))$coefficients
+capm_fit <- factor_fit(y[, 1], factors[, "mktrf", drop = FALSE])
+ff4_direct <- summary(lm(y[, 3] ~ factors))$coefficients
+ff4_fit <- factor_fit(y[, 3], factors)
 stopifnot(
-  isTRUE(all.equal(extract_beta(y[, 1], factors[, "mktrf"]), capm_direct)),
-  isTRUE(all.equal(
-    extract_ff4_coeffs(
-      y[, 3], factors[, "mktrf"], factors[, "smb"], factors[, "hml"],
-      factors[, "umd"]
-    ),
-    ff4_direct
-  )),
-  is.na(extract_beta(y[1:59, 1], factors[1:59, "mktrf"]))
+  isTRUE(all.equal(capm_fit$slopes, unname(capm_direct[2L, 1L]))),
+  isTRUE(all.equal(capm_fit$alpha, unname(capm_direct[1L, 1L]))),
+  isTRUE(all.equal(capm_fit$alpha_se, unname(capm_direct[1L, 2L]))),
+  isTRUE(all.equal(ff4_fit$slopes, unname(ff4_direct[2:5, 1L]))),
+  isTRUE(all.equal(ff4_fit$alpha_se, unname(ff4_direct[1L, 2L]))),
+  ff4_fit$nobs == sum(!is.na(y[, 3])),
+  is.na(factor_fit(y[1:59, 1], factors[1:59, "mktrf", drop = FALSE])$slopes)
 )
 
-fitted <- factor_model_slopes(y, factors, minimum_observations = 60L)
-direct <- t(vapply(seq_len(ncol(y)), function(j) {
+fitted <- factor_model_fits(y, factors, minimum_observations = 60L)
+direct <- lapply(seq_len(ncol(y)), function(j) {
   complete <- complete.cases(y[, j], factors)
-  coef(lm(y[complete, j] ~ factors[complete, ]))[-1L]
-}, numeric(4L)))
-stopifnot(isTRUE(all.equal(
-  fitted$slopes, direct, tolerance = 1e-10, check.attributes = FALSE
-)))
+  summary(lm(y[complete, j] ~ factors[complete, ]))$coefficients
+})
+stopifnot(
+  isTRUE(all.equal(
+    fitted$slopes, t(vapply(direct, function(x) x[-1L, 1L], numeric(4L))),
+    tolerance = 1e-10, check.attributes = FALSE
+  )),
+  isTRUE(all.equal(
+    fitted$alpha, vapply(direct, function(x) x[1L, 1L], numeric(1L)),
+    tolerance = 1e-10
+  )),
+  isTRUE(all.equal(
+    fitted$alpha_se, vapply(direct, function(x) x[1L, 2L], numeric(1L)),
+    tolerance = 1e-10
+  ))
+)
 
+# The alpha t-statistic must be the OLS intercept t-statistic, not the
+# abnormal-return series mean over its own standard deviation.
 abnormal <- factor_abnormal_returns(y, factors, fitted$slopes)
-stats <- factor_alpha_stats(abnormal)
+stats <- factor_alpha_stats(abnormal, fitted$alpha_se)
 direct_stats <- rbindlist(lapply(seq_len(ncol(y)), function(j) {
   x <- abnormal[, j]
   data.table(
     alpha_mean = mean(x, na.rm = TRUE),
     alpha_sd = sd(x, na.rm = TRUE),
+    alpha_se = direct[[j]][1L, 2L],
     alpha_n = sum(!is.na(x)),
-    alpha_t = mean(x, na.rm = TRUE) / sd(x, na.rm = TRUE) *
-      sqrt(sum(!is.na(x)))
+    alpha_t = direct[[j]][1L, 3L]
   )
 }))
 stopifnot(isTRUE(all.equal(
   stats, direct_stats, tolerance = 1e-10, check.attributes = FALSE
 )))
+# The superseded formula is close enough to look right and different enough to
+# move the t > 2 screen, so guard against a silent revert.
+naive_t <- stats$alpha_mean / stats$alpha_sd * sqrt(stats$alpha_n)
+stopifnot(all(naive_t > stats$alpha_t), max(naive_t / stats$alpha_t) > 1.01)
+
+stopifnot(inherits(
+  try(factor_alpha_stats(abnormal, fitted$alpha_se[-1L]), silent = TRUE),
+  "try-error"
+))
 
 # Fewer than 60 observations must not produce coefficients.
 short <- y
 short[60:n, 1] <- NA_real_
-short_fit <- factor_model_slopes(short, factors, minimum_observations = 60L)
-stopifnot(all(is.na(short_fit$slopes[1, ])), short_fit$nobs[1] == 59L)
+short_fit <- factor_model_fits(short, factors, minimum_observations = 60L)
+stopifnot(
+  all(is.na(short_fit$slopes[1, ])), short_fit$nobs[1] == 59L,
+  is.na(short_fit$alpha[1]), is.na(short_fit$alpha_se[1])
+)
 
 message("Window-batched factor-adjustment helper tests passed.")

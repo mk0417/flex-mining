@@ -32,8 +32,8 @@ if (length(missing_files) > 0L) {
 
 raw_contract <- readRDS(required_files[1])
 factor_contract <- readRDS(required_files[2])
-if (!identical(factor_contract$metadata$schema_version, 2L)) {
-  stop("Section 4 requires factor_adjusted_dm_benchmarks schema version 2.")
+if (!identical(factor_contract$metadata$schema_version, 3L)) {
+  stop("Section 4 requires factor_adjusted_dm_benchmarks schema version 3.")
 }
 stopifnot(identical(
   raw_contract$metadata$accounting_t2$pair_fingerprint_sha256,
