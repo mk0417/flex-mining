@@ -191,7 +191,7 @@ fig2_aggregate_series = function(dt_long, rollmonths = 60) {
 # agg: output of fig2_aggregate_series (possibly several panels' worth).
 # series_labels: labels to plot, in legend order.
 fig2_overlay_plot = function(agg, series_labels, colors, linetypes,
-                             xl = -360, xh = 300, yl = -10, yh = 130,
+                             xl = -300, xh = 300, yl = -30, yh = 150,
                              fontsize = 28, legendpos = c(30, 15) / 100,
                              yaxislab = 'Trailing 5-Year Return (bps pm)',
                              linesize = 1.5, ribbon_alpha = 0.10) {
@@ -208,7 +208,7 @@ fig2_overlay_plot = function(agg, series_labels, colors, linetypes,
     scale_linetype_manual(values = linetypes) +
     geom_vline(xintercept = 0) +
     geom_hline(yintercept = c(0, 100), color = c('black', 'dimgrey')) +
-    coord_cartesian(xlim = c(xl, xh), ylim = c(yl, yh)) +
+    coord_cartesian(xlim = c(xl, xh), ylim = c(yl, yh), expand = FALSE) +
     scale_y_continuous(breaks = seq(-200, 180, 25)) +
     scale_x_continuous(breaks = seq(-360, 360, 60)) +
     labs(x = 'Months Since Original Sample Ended', y = yaxislab,
@@ -292,8 +292,10 @@ colors_paired = c(colors[1], colors[1], colors[2], colors[2])
 fontsizeall = 28
 linesizeall = 1.5
 ylaball = 'Trailing 5-Year Return (bps pm)'
-global_xl = -360
+global_xl = -300
 global_xh = 300
+global_yl = -30
+global_yh = 150
 
 panels = list(
   a = list(
@@ -303,7 +305,7 @@ panels = list(
     # Spec-3 styling: each published/data-mined pair shares a hue.
     linetypes = c('solid', 'dotted', 'solid', 'dotted'),
     yaxislab = 'Trailing 5-Year Alpha (bps pm)',
-    yl = 0, yh = 150, legendpos = c(35, 20) / 100,
+    legendpos = c(35, 20) / 100,
     file = 'Fig2a_FactorAdj'
   ),
   b = list(
@@ -312,7 +314,7 @@ panels = list(
     colors = colors_paired,
     linetypes = c('solid', 'dotted', 'solid', 'dotted'),
     yaxislab = ylaball,
-    yl = 0, yh = 200, legendpos = c(35, 20) / 100,
+    legendpos = c(35, 20) / 100,
     file = 'Fig2b_PubSampleLimits'
   ),
   c = list(
@@ -321,7 +323,7 @@ panels = list(
     colors = colors,
     linetypes = c('solid', 'dashed', 'longdash'),
     yaxislab = ylaball,
-    yl = -50, yh = 170, legendpos = c(40, 22) / 100,
+    legendpos = c(40, 22) / 100,
     file = 'Fig2c_MatchedExclCorr'
   ),
   d = list(
@@ -330,7 +332,7 @@ panels = list(
     colors = colors,
     linetypes = c('solid', 'longdash', 'dashed'),
     yaxislab = ylaball,
-    yl = -50, yh = 145, legendpos = c(35, 18) / 100,
+    legendpos = c(35, 18) / 100,
     file = 'Fig2d_AltMining'
   )
 )
@@ -341,7 +343,7 @@ for (pk in names(panels)) {
 
   plt = fig2_overlay_plot(
     agg, series_labels = p$series, colors = p$colors, linetypes = p$linetypes,
-    xl = global_xl, xh = global_xh, yl = p$yl, yh = p$yh,
+    xl = global_xl, xh = global_xh, yl = global_yl, yh = global_yh,
     fontsize = fontsizeall, legendpos = p$legendpos,
     yaxislab = p$yaxislab, linesize = linesizeall
   )
