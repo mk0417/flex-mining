@@ -37,9 +37,10 @@ match_screen <- list(
   # alternative filtering
   t_min = globalSettings$benchmark$t_min, # Default = 0, minimum screened t-stat
   t_max = globalSettings$benchmark$t_max, # maximum screened t-stat
-  t_rankpct_min = globalSettings$benchmark$t_rankpct_min, # top x% of data mined t-stats, 100% for off
-  minNumStocks = globalSettings$benchmark$minNumStocks
+  t_rankpct_min = globalSettings$benchmark$t_rankpct_min # top x% of data mined t-stats, 100% for off
 )
+# The common accounting-ratio gates are not listed here: SelectDMStrats() takes
+# them straight from globalSettings$benchmark$gates.
 
 ## Load data ----------------------------------------------------
 

@@ -212,12 +212,86 @@ sumstats_for_DM_Strats <- function(
 
 
 
-SelectDMStrats <- function(insampsum, settings) {
+# Common accounting-ratio gates -------------------------------------------
+# docs/benchmark-logic.md lists five gates that every accounting-ratio
+# benchmark shares. The two functions below are the only implementation of
+# them: selectors call apply_common_gates() first and then add whatever screen
+# distinguishes their benchmark. Keeping the gates in one place is what makes
+# the doc's "Common accounting-ratio gates" section verifiable rather than a
+# claim repeated across selectors.
+#
+# Three gates are numeric thresholds and live in globalSettings$benchmark$gates.
+# The remaining two are structural and are applied here unconditionally:
+#   * orientation is taken from the in-sample mean, as `orientation`; ratios
+#     with an exactly zero mean have no defined orientation and are dropped.
+#   * correlations are signed by that orientation, as `rho`, whenever the input
+#     carries a raw `cor` column.
+validate_common_gates <- function(gates) {
+  required <- c("minNumStocks", "nmonth_min", "nlastyear_required")
+  missing <- setdiff(required, names(gates))
+  if (length(missing) > 0L) {
+    stop("Common gate settings are missing: ", paste(missing, collapse = ", "))
+  }
+  bad <- vapply(
+    gates[required],
+    function(x) !is.numeric(x) || length(x) != 1L || !is.finite(x) || x < 0,
+    logical(1)
+  )
+  if (any(bad)) {
+    stop("Common gate settings must be single non-negative finite numbers: ",
+         paste(required[bad], collapse = ", "))
+  }
+  gates[required]
+}
+
+apply_common_gates <- function(pairs, gates = globalSettings$benchmark$gates) {
+  gates <- validate_common_gates(gates)
+  gated <- data.table::as.data.table(pairs)
+  required <- c(
+    "rbar", "min_nstock_long", "min_nstock_short", "nmonth", "nlastyear"
+  )
+  missing <- setdiff(required, names(gated))
+  if (length(missing) > 0L) {
+    stop("Cannot apply the common accounting-ratio gates; input is missing ",
+         "column(s): ", paste(missing, collapse = ", "))
+  }
+  gated <- gated[
+    !is.na(rbar) &
+      min_nstock_long >= gates$minNumStocks / 2 &
+      min_nstock_short >= gates$minNumStocks / 2 &
+      nmonth >= gates$nmonth_min &
+      nlastyear == gates$nlastyear_required
+  ]
+  gated[, orientation := sign(rbar)]
+  gated <- gated[orientation != 0]
+  if ("cor" %in% names(gated)) {
+    gated[, rho := cor * orientation]
+  }
+  data.table::setattr(gated, "common_gates", gates)
+  gated[]
+}
+
+# Correlation screen shared by benchmarks A2 and A4. Expects the signed
+# correlation `rho` written by apply_common_gates(); pairs without a measured
+# correlation cannot be shown to be uncorrelated and are dropped.
+apply_uncorrelated_screen <- function(
+    pairs, corr_max = globalSettings$benchmark$corr_max) {
+  screened <- data.table::as.data.table(pairs)
+  if (!"rho" %in% names(screened)) {
+    stop("The uncorrelated screen needs the signed correlation `rho`; run ",
+         "apply_common_gates() on an input carrying `cor` first.")
+  }
+  screened[!is.na(rho) & rho <= corr_max]
+}
+
+SelectDMStrats <- function(insampsum, settings,
+                           gates = globalSettings$benchmark$gates) {
   # input:
   #     insampsum = summary stats for each pubname, dmname combination
   #     dmset = settings for selection
+  #     gates = common accounting-ratio gates (see apply_common_gates)
   # output: matchcur = all pubname, dmname that satisfy dmset
-  
+
   # add derivative statistics
   insampsum <- insampsum %>%
     # The same mining universe is repeated for every publication sharing a
@@ -233,22 +307,23 @@ SelectDMStrats <- function(insampsum, settings) {
       diff_tstat = abs(tstat * sign(rbar) - tstat_op)
     ) %>%
     setDT()
-  
+
+  # Impose the common gates. Ranks are deliberately computed above, on the
+  # ungated universe: t_rankpct_min selects the top x% of all mined ratios and
+  # then keeps the ones that clear the gates, not the top x% of gated ratios.
+  insampsum <- apply_common_gates(insampsum, gates)
+
   # filter
   matchcur <- insampsum[
     diff_rbar <= settings$r_tol &
       diff_tstat <= settings$t_tol &
       diff_rbar / abs(rbar_op) <= settings$r_reltol &
       diff_tstat / abs(tstat_op) <= settings$t_reltol &
-      min_nstock_long >= settings$minNumStocks/2 &
-      min_nstock_short >= settings$minNumStocks/2 &
       abs(tstat) > settings$t_min &
       abs(tstat) < settings$t_max &
-      rank_tstat / n_dm_tot <= settings$t_rankpct_min / 100 &
-      nlastyear == 12 &   # tbc: make flexible
-      nmonth >= 5*12 # tbc: make flexible
+      rank_tstat / n_dm_tot <= settings$t_rankpct_min / 100
   ]
-  
+
   print("summary of matching:")
   matchcur[, .(n_dm_match = .N, sampstart = min(sampstart), sampend = min(sampend)), by = "pubname"] %>%
     arrange(-n_dm_match) %>%
@@ -266,10 +341,8 @@ SelectDMStrats <- function(insampsum, settings) {
 # as the raw benchmark.
 select_accounting_t2_pairs <- function(
     insampsum,
-    min_num_stocks = globalSettings$benchmark$minNumStocks,
-    t_threshold = 2,
-    minimum_months = 60L,
-    required_final_year_months = 12L,
+    t_threshold = globalSettings$benchmark$t_min,
+    gates = globalSettings$benchmark$gates,
     pubnames = NULL) {
   pairs <- data.table::copy(data.table::as.data.table(insampsum))
   required <- c(
@@ -283,19 +356,12 @@ select_accounting_t2_pairs <- function(
   }
 
   pairs[, sweight := tolower(sweight)]
-  pairs <- pairs[
-    !is.na(rbar) & !is.na(tstat) &
-      abs(tstat) > t_threshold &
-      min_nstock_long >= min_num_stocks / 2 &
-      min_nstock_short >= min_num_stocks / 2 &
-      nmonth >= minimum_months &
-      nlastyear == required_final_year_months
-  ]
+  pairs <- apply_common_gates(pairs, gates)
+  # A1's own screen: significant raw in-sample t-statistic.
+  pairs <- pairs[!is.na(tstat) & abs(tstat) > t_threshold]
   if (!is.null(pubnames)) {
     pairs <- pairs[pubname %in% pubnames]
   }
-  pairs[, orientation := sign(rbar)]
-  pairs <- pairs[orientation != 0]
   data.table::setorder(pairs, pubname, sweight, dmname)
   if (anyDuplicated(pairs, by = c("pubname", "sweight", "dmname"))) {
     stop("Accounting t>2 pair keys are not unique.")
@@ -328,13 +394,13 @@ select_matched_dm_pairs <- function(
     r_tol = globalSettings$benchmark$r_tol,
     t_reltol = globalSettings$benchmark$matched_uncorr_t_reltol,
     r_reltol = globalSettings$benchmark$matched_uncorr_r_reltol,
-    min_num_stocks = globalSettings$benchmark$minNumStocks,
+    gates = globalSettings$benchmark$gates,
     pubnames = NULL) {
   pairs <- data.table::copy(data.table::as.data.table(insampsum))
   required <- c(
     "pubname", "sweight", "dmname", "rbar_op", "tstat_op", "sampstart",
     "sampend", "rbar", "tstat", "min_nstock_long", "min_nstock_short",
-    "nlastyear"
+    "nmonth", "nlastyear"
   )
   missing <- setdiff(required, names(pairs))
   if (length(missing) > 0L) {
@@ -342,19 +408,21 @@ select_matched_dm_pairs <- function(
   }
 
   pairs[, sweight := tolower(sweight)]
+  pairs <- apply_common_gates(pairs, gates)
+  # `sign` is the downstream name for the orientation; materialize_matched_dm_
+  # returns() and the Section 5 inspection tables both read it.
   pairs[, `:=`(
-    sign = sign(rbar),
-    diff_rbar = abs(rbar * sign(rbar) - rbar_op),
-    diff_tstat = abs(tstat * sign(rbar) - tstat_op)
+    sign = orientation,
+    diff_rbar = abs(rbar * orientation - rbar_op),
+    diff_tstat = abs(tstat * orientation - tstat_op)
   )]
+  # A3's own screen: in-sample t-statistic and mean return each within a
+  # relative tolerance of the published signal's.
   pairs <- pairs[
     diff_rbar <= r_tol &
       diff_tstat <= t_tol &
       diff_rbar / abs(rbar_op) <= r_reltol &
-      diff_tstat / abs(tstat_op) <= t_reltol &
-      min_nstock_long >= min_num_stocks / 2 &
-      min_nstock_short >= min_num_stocks / 2 &
-      nlastyear == 12
+      diff_tstat / abs(tstat_op) <= t_reltol
   ]
   if (!is.null(pubnames)) {
     pairs <- pairs[pubname %in% pubnames]
@@ -428,8 +496,9 @@ build_matched_uncorr_pair_data <- function(
     insampsum,
     published_metadata,
     DMname,
-    minimum_insample_months = globalSettings$benchmark$match_nmonth_min,
+    gates = globalSettings$benchmark$gates,
     maximum_pairwise_correlation = globalSettings$benchmark$corr_max) {
+  gates <- validate_common_gates(gates)
   published_metadata <- data.table::copy(
     data.table::as.data.table(published_metadata)
   )
@@ -448,6 +517,7 @@ build_matched_uncorr_pair_data <- function(
 
   pair_catalog <- select_matched_dm_pairs(
     insampsum,
+    gates = gates,
     pubnames = published_metadata$pubname
   )
   candidate_returns <- materialize_matched_dm_returns(pair_catalog, DMname)
@@ -477,11 +547,10 @@ build_matched_uncorr_pair_data <- function(
     all.x = TRUE
   )
 
-  correlations <- data.table::as.data.table(insampsum)[, .(
-    pubname,
-    sweight = tolower(sweight),
-    matched_name = dmname,
-    rho = cor * sign(rbar)
+  # The signed correlation is carried over from the gated pair catalog rather
+  # than re-derived, so A2 and A4 cannot drift apart in how `rho` is signed.
+  correlations <- pair_catalog[, .(
+    pubname, sweight, matched_name = dmname, rho
   )]
   if (anyDuplicated(correlations, by = c("pubname", "sweight", "matched_name"))) {
     stop("Matched-pair correlations do not have unique composite keys.")
@@ -497,15 +566,26 @@ build_matched_uncorr_pair_data <- function(
       abs(rbar_insamp_matched - published_rbar) / abs(published_rbar),
     tstat_rel_distance =
       abs(tstat_insamp_matched - published_tstat) / abs(published_tstat),
-    passes_history = nmonth_insamp >= minimum_insample_months,
-    passes_correlation =
-      !is.na(rho) & rho <= maximum_pairwise_correlation
+    # select_matched_dm_pairs() already imposed the history gate on the summary
+    # statistics. Re-checking it against the materialized panel is a cheap guard
+    # against the two ever disagreeing; it should never bind.
+    passes_history = nmonth_insamp >= gates$nmonth_min
   )]
-  diagnostics[, keep_matched_uncorr := passes_history & passes_correlation]
+  if (any(!diagnostics$passes_history)) {
+    warning(
+      sum(!diagnostics$passes_history),
+      " gated pair(s) fall short of the in-sample history gate when recomputed ",
+      "from the materialized panel; summary statistics and returns disagree."
+    )
+  }
   data.table::setorder(diagnostics, pubname, sweight, matched_name)
 
+  # A3 is the history-qualified set; A4 adds the correlation screen that A2
+  # also uses.
   history_pairs <- diagnostics[passes_history == TRUE]
-  uncorr_pairs <- diagnostics[keep_matched_uncorr == TRUE]
+  uncorr_pairs <- apply_uncorrelated_screen(
+    history_pairs, maximum_pairwise_correlation
+  )
   if (nrow(uncorr_pairs) == 0L) {
     stop("The matched-uncorrelated screens retained no pairs.")
   }
