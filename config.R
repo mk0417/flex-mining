@@ -61,31 +61,50 @@ inclusionSettings <- list(
 )
 
 # Benchmark definitions (see docs/benchmark-logic.md, step 2) --------------
+#
+# Benchmarks are named with the labels used in docs/benchmark-logic.md, which is
+# the authoritative description of each screen and of the exhibits it feeds:
+#
+#   A1  Significant                     t_min, t_max
+#   A2  Significant, uncorrelated       A1 + corr_max
+#   A3  Matched statistics              matched_uncorr_{t,r}_reltol
+#   A4  Matched statistics, uncorr.     A3 + corr_max
+#   B1  Significant CAPM alpha          A1 universe + alpha-t screen (3c)
+#   C1  Significant FF4 alpha           A1 universe + alpha-t screen (3c)
+#   D1  Top 5% accounting               t_rankpct_min, set locally (see below)
+#   D2  Top 5% ticker                   t_rankpct_min, set locally (see below)
+#   D3  Spanning splits                 thresholds hardcoded in
+#                                       Appendices/SA11_DMSpanPCAPrep.R
 benchmarkSettings <- list(
   # common gates applied to every mined ratio before any screen
   minNumStocks     = 20, # min stocks per month over the in-sample period (ie minNumStocks/2 in each leg)
   match_nmonth_min = 60, # minimum pair-level in-sample history (months)
 
-  # significant screen (benchmarks 1 and 2): raw |t| > t_min
+  # A1 significant screen: raw |t| > t_min. Also the base universe for A2, and
+  # for the factor-adjusted B1 and C1.
   t_min = 2,
   t_max = Inf,
 
-  # top-5% screen (benchmark 3)
-  t_rankpct_min = 100, # top x% of data-mined |t-stats|; 100% = off (set to 5 for the top-5% benchmark)
+  # Top x% of data-mined |t-stats|. DO NOT CHANGE: 100 (= off) is what A1--A4
+  # and the EZ-themes code require. D1 and D2 build their top-5% universe from a
+  # local copy of the screen (see 3a_PrepDMBenchmarks.R, top5_screen), so editing
+  # this global would silently alter every other benchmark instead.
+  t_rankpct_min = 100,
 
-  # uncorrelated cutoff (benchmarks 2 and 5). Used by both the broad "excluding
-  # correlated" benchmark and the performance-matched benchmark: keep pairs
-  # whose signed correlation cor * sign(rbar) is <= this value.
-  matched_uncorr_corr_max = 0.10,
+  # A2 and A4 correlation screen: keep pairs whose signed correlation
+  # cor * sign(rbar) is <= this value. Used by both the broad "excluding
+  # correlated" benchmark (A2) and the performance-matched one (A4).
+  corr_max = 0.10,
 
-  # performance-matched benchmark (benchmarks 4 and 5): keep mined ratios whose
-  # in-sample t-stat and mean return are each within this relative tolerance of
-  # the published signal.
+  # A3 and A4 matched statistics: keep mined ratios whose in-sample t-stat and
+  # mean return are each within this relative tolerance of the published signal.
+  # A3 does not additionally impose the A1 |t| > 2 screen.
   matched_uncorr_t_reltol = 0.10,
   matched_uncorr_r_reltol = 0.10,
 
-  # absolute (level) DM-vs-published tolerances. Currently OFF (Inf); the active
-  # matching uses the relative tolerances above.
+  # absolute (level) DM-vs-published tolerances. Currently OFF (Inf); no
+  # benchmark uses them, and the active matching uses the relative tolerances
+  # above.
   t_tol    = .1*Inf, # tolerance in t-statistics (DM vs OP)
   r_tol    = .3*Inf, # tolerance in mean return (DM vs OP)
   t_reltol = .1*Inf, # relative (to OP) tolerance in t-statistics (DM vs OP)

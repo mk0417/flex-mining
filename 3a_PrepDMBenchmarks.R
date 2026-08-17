@@ -142,7 +142,7 @@ print(stop_time - start_time)
 # significant, non-redundant mined strategies rather than a handful of
 # look-alikes.
 accounting_t2_uncorr_matched <- accounting_t2_matched[
-  !is.na(cor) & cor * sign(rbar) <= globalSettings$benchmark$matched_uncorr_corr_max
+  !is.na(cor) & cor * sign(rbar) <= globalSettings$benchmark$corr_max
 ]
 
 print("Making t>2 & uncorrelated event time returns")
@@ -285,7 +285,7 @@ matched_metadata <- list(
     tstat_relative_tolerance = globalSettings$benchmark$matched_uncorr_t_reltol,
     mean_return_relative_tolerance = globalSettings$benchmark$matched_uncorr_r_reltol,
     minimum_insample_months = globalSettings$benchmark$match_nmonth_min,
-    maximum_pairwise_correlation = globalSettings$benchmark$matched_uncorr_corr_max,
+    maximum_pairwise_correlation = globalSettings$benchmark$corr_max,
     normalization = "each matched strategy by its own in-sample mean"
   ),
   pair_count = nrow(matched_uncorr_pairs),
@@ -395,7 +395,7 @@ accounting_t2_uncorr_metadata <- list(
     minimum_stocks_per_leg = globalSettings$benchmark$minNumStocks / 2,
     minimum_insample_months = 60L,
     required_final_year_months = 12L,
-    maximum_pairwise_correlation = globalSettings$benchmark$matched_uncorr_corr_max,
+    maximum_pairwise_correlation = globalSettings$benchmark$corr_max,
     normalization = "100 times return divided by the strategy in-sample mean"
   ),
   pair_count = nrow(accounting_t2_uncorr_matched),

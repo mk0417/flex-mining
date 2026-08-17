@@ -429,7 +429,7 @@ build_matched_uncorr_pair_data <- function(
     published_metadata,
     DMname,
     minimum_insample_months = globalSettings$benchmark$match_nmonth_min,
-    maximum_pairwise_correlation = globalSettings$benchmark$matched_uncorr_corr_max) {
+    maximum_pairwise_correlation = globalSettings$benchmark$corr_max) {
   published_metadata <- data.table::copy(
     data.table::as.data.table(published_metadata)
   )
