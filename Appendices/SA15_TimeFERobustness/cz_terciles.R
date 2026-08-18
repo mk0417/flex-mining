@@ -5,7 +5,7 @@
 # How to run: from flex-mining/, normally through
 #   Rscript Appendices/SA15_TimeFERobustness/run.R build
 # Inputs:  the CZ signal panel and signal documentation under
-#            ../Data/{Raw,Processed}/TimeFERobustness (see acquire.R)
+#            ../Data/{Raw,Processed}/TimeFERobustness (see download.R)
 #          CRSP.MSF, MSENAMES, and MSEDELIST via WRDS, cached after the first
 #            download as crsp-monthly-returns-market-equity.parquet
 #          ../Data/Processed/TimeFERobustness/output/jkp-cz-matched-pairs.csv
@@ -74,7 +74,7 @@ next_yyyymm <- function(x) {
 check(
   dir.exists(timefeSettings$files$signal_panel),
   paste0("%s does not exist. Run `Rscript ",
-         "Appendices/SA15_TimeFERobustness/run.R acquire` first."),
+         "Appendices/SA15_TimeFERobustness/run.R download` first."),
   timefeSettings$files$signal_panel
 )
 signal_dataset <- open_dataset(timefeSettings$files$signal_panel,

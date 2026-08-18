@@ -12,7 +12,7 @@ module_dir <- "Appendices/SA15_TimeFERobustness"
 files <- list.files(module_dir, pattern = "[.]R$", full.names = TRUE)
 stopifnot(
   identical(basename(files),
-            c("acquire.R", "cz_terciles.R", "estimate.R", "exhibits.R",
+            c("cz_terciles.R", "download.R", "estimate.R", "exhibits.R",
               "run.R", "setup.R")),
   all(file.exists(files))
 )
@@ -31,7 +31,7 @@ on.exit(unlink(temp_root, recursive = TRUE), add = TRUE)
 # Pins and paths ----------------------------------------------------------
 
 stopifnot(
-  identical(timefeSettings$pins$release, "2025_10"),
+  identical(timefeSettings$pins$release, "2024_10"),
   nchar(timefeSettings$pins$jkp_commit) == 40L,
   nchar(timefeSettings$pins$cz_mapping_commit) == 40L,
   nchar(timefeSettings$pins$cz_mapping_sha256) == 64L,

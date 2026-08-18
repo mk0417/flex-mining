@@ -8,7 +8,7 @@
 #            factor_details.xlsx, all downloaded here on first use
 #          the pinned CZ portfolio returns, signal documentation, and
 #            meta-replication mapping under ../Data/Raw/TimeFERobustness
-#            (see acquire.R)
+#            (see download.R)
 # Outputs: ../Data/Raw/TimeFERobustness/jkp/download-manifest.csv
 #          ../Data/Processed/TimeFERobustness/output/
 #            mp-regressions.csv
@@ -49,6 +49,26 @@ report_cols <- c(
   "specification", "fixed_effects", "post_sample", "post_sample_se",
   "additional_post_publication", "additional_post_publication_se",
   "total_post_publication_change", "observations", "factors"
+)
+
+# This stage and cz_terciles.R read files that only download.R produces. Check
+# them before the JKP downloads below, so a run that skipped `download` stops
+# at once with a clear instruction rather than fetching the JKP inputs first
+# and then failing on the first missing CZ file. The CRSP cache is not checked
+# here: cz_terciles.R builds it on first run.
+downloaded_inputs <- unlist(timefeSettings$files[c(
+  "op_portfolios", "signal_doc", "meta_replications", "signal_panel"
+)])
+missing_inputs <- downloaded_inputs[
+  !(file.exists(downloaded_inputs) | dir.exists(downloaded_inputs))
+]
+check(
+  length(missing_inputs) == 0L,
+  paste0(
+    "Missing downloaded input(s):\n  %s\n",
+    "Run `Rscript Appendices/SA15_TimeFERobustness/run.R download` first."
+  ),
+  paste(missing_inputs, collapse = "\n  ")
 )
 
 # =========================================================================

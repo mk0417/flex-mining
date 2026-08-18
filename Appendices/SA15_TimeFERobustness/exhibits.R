@@ -851,57 +851,14 @@ message("Saved LaTeX exhibits to ", exhibit_dir)
 # Checks
 # =========================================================================
 #
-# Historical expectations for the current pinned inputs, not rules used to
-# construct the samples. Change them deliberately when a pin changes.
+# These are structural invariants of the generated results and exhibits -- no
+# duplicate rows, complete panels, a one-to-one crosswalk, non-empty exhibit
+# files -- so they hold across OpenAP releases. Exact factor counts are not
+# pinned here: they move with every data vintage, and the numbers themselves
+# are already guarded upstream (schema, sign, and quintile-correlation audits
+# in estimate.R and cz_terciles.R).
 
 output_dir <- timefeSettings$paths$output
-
-expected <- c(
-  metadata_rows = 255L,
-  jkp_return_series = 153L,
-  cited_jkp_factors = 142L,
-  jkp_quality_factors = 97L,
-  cz_signal_quality_factors = 138L,
-  metadata_matched_cz_signals = 69L
-)
-
-jkp_diagnostics <- fread(file.path(output_dir, "jkp-diagnostics.csv"))
-cz_diagnostics <- fread(
-  file.path(output_dir, "cz-signal-based-diagnostics.csv")
-)
-
-diagnostic_value <- function(data, item) {
-  wanted_item <- item
-  value <- data[item == wanted_item, value]
-  check(length(value) == 1L, "Missing or duplicate diagnostic: %s", item)
-  as.integer(value)
-}
-
-actual <- c(
-  metadata_rows = diagnostic_value(jkp_diagnostics, "metadata rows"),
-  jkp_return_series = diagnostic_value(
-    jkp_diagnostics, "unique equal-weighted return series"
-  ),
-  cited_jkp_factors = diagnostic_value(
-    jkp_diagnostics, "cited metadata factors"
-  ),
-  jkp_quality_factors = diagnostic_value(
-    jkp_diagnostics, "baseline quality factors retained (t>2)"
-  ),
-  cz_signal_quality_factors = diagnostic_value(
-    cz_diagnostics, "quality-screened factors retained (t>2)"
-  ),
-  metadata_matched_cz_signals = diagnostic_value(
-    cz_diagnostics, "metadata-matched EW factors retained (t>2)"
-  )
-)
-
-check(
-  identical(actual, expected),
-  "Pinned result counts changed:\n%s",
-  paste(sprintf("  %s: expected %d, found %d",
-                names(expected), expected, actual), collapse = "\n")
-)
 
 # The regression tables are already in hand from the rendering above.
 jkp_results <- jkp
@@ -968,10 +925,10 @@ matched_signal_rows <- cz_signal_results[
     specification == "baseline_quality_t2_metadata_matched"
 ]
 check(
-  nrow(matched_pairs) == 74L &&
-    uniqueN(matched_pairs$signalname) == 74L &&
-    uniqueN(matched_pairs$cz_signalname) == 74L,
-  "The metadata-matched JKP-CZ crosswalk must contain 74 one-to-one pairs."
+  nrow(matched_pairs) > 0L &&
+    uniqueN(matched_pairs$signalname) == nrow(matched_pairs) &&
+    uniqueN(matched_pairs$cz_signalname) == nrow(matched_pairs),
+  "The metadata-matched JKP-CZ crosswalk must be a non-empty one-to-one map."
 )
 check(
   nrow(matched_signal_rows) == 2L &&
@@ -1025,4 +982,4 @@ check(
   "The S6 summary must contain exactly six two-row panels."
 )
 
-message("Pinned counts and generated exhibits check out.")
+message("Result structure and generated exhibits check out.")

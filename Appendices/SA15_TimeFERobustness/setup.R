@@ -48,7 +48,7 @@ options(stringsAsFactors = FALSE)
 # every input is pinned. Changing a pin changes the sample, and the counts
 # checked at the end of exhibits.R are expected to move with it.
 pinSettings <- list(
-  release = "2025_10",  # Open Source Asset Pricing release
+  release = "2024_10",  # Open Source Asset Pricing release
   jkp_commit = "98adb75ddc66d2cc47613dcab745b0ea6260e902",
   cz_mapping_commit = "e4a1d728caea04e68868614ad938d0293c5d0b11",
   cz_mapping_sha256 = paste0(

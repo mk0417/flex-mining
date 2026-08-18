@@ -1,13 +1,14 @@
 # Download the Chen-Zimmermann signal-level predictor panel.
 #
 # How to run: from flex-mining/,
-#   Rscript Appendices/SA15_TimeFERobustness/run.R acquire
+#   Rscript Appendices/SA15_TimeFERobustness/run.R download
 # Inputs:  the pinned Open Source Asset Pricing release (firm characteristics,
 #            signal documentation, original portfolio returns), the pinned
 #            meta-replication mapping, and CRSP.MSF via WRDS for the three
 #            CRSP-derived signals the bulk file omits
-#          WRDS credentials in WRDS_USER/WRDS_PASS or
-#            WRDS_USERNAME/WRDS_PASSWORD (otherwise the package prompts)
+#          WRDS credentials, resolved as in 1_Download_and_Clean.R: from a
+#            .env file if present, then WRDS_USERNAME/WRDS_PASSWORD in the
+#            environment, otherwise an interactive getPass prompt
 # Outputs: ../Data/Raw/TimeFERobustness/opensourceap/ (pinned downloads)
 #          ../Data/Processed/TimeFERobustness/opensourceap/
 #            signed_predictors_all_wide-<release>.parquet/
@@ -37,8 +38,18 @@ op_csv <- timefeSettings$files$op_portfolios
 meta_csv <- timefeSettings$files$meta_replications
 panel_parquet <- timefeSettings$files$signal_panel
 
-# OpenSourceAP.DownloadR expects the shorter WRDS variable names. Support the
-# credential names used elsewhere in the devcontainer without printing them.
+# Resolve WRDS credentials the same way as 1_Download_and_Clean.R: load a .env
+# file if one is present, which populates WRDS_USERNAME/WRDS_PASSWORD. Anything
+# still missing is prompted for downstream by OpenSourceAP.DownloadR (for the
+# CRSP signals) via getPass, the same package the main pipeline prompts with.
+if (file.exists(".env")) {
+  library(dotenv)
+  load_dot_env(".env")
+}
+
+# OpenSourceAP.DownloadR reads the shorter WRDS_USER/WRDS_PASS names, while the
+# repository convention (and .env) uses WRDS_USERNAME/WRDS_PASSWORD. Bridge the
+# two without printing the values.
 if (!nzchar(Sys.getenv("WRDS_USER")) &&
     nzchar(Sys.getenv("WRDS_USERNAME"))) {
   Sys.setenv(WRDS_USER = Sys.getenv("WRDS_USERNAME"))

@@ -2,10 +2,10 @@
 #
 # How to run: from anywhere,
 #   Rscript Appendices/SA15_TimeFERobustness/run.R [command]
-#   commands: build (default), exhibits, preflight, acquire. Run with --help
+#   commands: build (default), exhibits, preflight, download. Run with --help
 #             for one-line descriptions.
 # Inputs:  pinned external inputs under ../Data/Raw/TimeFERobustness and caches
-#          under ../Data/Processed/TimeFERobustness; `acquire` obtains the
+#          under ../Data/Processed/TimeFERobustness; `download` obtains the
 #          missing ones.
 # Outputs: analysis CSVs under ../Data/Processed/TimeFERobustness/output and
 #          TeX exhibits under ../Results/TimeFERobustness.
@@ -31,13 +31,13 @@ exhibits <- file.path(module, "exhibits.R")
 commands <- list(
   build = c(estimate, terciles, exhibits),
   exhibits = exhibits,
-  acquire = file.path(module, "acquire.R")
+  download = file.path(module, "download.R")
 )
 descriptions <- c(
   build     = "Estimate everything and render the exhibits (default)",
   exhibits  = "Re-render the exhibits and re-check them, reusing the results",
   preflight = "Report package and input readiness",
-  acquire   = "Acquire the large pinned CZ signal-level input"
+  download  = "Download the large pinned CZ signal-level input"
 )
 
 arguments <- commandArgs(trailingOnly = TRUE)
@@ -81,7 +81,7 @@ if (command == "preflight") {
     message("Time-FE robustness build inputs are present.")
   } else {
     message(
-      "Preflight found missing data. Run `acquire` for the Open Source Asset ",
+      "Preflight found missing data. Run `download` for the Open Source Asset ",
       "Pricing inputs; a missing CRSP cache requires an explicitly authorized ",
       "WRDS connection during `build`."
     )

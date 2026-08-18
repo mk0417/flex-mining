@@ -9,12 +9,12 @@ Run commands from any directory:
 ```sh
 Rscript Appendices/SA15_TimeFERobustness/run.R --help
 Rscript Appendices/SA15_TimeFERobustness/run.R preflight
-Rscript Appendices/SA15_TimeFERobustness/run.R acquire
+Rscript Appendices/SA15_TimeFERobustness/run.R download
 Rscript Appendices/SA15_TimeFERobustness/run.R build
 Rscript Appendices/SA15_TimeFERobustness/run.R exhibits
 ```
 
-`acquire` is deliberately separate from `build`. It downloads the pinned
+`download` is deliberately separate from `build`. It downloads the pinned
 Open Source Asset Pricing release and obtains the three CRSP-derived signals
 used in that release. `build` can also need one WRDS connection when its
 detailed CRSP return/market-equity cache is absent. In the sandbox, obtain the
@@ -22,20 +22,20 @@ user's permission before either command makes a WRDS connection.
 
 ## Layout
 
-Five R files, isolated from the rest of the repository: nothing here reads a
+Six R files, isolated from the rest of the repository: nothing here reads a
 main-pipeline cache, and no main-pipeline script sources anything here.
 
 | File | Role |
 | --- | --- |
 | `run.R` | Driver and preflight; runs each stage as its own Rscript |
 | `setup.R` | `timefeSettings`, packages, folders, and the helpers with more than one consumer |
-| `acquire.R` | Downloads the CZ signal-level panel (`acquire`) |
+| `download.R` | Downloads the CZ signal-level panel (`download`) |
 | `estimate.R` | The MP, JKP, alternative-construction, and date sections |
 | `cz_terciles.R` | CZ signal-level tercile portfolios and their regressions |
 | `exhibits.R` | Renders the six TeX exhibits, then checks them |
 
 There are only two reasons a stage is its own file, and both are practical.
-`acquire` downloads gigabytes and can need WRDS, so it has to be separately
+`download` downloads gigabytes and can need WRDS, so it has to be separately
 invocable. `cz_terciles.R` holds a 2.5 GB Arrow signal panel and the CRSP
 monthly file in memory, so it runs in its own process and releases that memory
 before the exhibits are rendered. Everything else that shares inputs shares a
