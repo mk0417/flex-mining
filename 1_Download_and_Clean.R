@@ -193,13 +193,26 @@ saveRDS(crspm, '../Data/Raw/crspm.RData')
 
 # Fama-French Factors ----------------------------------------------------
 
-FamaFrenchFactors <- dbSendQuery(conn = wrds, statement = 
-                                   "SELECT date, mktrf, smb, hml, rf, umd, rmw, cma 
-                                 FROM ff.fivefactors_monthly"
+FamaFrenchFactors <- dbSendQuery(conn = wrds, statement =
+                                  "SELECT date, mktrf, smb, hml, rf, umd
+                                 FROM ff.factors_monthly"
 ) %>% 
   # Pull data
   dbFetch(n = -1) %>%
   as_tibble()
+
+# RMW and CMA begin in July 1963, but their shorter history should not truncate
+# the CAPM and FF4 factors. Keep them for five-factor appendix calculations by
+# joining them onto the longer FF3-plus-momentum panel.
+FamaFrenchFiveFactors <- dbSendQuery(conn = wrds, statement =
+                                      "SELECT date, rmw, cma
+                                     FROM ff.fivefactors_monthly"
+) %>%
+  dbFetch(n = -1) %>%
+  as_tibble()
+
+FamaFrenchFactors <- FamaFrenchFactors %>%
+  left_join(FamaFrenchFiveFactors, by = "date")
 
 # Convert returns to percent and format date
 FamaFrenchFactors <- FamaFrenchFactors %>%
@@ -214,6 +227,17 @@ FamaFrenchFactors <- FamaFrenchFactors %>%
          date = as.Date(date)
          ) %>% 
   select(-date)
+
+if (anyDuplicated(FamaFrenchFactors$yearm)) {
+  stop("Fama-French factor months are not unique.")
+}
+ff4_complete <- complete.cases(
+  FamaFrenchFactors[, c("mktrf", "smb", "hml", "umd")]
+)
+if (!any(ff4_complete) ||
+    min(FamaFrenchFactors$yearm[ff4_complete]) > as.yearmon("Jan 1927")) {
+  stop("The FF3-plus-momentum history does not extend back to January 1927.")
+}
 
 # write to disk 
 saveRDS(FamaFrenchFactors, '../Data/Raw/FamaFrenchFactors.RData')

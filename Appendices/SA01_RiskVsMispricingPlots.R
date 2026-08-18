@@ -104,10 +104,13 @@ add_catID <- function(df, risk_measure, n_tiles = 3) {
               , ordered = TRUE)]
 
 }
-extract_beta <- function(x, y) {
-  model <- lm(y ~ x)
+# Loading of a return series on a factor. The return is the response: the
+# arguments used to be named (x, y) and fit lm(y ~ x), which reversed every
+# call site below and attenuated the loadings by var(factor)/var(return).
+extract_beta <- function(ret, factor_return) {
+  model <- lm(ret ~ factor_return)
   bet <- coef(model)[2]
-  return(bet)
+  return(unname(bet))
 }
 
 czsum = readRDS('../Data/Processed/czsum_allpredictors.RDS')
@@ -236,9 +239,9 @@ czret <- czret %>%
 
 
 ## Full-sample betas -------------------------------------------------------
-czret[, beta_all :=  extract_beta(ret, mktrf*100), by = signalname]
+czret[, beta_all :=  extract_beta(ret, mktrf), by = signalname]
 
-czret[, abnormal_all := ret - beta_all*mktrf*100]
+czret[, abnormal_all := ret - beta_all*mktrf]
 
 czret[samptype == 'insamp', abar_all := mean(abnormal_all, na.rm = TRUE), by = signalname]
 
@@ -247,9 +250,10 @@ czret[, abar_all := nafill(abar_all, "locf"), by = .(signalname)]
 czret[, abnormal_all_normalized := 100*abnormal_all/abar_all]
 
 ## Rolling betas -----------------------------------------------------------
-czret[, beta_roll :=  coefficients(roll_lm(ret, mktrf*100, width = 60))[, 2], by = signalname]
+# roll_lm(x, y, width): the factor is the regressor and the return the response.
+czret[, beta_roll :=  coefficients(roll_lm(mktrf, ret, width = 60))[, 2], by = signalname]
 
-czret[, abnormal_roll := ret - beta_roll*mktrf*100]
+czret[, abnormal_roll := ret - beta_roll*mktrf]
 
 czret[samptype == 'insamp', abar_roll := mean(abnormal_roll, na.rm = TRUE), by = signalname]
 

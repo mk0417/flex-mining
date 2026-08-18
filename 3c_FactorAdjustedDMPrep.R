@@ -9,29 +9,47 @@
 #
 # Sample-specific CAPM/FF4 begins from the exact broad accounting |t| > 2 pair
 # universe used by the raw benchmark; no published mean-return or t-stat
-# matching is applied.
+# matching is applied. The alpha-t screen on both sides uses the OLS intercept
+# t-statistic (see the note above factor_fit()).
 
 rm(list = ls())
 source("0_Environment.R")
 # Factor-adjustment implementation ---------------------------------------
+#
+# An alpha is an OLS intercept, so its standard error is
+# s * sqrt((X'X)^-1_11) with s^2 = RSS/(n - p). Reading the standard error off
+# the abnormal-return series instead -- mean(abnormal)/sd(abnormal)*sqrt(n) --
+# treats the estimated factor loadings as known and ignores the degrees of
+# freedom they consume, which understates the standard error by roughly 2%
+# under the CAPM and 10% under FF4, and so admits ratios and predictors that
+# the alpha-t screen should reject. Both sides screen on the intercept
+# t-statistic below.
 
-extract_beta <- function(ret, mktrf, minimum_observations = 60L) {
-  observed <- stats::complete.cases(ret, mktrf)
-  if (sum(observed) < minimum_observations) return(NA_real_)
-  unname(stats::coef(stats::lm(ret[observed] ~ mktrf[observed]))[2L])
+# Fit one factor model to one return series. Returns the slopes, the intercept,
+# and the intercept's OLS standard error.
+factor_fit <- function(ret, factors, minimum_observations = 60L) {
+  factors <- as.matrix(factors)
+  n_factor <- ncol(factors)
+  observed <- stats::complete.cases(ret, factors)
+  n_observed <- sum(observed)
+  unfitted <- list(
+    slopes = rep(NA_real_, n_factor), alpha = NA_real_,
+    alpha_se = NA_real_, nobs = n_observed
+  )
+  if (n_observed < minimum_observations) return(unfitted)
+  fit <- stats::lm(ret[observed] ~ factors[observed, , drop = FALSE])
+  estimates <- summary(fit)$coefficients
+  # A rank-deficient design drops rows from the coefficient table.
+  if (nrow(estimates) != n_factor + 1L) return(unfitted)
+  list(
+    slopes = unname(stats::coef(fit))[-1L],
+    alpha = unname(estimates[1L, 1L]),
+    alpha_se = unname(estimates[1L, 2L]),
+    nobs = n_observed
+  )
 }
 
-extract_ff4_coeffs <- function(
-    ret, mktrf, smb, hml, umd, minimum_observations = 60L) {
-  observed <- stats::complete.cases(ret, mktrf, smb, hml, umd)
-  if (sum(observed) < minimum_observations) return(rep(NA_real_, 4L))
-  unname(stats::coef(stats::lm(
-    ret[observed] ~ mktrf[observed] + smb[observed] +
-      hml[observed] + umd[observed]
-  ))[2:5])
-}
-
-factor_model_slopes <- function(y, factors, minimum_observations = 60L) {
+factor_model_fits <- function(y, factors, minimum_observations = 60L) {
   y <- as.matrix(y)
   factors <- as.matrix(factors)
   if (nrow(y) != nrow(factors)) {
@@ -45,8 +63,11 @@ factor_model_slopes <- function(y, factors, minimum_observations = 60L) {
   n_factor <- ncol(factors)
   slopes <- matrix(NA_real_, nrow = n_series, ncol = n_factor)
   colnames(slopes) <- colnames(factors)
+  alpha <- rep(NA_real_, n_series)
+  alpha_se <- rep(NA_real_, n_series)
   if (nrow(y) == 0L || n_series == 0L) {
-    return(list(slopes = slopes, nobs = integer(n_series)))
+    return(list(slopes = slopes, alpha = alpha, alpha_se = alpha_se,
+                nobs = integer(n_series)))
   }
 
   observed <- !is.na(y)
@@ -56,6 +77,7 @@ factor_model_slopes <- function(y, factors, minimum_observations = 60L) {
   p <- ncol(design)
   nobs <- colSums(observed)
   xty <- crossprod(design, y_zero)
+  yty <- colSums(y_zero * y_zero)
 
   # Each return series may have a different history.  Compute its small X'X
   # from vectorized sufficient statistics, then solve only the p-by-p system.
@@ -81,13 +103,20 @@ factor_model_slopes <- function(y, factors, minimum_observations = 60L) {
         xtx[b, a] <- xtx[a, b]
       }
     }
-    coef <- tryCatch(
-      solve(xtx, xty[, j]),
-      error = function(e) rep(NA_real_, p)
-    )
+    xtx_inverse <- tryCatch(solve(xtx), error = function(e) NULL)
+    if (is.null(xtx_inverse)) next
+    coef <- drop(xtx_inverse %*% xty[, j])
     slopes[j, ] <- coef[-1L]
+    alpha[j] <- coef[1L]
+    # At the OLS solution the residual sum of squares is y'y - coef'X'y.
+    residual_ss <- max(yty[j] - sum(coef * xty[, j]), 0)
+    degrees_freedom <- nobs[j] - p
+    if (degrees_freedom > 0L) {
+      alpha_se[j] <- sqrt(residual_ss / degrees_freedom * xtx_inverse[1L, 1L])
+    }
   }
-  list(slopes = slopes, nobs = as.integer(nobs))
+  list(slopes = slopes, alpha = alpha, alpha_se = alpha_se,
+       nobs = as.integer(nobs))
 }
 
 factor_abnormal_returns <- function(y, factors, slopes) {
@@ -103,8 +132,15 @@ factor_abnormal_returns <- function(y, factors, slopes) {
   abnormal
 }
 
-factor_alpha_stats <- function(abnormal) {
+# Alpha statistics for a matrix of abnormal returns, paired with the standard
+# errors of the fit that produced it. `alpha_sd` describes the dispersion of
+# the abnormal returns; `alpha_se` is what the t-statistic divides by.
+factor_alpha_stats <- function(abnormal, alpha_se) {
   abnormal <- as.matrix(abnormal)
+  alpha_se <- as.numeric(alpha_se)
+  if (length(alpha_se) != ncol(abnormal)) {
+    stop("One alpha standard error is required per return series.")
+  }
   observed <- !is.na(abnormal)
   x <- abnormal
   x[!observed] <- 0
@@ -118,10 +154,10 @@ factor_alpha_stats <- function(abnormal) {
     NA_real_
   )
   sd <- sqrt(variance)
-  tstat <- ifelse(n > 1L & sd > 0, mean / sd * sqrt(n), NA_real_)
+  tstat <- ifelse(!is.na(alpha_se) & alpha_se > 0, mean / alpha_se, NA_real_)
   data.table::data.table(
-    alpha_mean = mean, alpha_sd = sd, alpha_n = as.integer(n),
-    alpha_t = tstat
+    alpha_mean = mean, alpha_sd = sd, alpha_se = alpha_se,
+    alpha_n = as.integer(n), alpha_t = tstat
   )
 }
 
@@ -219,9 +255,16 @@ aggregate_normalized_abnormal <- function(
 fit_dm_window_models <- function(
     return_store, factor_data, window_pairs,
     minimum_observations = 60L, alpha_threshold = 2) {
-  window_pairs <- unique(data.table::as.data.table(window_pairs), by = c(
-    "sweight", "dmname"
-  ))
+  window_pairs <- data.table::as.data.table(window_pairs)
+  # The window is read off the first row and every series is fit once, so a
+  # caller that mixed windows or repeated a mined ratio would be mis-fit
+  # silently rather than loudly.
+  if (data.table::uniqueN(window_pairs[, .(sampstart, sampend)]) != 1L) {
+    stop("fit_dm_window_models() fits one publication sample window at a time.")
+  }
+  if (anyDuplicated(window_pairs, by = c("sweight", "dmname"))) {
+    stop("A mined ratio appears more than once in one sample window.")
+  }
   data.table::setorder(window_pairs, sweight, dmname)
   key_lookup <- return_store$keys[window_pairs, on = c("sweight", "dmname")]
   if (anyNA(key_lookup$column)) {
@@ -247,20 +290,25 @@ fit_dm_window_models <- function(
   for (model in names(model_factors)) {
     factor_names <- model_factors[[model]]
     f <- factor_matrix[, factor_names, drop = FALSE]
-    fit_is <- factor_model_slopes(
+    fit_is <- factor_model_fits(
       y[is_rows, , drop = FALSE], f[is_rows, , drop = FALSE],
       minimum_observations
     )
-    fit_oos <- factor_model_slopes(
+    fit_oos <- factor_model_fits(
       y[oos_rows, , drop = FALSE], f[oos_rows, , drop = FALSE],
       minimum_observations
     )
     abnormal_is <- factor_abnormal_returns(
       y[is_rows, , drop = FALSE], f[is_rows, , drop = FALSE], fit_is$slopes
     )
-    alpha <- factor_alpha_stats(abnormal_is)
-    stats[, paste0(model, c("_alpha_mean", "_alpha_sd", "_alpha_n", "_alpha_t")) :=
-      alpha]
+    alpha <- factor_alpha_stats(abnormal_is, fit_is$alpha_se)
+    # The mean in-sample abnormal return is the fitted intercept. Disagreement
+    # would mean the fit and the abnormal returns covered different months.
+    if (!identical(is.na(alpha$alpha_mean), is.na(fit_is$alpha)) ||
+        any(abs(alpha$alpha_mean - fit_is$alpha) > 1e-8, na.rm = TRUE)) {
+      stop("In-sample abnormal returns disagree with the fitted intercepts.")
+    }
+    stats[, paste0(model, "_", names(alpha)) := alpha]
     stats[, paste0(model, "_eligible") :=
       !is.na(alpha$alpha_t) & alpha$alpha_t > alpha_threshold]
 
@@ -391,11 +439,16 @@ published_raw <- czret[
 
 capm_is <- czret[
   date >= sampstart & date <= sampend,
-  .(beta_capm_is = extract_beta(ret, mktrf)), by = signalname
+  {
+    z <- factor_fit(ret, cbind(mktrf), minimum_observations)
+    .(beta_capm_is = z$slopes[1L], abar_capm_tv_se = z$alpha_se)
+  }, by = signalname
 ]
 capm_oos <- czret[
   date > sampend,
-  .(beta_capm_oos = extract_beta(ret, mktrf)), by = signalname
+  .(beta_capm_oos = factor_fit(
+    ret, cbind(mktrf), minimum_observations)$slopes[1L]),
+  by = signalname
 ]
 czret <- merge(czret, capm_is, by = "signalname", all.x = TRUE)
 czret <- merge(czret, capm_oos, by = "signalname", all.x = TRUE)
@@ -407,16 +460,12 @@ czret[, beta_capm_tv := fcase(
 czret[, abnormal_capm_tv := ret - beta_capm_tv * mktrf]
 capm_alpha <- czret[
   date >= sampstart & date <= sampend,
-  .(
-    abar_capm_tv = mean(abnormal_capm_tv, na.rm = TRUE),
-    abar_capm_tv_t = {
-      n <- sum(!is.na(abnormal_capm_tv))
-      m <- mean(abnormal_capm_tv, na.rm = TRUE)
-      s <- sd(abnormal_capm_tv, na.rm = TRUE)
-      if (n > 1L && s > 0) m / s * sqrt(n) else NA_real_
-    }
-  ), by = signalname
+  .(abar_capm_tv = mean(abnormal_capm_tv, na.rm = TRUE)), by = signalname
 ]
+capm_alpha[capm_is, on = "signalname", abar_capm_tv_t := fifelse(
+  !is.na(i.abar_capm_tv_se) & i.abar_capm_tv_se > 0,
+  abar_capm_tv / i.abar_capm_tv_se, NA_real_
+)]
 czret <- merge(czret, capm_alpha, by = "signalname", all.x = TRUE)
 czret[, abnormal_capm_tv_normalized := fifelse(
   abs(abar_capm_tv) > 1e-10,
@@ -427,15 +476,18 @@ czret[, abnormal_capm_tv_normalized := fifelse(
 ff4_is <- czret[
   date >= sampstart & date <= sampend,
   {
-    z <- extract_ff4_coeffs(ret, mktrf, smb, hml, umd)
-    .(beta_ff4_is = z[1], s_ff4_is = z[2], h_ff4_is = z[3], u_ff4_is = z[4])
+    z <- factor_fit(ret, cbind(mktrf, smb, hml, umd), minimum_observations)
+    .(beta_ff4_is = z$slopes[1L], s_ff4_is = z$slopes[2L],
+      h_ff4_is = z$slopes[3L], u_ff4_is = z$slopes[4L],
+      abar_ff4_tv_se = z$alpha_se)
   }, by = signalname
 ]
 ff4_oos <- czret[
   date > sampend,
   {
-    z <- extract_ff4_coeffs(ret, mktrf, smb, hml, umd)
-    .(beta_ff4_oos = z[1], s_ff4_oos = z[2], h_ff4_oos = z[3], u_ff4_oos = z[4])
+    z <- factor_fit(ret, cbind(mktrf, smb, hml, umd), minimum_observations)
+    .(beta_ff4_oos = z$slopes[1L], s_ff4_oos = z$slopes[2L],
+      h_ff4_oos = z$slopes[3L], u_ff4_oos = z$slopes[4L])
   }, by = signalname
 ]
 czret <- merge(czret, ff4_is, by = "signalname", all.x = TRUE)
@@ -456,16 +508,12 @@ czret[, abnormal_ff4_tv := ret - (
 )]
 ff4_alpha <- czret[
   date >= sampstart & date <= sampend,
-  .(
-    abar_ff4_tv = mean(abnormal_ff4_tv, na.rm = TRUE),
-    abar_ff4_tv_t = {
-      n <- sum(!is.na(abnormal_ff4_tv))
-      m <- mean(abnormal_ff4_tv, na.rm = TRUE)
-      s <- sd(abnormal_ff4_tv, na.rm = TRUE)
-      if (n > 1L && s > 0) m / s * sqrt(n) else NA_real_
-    }
-  ), by = signalname
+  .(abar_ff4_tv = mean(abnormal_ff4_tv, na.rm = TRUE)), by = signalname
 ]
+ff4_alpha[ff4_is, on = "signalname", abar_ff4_tv_t := fifelse(
+  !is.na(i.abar_ff4_tv_se) & i.abar_ff4_tv_se > 0,
+  abar_ff4_tv / i.abar_ff4_tv_se, NA_real_
+)]
 czret <- merge(czret, ff4_alpha, by = "signalname", all.x = TRUE)
 czret[, abnormal_ff4_tv_normalized := fifelse(
   abs(abar_ff4_tv) > 1e-10,
@@ -545,7 +593,7 @@ result <- list(
   published_stats = as_tibble(published_stats),
   window_diagnostics = as_tibble(window_diagnostics),
   metadata = list(
-    schema_version = 2L,
+    schema_version = 3L,
     base_universe = "accounting_t2",
     base_pair_count = nrow(base_pairs),
     base_predictor_count = uniqueN(base_pairs$pubname),
@@ -556,6 +604,7 @@ result <- list(
     raw_t_threshold = raw_t_threshold,
     alpha_t_threshold = alpha_t_threshold,
     normalization = "each series by its own original-sample alpha mean",
+    alpha_t_statistic = "OLS intercept estimate over its OLS standard error",
     factor_models = list(
       capm = "Mkt-RF",
       ff4 = c("Mkt-RF", "SMB", "HML", "UMD")

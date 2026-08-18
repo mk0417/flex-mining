@@ -36,6 +36,12 @@ runStages <- list(
 universeSettings <- list(
   dataVersion = 'CZ-style-v8b',
 
+  # Compustat coverage before July 1963 is not reliable enough for the
+  # synthetic accounting-strategy universe. This floor applies to portfolio
+  # return months, not to the underlying accounting observations used with a
+  # reporting lag.
+  accounting_return_start = 'Jul 1963',
+
   # signal construction
   form           = c('v1/v2', 'diff(v1)/lag(v2)'), # 'pdiff(v1/v2)', 'pdiff(v1)', 'diff(v1/v2)', 'pdiff(v1)-pdiff(v2)')
   denom_min_fobs = 0.25, # minimum fraction of non-missing observations in 1963

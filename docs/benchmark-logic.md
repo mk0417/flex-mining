@@ -77,6 +77,11 @@ benchmark families below.
     - Retain published comparisons when the published strategy has both raw
       in-sample t > 2 and FF4-alpha t > 2.
 
+Every alpha-t screen in B and C uses the OLS intercept t-statistic, so it
+accounts for estimation error in the factor loadings and for the degrees of
+freedom they consume. Dividing the mean abnormal return by its own standard
+deviation instead overstates t by roughly 2% under the CAPM and 10% under FF4.
+
 ### D. Minor robustness benchmarks
 
 These one-off variants support alternative-mining and appendix checks rather
