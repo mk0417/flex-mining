@@ -419,6 +419,7 @@ user$data = list(
   , toostale_months = globalSettings$universe$toostale_months   
   , delist_adj      = globalSettings$universe$delist_adj
   , crsp_filter     = globalSettings$universe$crsp_filter 
+  , return_start    = globalSettings$universe$accounting_return_start
 )
 
 # debugging
@@ -613,6 +614,9 @@ if (debugset$prep_data){
   crsp = crsp %>%
     transmute(
       permno, ret_yearm, ret, me_monthly = me
+    ) %>%
+    filter(
+      ret_yearm >= as.yearmon(user$data$return_start)
     )
   
   # merge, signals available at signalyearm get used for returns in ret_yearm
@@ -696,6 +700,11 @@ stratdat = list(
   , port_list = port_list
   , user = user
   , name = user$name
+)
+
+stopifnot(
+  min(stratdat$ret$yearm, na.rm = TRUE) >=
+    as.yearmon(user$data$return_start)
 )
 
 # save
