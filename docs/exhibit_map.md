@@ -161,6 +161,20 @@ separate manuscript repository.
 | Table B.2        | Annual-accounting decay regressions without time FE | Table_MPStyleRegsNoTimeFE_AccountingOnly.tex     | Appendices/SA14_MPStyleRegsAccountingOnly.R |
 | Table B.3        | Annual-accounting decay regressions with time FE    | Table_MPStyleRegsTimeFE_AccountingOnly.tex       | Appendices/SA14_MPStyleRegsAccountingOnly.R |
 
+The opt-in time-fixed-effects robustness pipeline is kept in
+`Appendices/SA15_TimeFERobustness/`. It produces six private-note/response
+tables under `../Results/TimeFERobustness/`; they are not currently wired into
+the manuscript:
+
+| Output                       | Description                                      |
+| ---------------------------- | ------------------------------------------------ |
+| `s6-timefe-summary.tex`      | Six-panel summary with and without time FE       |
+| `mp-cz-normalized.tex`       | MP and quality-screened CZ comparison            |
+| `jkp-cz-normalized.tex`      | JKP weighting and normalization comparison       |
+| `cz-alternative-specs.tex`   | Alternative CZ portfolio constructions           |
+| `jkp-rep-using-cz.tex`       | JKP portfolio constructions rebuilt from CZ data |
+| `jkp-cz-date-comparison.tex` | Quality-screened JKP/CZ date comparison           |
+
 ## Gaps
 
 At its default stages, `MAIN.R` rebuilds the source outputs for every generated

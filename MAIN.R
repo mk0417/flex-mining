@@ -13,6 +13,7 @@
 #   S4_Heterogeneity        Section 4 exhibits.
 #   S5_BestPredictors       Section 5 exhibits.
 #   SA_Appendices           Appendix-only exhibits.
+#   TimeFERobustness        Large, opt-in time-FE robustness appendix.
 #   9_ExportDataToCsv       Shared-data CSV exports.
 #
 # Iterating on an exhibit normally means running only its section. Changes to
@@ -91,6 +92,14 @@ if (runStages$best_predictors) {
 
 if (runStages$appendices) {
   run_script("SA_Appendices.R")
+}
+
+# Time-fixed-effects robustness appendix ---------------------------------
+# This is separate from the normal appendix rebuild because it uses pinned
+# external data, multi-gigabyte caches, and may require a WRDS connection.
+
+if (runStages$time_fe_robustness) {
+  run_script("Appendices/SA15_TimeFERobustness/run.R")
 }
 
 # Chapter 9: data exports -------------------------------------------------

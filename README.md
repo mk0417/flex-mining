@@ -26,9 +26,15 @@ for each data stage and paper section:
 6. `S4_Heterogeneity.R` renders the Section 4 heterogeneity exhibits.
 7. `S5_BestPredictors.R` renders the Section 5 predictor examples.
 8. `SA_Appendices.R` renders appendix-only exhibits.
-9. `9_ExportDataToCsv.R` exports the mined-strategy data for sharing.
+9. `Appendices/SA15_TimeFERobustness/run.R` optionally rebuilds the large,
+   externally sourced time-fixed-effects robustness appendix.
+10. `9_ExportDataToCsv.R` exports the mined-strategy data for sharing.
 
 The paper-section stages treat processed data as read-only. For a formatting-only
 figure or table change, run only the corresponding section. Chapter 1 overwrites
 `../Data/Raw` with a new, non-recoverable WRDS/Google Drive vintage, so its
 `MAIN.R` switch is off by default and should be enabled deliberately.
+
+The time-FE robustness stage is also off by default. See
+`Appendices/SA15_TimeFERobustness/README.md` for its pinned inputs, storage
+layout, commands, and WRDS warning.

@@ -29,6 +29,7 @@ runStages <- list(
   heterogeneity            = TRUE,   # Section 4
   best_predictors          = TRUE,   # Section 5
   appendices               = TRUE,   # Appendices
+  time_fe_robustness       = FALSE,  # Large optional appendix; may need WRDS
   export_data_to_csv       = TRUE    # Chapter 9
 )
 
