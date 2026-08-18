@@ -1,37 +1,34 @@
-# Generate the LaTeX regression exhibits included by the private note.
+# Render the LaTeX exhibits of the time-FE robustness appendix, then check
+# them and the results behind them.
 #
-# Run from the repository root through the single entry point:
+# How to run: from flex-mining/, normally through
 #   Rscript Appendices/SA15_TimeFERobustness/run.R tables
+# Inputs:  the regression and date-comparison CSVs under
+#          ../Data/Processed/TimeFERobustness/output
+# Outputs: six TeX fragments under ../Results/TimeFERobustness
 #
-# Inputs: regression and date-comparison CSVs in the configured output folder.
-# Outputs: TeX fragments under ../Results/TimeFERobustness by default.
+# The checks at the end run in the same process because they verify exactly
+# what was just written, and read the same result tables.
 
-pdf(NULL)
-source("Appendices/SA15_TimeFERobustness/R/config.R")
+source("Appendices/SA15_TimeFERobustness/setup.R")
 
-suppressPackageStartupMessages(library(data.table))
-
-MP_RESULTS <- file.path(TIMEFE_OUTPUT_DIR, "mp-regressions.csv")
-JKP_RESULTS <- file.path(TIMEFE_OUTPUT_DIR, "jkp-regressions.csv")
-ALT_RESULTS <- file.path(TIMEFE_OUTPUT_DIR, "cz-alternative-specs.csv")
-JKP_ALT_RESULTS <- file.path(TIMEFE_OUTPUT_DIR, "jkp-alternative-specs.csv")
-DATE_RESULTS <- file.path(
-  TIMEFE_OUTPUT_DIR, "jkp-cz-full-date-comparison.csv"
+exhibit_dir <- timefeSettings$paths$exhibits
+result_files <- setNames(
+  file.path(timefeSettings$paths$output, c(
+    "mp-regressions.csv", "jkp-regressions.csv", "cz-alternative-specs.csv",
+    "jkp-alternative-specs.csv", "jkp-cz-full-date-comparison.csv",
+    "cz-signal-based-regressions.csv"
+  )),
+  c("mp", "jkp", "alt", "jkp_alt", "dates", "signal")
 )
-SIGNAL_RESULTS <- file.path(
-  TIMEFE_OUTPUT_DIR, "cz-signal-based-regressions.csv"
-)
-EXHIBIT_DIR <- TIMEFE_EXHIBIT_DIR
 
-# Table-only choices live here. Analysis files use stable internal names;
+# Table-only choices live here. Analysis stages use stable internal names;
 # labels, units, captions, panel order, and rounding are presentation details.
-TABLE_CONFIG <- list(
+tableSettings <- list(
   labels = list(
     fixed_effects = c(
       predictor = "Predictor FE",
-      `predictor + month` = "Predictor + time FE",
-      `pred FE` = "Predictor FE",
-      `+time FE` = "Predictor + time FE"
+      `predictor + month` = "Predictor + time FE"
     ),
     units = c(bps_per_month = "bp/month"),
     mp_cz_panels = c(
@@ -127,34 +124,24 @@ TABLE_CONFIG <- list(
   )
 )
 
-if (
-  !file.exists(MP_RESULTS) || !file.exists(JKP_RESULTS) ||
-  !file.exists(ALT_RESULTS) || !file.exists(JKP_ALT_RESULTS) ||
-  !file.exists(DATE_RESULTS) || !file.exists(SIGNAL_RESULTS)
-) {
-  stop(
-    paste0(
-      "Run `Rscript Appendices/SA15_TimeFERobustness/run.R build` before generating ",
-      "the LaTeX exhibits."
-    ),
-    call. = FALSE
-  )
-}
+check(
+  all(file.exists(result_files)),
+  paste0("Missing %s. Run `Rscript Appendices/SA15_TimeFERobustness/run.R ",
+         "build` before generating the LaTeX exhibits."),
+  paste(result_files[!file.exists(result_files)], collapse = ", ")
+)
 
-dir.create(EXHIBIT_DIR, recursive = TRUE, showWarnings = FALSE)
-mp <- fread(MP_RESULTS)
-jkp <- fread(JKP_RESULTS)
-alt <- fread(ALT_RESULTS)
-jkp_alt <- fread(JKP_ALT_RESULTS)
-date_comparison <- fread(DATE_RESULTS)
-signal_results <- fread(SIGNAL_RESULTS)
+mp <- fread(result_files[["mp"]])
+jkp <- fread(result_files[["jkp"]])
+alt <- fread(result_files[["alt"]])
+jkp_alt <- fread(result_files[["jkp_alt"]])
+date_comparison <- fread(result_files[["dates"]])
+signal_results <- fread(result_files[["signal"]])
 
 fixed_effect_label <- function(id) {
-  label <- unname(TABLE_CONFIG$labels$fixed_effects[id])
-  if (length(label) != 1L || is.na(label)) {
-    stop(sprintf("No table label is configured for fixed effects '%s'.", id),
-         call. = FALSE)
-  }
+  label <- unname(tableSettings$labels$fixed_effects[id])
+  check(length(label) == 1L && !is.na(label),
+        "No table label is configured for fixed effects '%s'.", id)
   label
 }
 
@@ -185,15 +172,9 @@ select_row <- function(data, specification, fixed_effects, label) {
   row <- data[
     specification == spec_value & fixed_effects == fe_value
   ]
-  if (nrow(row) != 1L) {
-    stop(
-      sprintf(
+  check(nrow(row) == 1L,
         "Expected one row for specification '%s' and FE '%s'; found %d.",
-        specification, fixed_effects, nrow(row)
-      ),
-      call. = FALSE
-    )
-  }
+        specification, fixed_effects, nrow(row))
   row[, display_label := label]
   row
 }
@@ -290,43 +271,27 @@ write_exhibit <- function(filename, caption, label, rows, digits,
     "\\end{tabular}"
   )
   lines <- c(lines, "\\end{table}")
-  writeLines(lines, file.path(EXHIBIT_DIR, filename), useBytes = TRUE)
+  writeLines(lines, file.path(exhibit_dir, filename), useBytes = TRUE)
 }
 
+# Put coefficients estimated in percent per month onto the same "in-sample
+# mean = 100" scale as the scaled specifications, by dividing through the
+# normalization mean the analysis stage recorded with the row.
 normalize_raw_rows <- function(rows) {
-  check_cols <- c(
+  scaled_cols <- c(
     "post_sample", "post_sample_se", "additional_post_publication",
     "additional_post_publication_se", "total_post_publication_change",
     "total_post_publication_change_se"
   )
-  if (
-    !"normalization_mean_pct" %in% names(rows) ||
-    any(is.na(rows$normalization_mean_pct))
-  ) {
-    stop("Raw rows lack an in-sample normalization mean.", call. = FALSE)
-  }
-  rows[, (check_cols) := lapply(
-    .SD, function(value) 100 * value / normalization_mean_pct
-  ), .SDcols = check_cols]
+  check(
+    "normalization_mean_bps" %in% names(rows) &&
+      all(is.finite(rows$normalization_mean_bps)),
+    "Raw rows lack an in-sample normalization mean."
+  )
+  rows[, (scaled_cols) := lapply(
+    .SD, function(value) 1e4 * value / normalization_mean_bps
+  ), .SDcols = scaled_cols]
   rows
-}
-
-grand_mean_bps <- function(data, spec_name) {
-  if (!"normalization_mean_bps" %in% names(data)) {
-    stop("Results lack numeric normalization_mean_bps metadata.",
-         call. = FALSE)
-  }
-  value <- unique(data[
-    specification == spec_name & !is.na(normalization_mean_bps),
-    normalization_mean_bps
-  ])
-  if (length(value) != 1L || !is.finite(value)) {
-    stop(
-      sprintf("Expected one numeric normalization mean for '%s'.", spec_name),
-      call. = FALSE
-    )
-  }
-  value
 }
 
 mp_normalized <- normalize_raw_rows(rbindlist(list(
@@ -347,9 +312,7 @@ mp_normalized[
   , additional_post_publication_se_approx :=
     fixed_effects == "predictor + month"
 ]
-mp_normalized[, mean_in_sample_bps := 100 * normalization_mean_pct]
-mp_normalized[, min_in_sample_mean_bps := NA_real_]
-mp_normalized[, panel_label := TABLE_CONFIG$labels$mp_cz_panels[["mp"]]]
+mp_normalized[, panel_label := tableSettings$labels$mp_cz_panels[["mp"]]]
 
 cz_all_signal_normalized <- rbindlist(list(
   select_row(
@@ -361,11 +324,8 @@ cz_all_signal_normalized <- rbindlist(list(
     fixed_effect_label("predictor + month")
   )
 ))
-cz_all_signal_normalized[, mean_in_sample_bps := grand_mean_bps(
-  jkp, "cz_all_grand_mean_scaled_reference"
-)]
 cz_all_signal_normalized[
-  , panel_label := TABLE_CONFIG$labels$mp_cz_panels[["cz_signal"]]
+  , panel_label := tableSettings$labels$mp_cz_panels[["cz_signal"]]
 ]
 
 cz_all_grand_normalized <- rbindlist(list(
@@ -378,26 +338,22 @@ cz_all_grand_normalized <- rbindlist(list(
     fixed_effect_label("predictor + month")
   )
 ))
-cz_all_grand_normalized[, mean_in_sample_bps := grand_mean_bps(
-  jkp, "cz_all_grand_mean_scaled_reference"
-)]
 cz_all_grand_normalized[
-  , panel_label := TABLE_CONFIG$labels$mp_cz_panels[["cz_grand"]]
+  , panel_label := tableSettings$labels$mp_cz_panels[["cz_grand"]]
 ]
 
 cz_mp_normalized <- normalize_raw_rows(rbindlist(list(
   select_row(
-    mp, "cz_mp_matched_2013_unscaled_pub_dec", "pred FE",
-    fixed_effect_label("pred FE")
+    mp, "cz_mp_matched_2013_unscaled_pub_dec", "predictor",
+    fixed_effect_label("predictor")
   ),
   select_row(
-    mp, "cz_mp_matched_2013_unscaled_pub_dec", "+time FE",
-    fixed_effect_label("+time FE")
+    mp, "cz_mp_matched_2013_unscaled_pub_dec", "predictor + month",
+    fixed_effect_label("predictor + month")
   )
 )))
-cz_mp_normalized[, mean_in_sample_bps := 100 * normalization_mean_pct]
 cz_mp_normalized[
-  , panel_label := TABLE_CONFIG$labels$mp_cz_panels[["cz_mp"]]
+  , panel_label := tableSettings$labels$mp_cz_panels[["cz_mp"]]
 ]
 
 mp_cz_normalized <- rbindlist(
@@ -407,7 +363,7 @@ mp_cz_normalized <- rbindlist(
   ),
   use.names = TRUE, fill = TRUE
 )
-mp_cz_config <- TABLE_CONFIG$tables$mp_cz
+mp_cz_config <- tableSettings$tables$mp_cz
 write_exhibit(
   mp_cz_config$filename,
   mp_cz_config$caption,
@@ -427,11 +383,8 @@ jkp_normalized <- rbindlist(list(
     fixed_effect_label("predictor + month")
   )
 ))
-jkp_normalized[, mean_in_sample_bps := grand_mean_bps(
-  jkp, "baseline_quality_t2_grand_mean_scaled"
-)]
 jkp_normalized[
-  , panel_label := TABLE_CONFIG$labels$jkp_panels[["jkp_signal"]]
+  , panel_label := tableSettings$labels$jkp_panels[["jkp_signal"]]
 ]
 
 jkp_grand_mean_normalized <- rbindlist(list(
@@ -444,11 +397,8 @@ jkp_grand_mean_normalized <- rbindlist(list(
     fixed_effect_label("predictor + month")
   )
 ))
-jkp_grand_mean_normalized[, mean_in_sample_bps := grand_mean_bps(
-  jkp, "baseline_quality_t2_grand_mean_scaled"
-)]
 jkp_grand_mean_normalized[
-  , panel_label := TABLE_CONFIG$labels$jkp_panels[["jkp_grand"]]
+  , panel_label := tableSettings$labels$jkp_panels[["jkp_grand"]]
 ]
 
 jkp_weighting_normalized <- copy(
@@ -461,8 +411,8 @@ jkp_weighting_normalized[, display_label := fifelse(
 )]
 jkp_weighting_normalized[, panel_label := fifelse(
   data_name == "vw_cap",
-  TABLE_CONFIG$labels$jkp_panels[["jkp_cap"]],
-  TABLE_CONFIG$labels$jkp_panels[["jkp_value"]]
+  tableSettings$labels$jkp_panels[["jkp_cap"]],
+  tableSettings$labels$jkp_panels[["jkp_value"]]
 )]
 
 jkp_table_rows <- rbindlist(
@@ -472,7 +422,7 @@ jkp_table_rows <- rbindlist(
   ),
   use.names = TRUE, fill = TRUE
 )
-jkp_config <- TABLE_CONFIG$tables$jkp
+jkp_config <- tableSettings$tables$jkp
 write_exhibit(
   jkp_config$filename,
   jkp_config$caption,
@@ -487,15 +437,12 @@ jkp_benchmark <- jkp[
   .(
     fixed_effects, post_sample, post_sample_se,
     additional_post_publication, additional_post_publication_se,
-    mean_in_sample_bps = grand_mean_bps(
-      jkp, "baseline_quality_t2_grand_mean_scaled"
-    ),
-    factors
+    mean_in_sample_bps, factors
   )
 ]
 jkp_benchmark[, `:=`(
   data_name = "jkp_baseline",
-  label = TABLE_CONFIG$labels$alternative_panels[["jkp_baseline"]]
+  label = tableSettings$labels$alternative_panels[["jkp_baseline"]]
 )]
 
 alt_long <- rbindlist(
@@ -503,11 +450,9 @@ alt_long <- rbindlist(
   use.names = TRUE,
   fill = TRUE
 )
-alt_long[, label := unname(TABLE_CONFIG$labels$alternative_panels[data_name])]
-if (anyNA(alt_long$label)) {
-  stop("At least one alternative portfolio lacks a configured table label.",
-       call. = FALSE)
-}
+alt_long[, label := unname(tableSettings$labels$alternative_panels[data_name])]
+check(!anyNA(alt_long$label),
+      "At least one alternative portfolio lacks a configured table label.")
 panel_order <- c("jkp_baseline", unique(alt$data_name))
 alt_long[, panel_order := match(data_name, panel_order)]
 alt_long[, fe_order := match(
@@ -519,12 +464,12 @@ alt_cell <- function(estimate, standard_error) {
   paste0(
     formatC(
       estimate,
-      digits = TABLE_CONFIG$tables$alternatives$digits,
+      digits = tableSettings$tables$alternatives$digits,
       format = "f"
     ), " (",
     formatC(
       standard_error,
-      digits = TABLE_CONFIG$tables$alternatives$digits,
+      digits = tableSettings$tables$alternatives$digits,
       format = "f"
     ), ")"
   )
@@ -542,7 +487,7 @@ write_alt_longtable <- function(
     "Data and specification & Post-sample & ",
     "\\shortstack{Additional\\\\post-publication} & ",
     "\\shortstack{Mean in-sample\\\\return (",
-    TABLE_CONFIG$labels$units[["bps_per_month"]], ")} & Signals \\\\"
+    tableSettings$labels$units[["bps_per_month"]], ")} & Signals \\\\"
   )
   lines <- c(
     "\\begingroup",
@@ -604,10 +549,10 @@ write_alt_longtable <- function(
     "\\end{longtable}",
     "\\endgroup"
   )
-  writeLines(lines, file.path(EXHIBIT_DIR, filename), useBytes = TRUE)
+  writeLines(lines, file.path(exhibit_dir, filename), useBytes = TRUE)
 }
 
-alternative_config <- TABLE_CONFIG$tables$alternatives
+alternative_config <- tableSettings$tables$alternatives
 write_alt_longtable(
   alternative_config$filename,
   alternative_config$caption,
@@ -615,7 +560,7 @@ write_alt_longtable(
   alt_long
 )
 
-jkp_rep_config <- TABLE_CONFIG$tables$jkp_rep_using_cz
+jkp_rep_config <- tableSettings$tables$jkp_rep_using_cz
 
 two_fe_rows <- function(data, specification, dataset_label) {
   rows <- rbindlist(lapply(
@@ -633,27 +578,27 @@ cz_rep_rows <- function(weighting_id, specification) {
   rows <- two_fe_rows(
     signal_results[weighting_id == wanted_weighting],
     specification,
-    TABLE_CONFIG$labels$replication_rows[["cz"]]
+    tableSettings$labels$replication_rows[["cz"]]
   )
   rows[]
 }
 
 jkp_rep_rows <- rbindlist(list(
   cz_rep_rows("ew", "baseline_quality_t2")[
-    , panel_label := TABLE_CONFIG$labels$jkp_rep_panels[["ew_signal"]]
+    , panel_label := tableSettings$labels$jkp_rep_panels[["ew_signal"]]
   ],
   cz_rep_rows("ew", "baseline_quality_t2_grand_mean_scaled")[
-    , panel_label := TABLE_CONFIG$labels$jkp_rep_panels[["ew_grand"]]
+    , panel_label := tableSettings$labels$jkp_rep_panels[["ew_grand"]]
   ],
   cz_rep_rows("vw_cap", "baseline_quality_t2")[
-    , panel_label := TABLE_CONFIG$labels$jkp_rep_panels[["vw_cap_signal"]]
+    , panel_label := tableSettings$labels$jkp_rep_panels[["vw_cap_signal"]]
   ],
   cz_rep_rows("vw", "baseline_quality_t2")[
-    , panel_label := TABLE_CONFIG$labels$jkp_rep_panels[["vw_signal"]]
+    , panel_label := tableSettings$labels$jkp_rep_panels[["vw_signal"]]
   ],
   cz_rep_rows("ew", "baseline_quality_t2_metadata_matched")[
     , panel_label :=
-      TABLE_CONFIG$labels$jkp_rep_panels[["metadata_matched"]]
+      tableSettings$labels$jkp_rep_panels[["metadata_matched"]]
   ]
 ), use.names = TRUE, fill = TRUE)
 
@@ -670,10 +615,10 @@ write_exhibit(
 # Compact six-panel summary for slide S6. Exact panels retain regression
 # standard errors; the CZ-alternatives panel reports the median and full range
 # across all eight portfolio constructions.
-s6_config <- TABLE_CONFIG$tables$s6_summary
+s6_config <- tableSettings$tables$s6_summary
 
 s6_bold_if_time_fe <- function(value, fixed_effects) {
-  if (fixed_effects %in% c("predictor + month", "+time FE")) {
+  if (identical(fixed_effects, "predictor + month")) {
     paste0("\\textbf{", value, "}")
   } else {
     value
@@ -683,20 +628,13 @@ s6_bold_if_time_fe <- function(value, fixed_effects) {
 s6_exact_panel <- function(data, panel_label) {
   wanted_panel_label <- panel_label
   rows <- copy(data)
-  if (nrow(rows) != 2L) {
-    stop(
-      sprintf("S6 panel '%s' must contain exactly two rows.", panel_label),
-      call. = FALSE
-    )
-  }
+  check(nrow(rows) == 2L, "S6 panel '%s' must contain exactly two rows.",
+        panel_label)
   rows[, fe_order := match(
-    fixed_effects,
-    c("predictor", "pred FE", "predictor + month", "+time FE")
+    fixed_effects, c("predictor", "predictor + month")
   )]
-  if (anyNA(rows$fe_order)) {
-    stop(sprintf("S6 panel '%s' has an unknown FE label.", panel_label),
-         call. = FALSE)
-  }
+  check(!anyNA(rows$fe_order), "S6 panel '%s' has an unknown FE label.",
+        panel_label)
   setorder(rows, fe_order)
 
   approximate <- if (
@@ -777,10 +715,8 @@ s6_rows <- rbindlist(list(
 ), use.names = TRUE)
 
 s6_panel_counts <- s6_rows[, .N, by = panel_label]
-if (nrow(s6_panel_counts) > 6L || any(s6_panel_counts$N != 2L)) {
-  stop("S6 summary must have at most six panels and two rows per panel.",
-       call. = FALSE)
-}
+check(nrow(s6_panel_counts) <= 6L && all(s6_panel_counts$N == 2L),
+      "S6 summary must have at most six panels and two rows per panel.")
 
 write_s6_table <- function(filename, caption, rows) {
   panels <- unique(rows$panel_label)
@@ -826,7 +762,7 @@ write_s6_table <- function(filename, caption, rows) {
     "\\end{tabular}",
     "\\end{table}"
   )
-  writeLines(lines, file.path(EXHIBIT_DIR, filename), useBytes = TRUE)
+  writeLines(lines, file.path(exhibit_dir, filename), useBytes = TRUE)
 }
 
 write_s6_table(
@@ -846,7 +782,7 @@ metadata_cell <- function(field_name, dataset_name) {
 }
 
 between <- date_comparison[field == "between_length"]
-date_config <- TABLE_CONFIG$tables$dates
+date_config <- tableSettings$tables$dates
 
 date_lines <- c(
   "\\begin{table}[!htbp]",
@@ -871,9 +807,9 @@ date_lines <- c(
     paste0(
       dataset_name, " & ", totals$total_factors, " & ",
       totals$published_factors, " & ",
-      metadata_cell("sample_start", dataset_name), " & ",
-      metadata_cell("sample_end", dataset_name), " & ",
-      metadata_cell("publication", dataset_name),
+      metadata_cell("SampleStartYear", dataset_name), " & ",
+      metadata_cell("SampleEndYear", dataset_name), " & ",
+      metadata_cell("pubYear", dataset_name),
       " \\\\"
     )
   }, character(1)),
@@ -905,8 +841,188 @@ date_lines <- c(
 )
 writeLines(
   date_lines,
-  file.path(EXHIBIT_DIR, date_config$filename),
+  file.path(exhibit_dir, date_config$filename),
   useBytes = TRUE
 )
 
-message("Saved LaTeX exhibits to ", EXHIBIT_DIR)
+message("Saved LaTeX exhibits to ", exhibit_dir)
+
+# =========================================================================
+# Checks
+# =========================================================================
+#
+# Historical expectations for the current pinned inputs, not rules used to
+# construct the samples. Change them deliberately when a pin changes.
+
+output_dir <- timefeSettings$paths$output
+
+expected <- c(
+  metadata_rows = 255L,
+  jkp_return_series = 153L,
+  cited_jkp_factors = 142L,
+  jkp_quality_factors = 97L,
+  cz_signal_quality_factors = 138L,
+  metadata_matched_cz_signals = 69L
+)
+
+jkp_diagnostics <- fread(file.path(output_dir, "jkp-diagnostics.csv"))
+cz_diagnostics <- fread(
+  file.path(output_dir, "cz-signal-based-diagnostics.csv")
+)
+
+diagnostic_value <- function(data, item) {
+  wanted_item <- item
+  value <- data[item == wanted_item, value]
+  check(length(value) == 1L, "Missing or duplicate diagnostic: %s", item)
+  as.integer(value)
+}
+
+actual <- c(
+  metadata_rows = diagnostic_value(jkp_diagnostics, "metadata rows"),
+  jkp_return_series = diagnostic_value(
+    jkp_diagnostics, "unique equal-weighted return series"
+  ),
+  cited_jkp_factors = diagnostic_value(
+    jkp_diagnostics, "cited metadata factors"
+  ),
+  jkp_quality_factors = diagnostic_value(
+    jkp_diagnostics, "baseline quality factors retained (t>2)"
+  ),
+  cz_signal_quality_factors = diagnostic_value(
+    cz_diagnostics, "quality-screened factors retained (t>2)"
+  ),
+  metadata_matched_cz_signals = diagnostic_value(
+    cz_diagnostics, "metadata-matched EW factors retained (t>2)"
+  )
+)
+
+check(
+  identical(actual, expected),
+  "Pinned result counts changed:\n%s",
+  paste(sprintf("  %s: expected %d, found %d",
+                names(expected), expected, actual), collapse = "\n")
+)
+
+# The regression tables are already in hand from the rendering above.
+jkp_results <- jkp
+cz_signal_results <- signal_results
+check(
+  jkp_results[, .N, by = .(specification, fixed_effects)][N > 1L, .N] == 0L,
+  "JKP results contain duplicate specification/fixed-effect rows."
+)
+check(
+  !any(startsWith(jkp_results$specification, "matched_")),
+  "Deprecated matched-sample specifications remain in JKP results."
+)
+check(
+  "normalization_mean_bps" %in% names(jkp_results) &&
+    jkp_results[
+      specification == "baseline_quality_t2_grand_mean_scaled",
+      all(is.finite(normalization_mean_bps))
+    ],
+  "JKP grand-mean results lack numeric normalization metadata."
+)
+check(
+  all(c("weighting_id", "mean_in_sample_bps") %in%
+        names(cz_signal_results)),
+  "CZ signal results lack weighting or in-sample-mean metadata."
+)
+check(
+  cz_signal_results[
+    , .N, by = .(weighting_id, specification, fixed_effects)
+  ][N > 1L, .N] == 0L,
+  "CZ signal results contain duplicate weighting/specification/FE rows."
+)
+check(
+  setequal(unique(cz_signal_results$weighting_id), c("ew", "vw_cap", "vw")),
+  "CZ signal results do not contain EW, capped-VW, and VW constructions."
+)
+replication_specs <- data.table(
+  weighting_id = c("ew", "ew", "vw_cap", "vw"),
+  specification = c(
+    "baseline_quality_t2",
+    "baseline_quality_t2_grand_mean_scaled",
+    "baseline_quality_t2",
+    "baseline_quality_t2"
+  )
+)
+replication_rows <- merge(
+  cz_signal_results,
+  replication_specs,
+  by = c("weighting_id", "specification")
+)
+check(
+  nrow(replication_rows) == 8L &&
+    setequal(
+      unique(replication_rows$fixed_effects),
+      c("predictor", "predictor + month")
+    ) &&
+    all(is.finite(replication_rows$mean_in_sample_bps)) &&
+    all(is.finite(replication_rows$min_in_sample_mean_bps)),
+  "The four-panel JKP replication lacks complete CZ target rows."
+)
+
+matched_pairs <- fread(file.path(output_dir, "jkp-cz-matched-pairs.csv"))
+matched_signal_rows <- cz_signal_results[
+  weighting_id == "ew" &
+    specification == "baseline_quality_t2_metadata_matched"
+]
+check(
+  nrow(matched_pairs) == 74L &&
+    uniqueN(matched_pairs$signalname) == 74L &&
+    uniqueN(matched_pairs$cz_signalname) == 74L,
+  "The metadata-matched JKP-CZ crosswalk must contain 74 one-to-one pairs."
+)
+check(
+  nrow(matched_signal_rows) == 2L &&
+    setequal(
+      matched_signal_rows$fixed_effects,
+      c("predictor", "predictor + month")
+    ) &&
+    all(is.finite(matched_signal_rows$mean_in_sample_bps)) &&
+    all(is.finite(matched_signal_rows$min_in_sample_mean_bps)),
+  "The metadata-matched CZ signal-level rows are missing or incomplete."
+)
+
+exhibits <- file.path(
+  exhibit_dir,
+  c(
+    "mp-cz-normalized.tex", "jkp-cz-normalized.tex",
+    "cz-alternative-specs.tex", "jkp-rep-using-cz.tex",
+    "s6-timefe-summary.tex", "jkp-cz-date-comparison.tex"
+  )
+)
+check(all(file.exists(exhibits)), "One or more configured exhibits are missing.")
+check(all(file.info(exhibits)$size > 0L), "One or more exhibits are empty.")
+jkp_exhibit <- readLines(
+  file.path(exhibit_dir, "jkp-cz-normalized.tex"),
+  warn = FALSE
+)
+check(
+  sum(grepl("Panel [A-D]:", jkp_exhibit)) == 4L &&
+    !any(grepl("Panel [EF]:", jkp_exhibit)),
+  "The JKP exhibit must contain exactly Panels A--D."
+)
+jkp_rep_exhibit <- readLines(
+  file.path(exhibit_dir, "jkp-rep-using-cz.tex"),
+  warn = FALSE
+)
+check(
+  sum(grepl("Panel [A-E]:", jkp_rep_exhibit)) == 5L &&
+    !any(grepl("Panel [F-G]:", jkp_rep_exhibit)) &&
+    !any(startsWith(jkp_rep_exhibit, "JKP,")),
+  "The JKP replication exhibit must contain exactly five CZ-only panels."
+)
+s6_exhibit <- readLines(
+  file.path(exhibit_dir, "s6-timefe-summary.tex"),
+  warn = FALSE
+)
+check(
+  sum(grepl("Panel [A-F]:", s6_exhibit)) == 6L &&
+    !any(grepl("Panel [G-Z]:", s6_exhibit)) &&
+    sum(startsWith(s6_exhibit, "Predictor FE &")) == 6L &&
+    sum(startsWith(s6_exhibit, "Predictor + time FE &")) == 6L,
+  "The S6 summary must contain exactly six two-row panels."
+)
+
+message("Pinned counts and generated exhibits check out.")
