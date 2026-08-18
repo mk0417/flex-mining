@@ -1,7 +1,7 @@
 # Download the Chen-Zimmermann signal-level predictor panel.
 #
 # How to run: from flex-mining/,
-#   Rscript Appendices/SA15_TimeFERobustness/run.R download
+#   Rscript Appendices/TimeFERobustness/run.R download
 # Inputs:  the pinned Open Source Asset Pricing release (firm characteristics,
 #            signal documentation, original portfolio returns), the pinned
 #            meta-replication mapping, and CRSP.MSF via WRDS for the three
@@ -18,7 +18,7 @@
 # Arrow dataset: the bulk archive is about 2.3 GB compressed and 8+ GB as CSV,
 # so it is streamed into Parquet rather than read into an R data.frame.
 
-source("Appendices/SA15_TimeFERobustness/setup.R")
+source("Appendices/TimeFERobustness/setup.R")
 suppressPackageStartupMessages({
   library(arrow)
   library(dplyr)

@@ -11,8 +11,8 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
 \usepackage{multirow}
-\usepackage{longtable} % cz-alternative-specs.tex (SA15)
-\usepackage{siunitx}   % jkp-rep-using-cz.tex S columns (SA15)
+\usepackage{longtable} % cz-alternative-specs.tex (time-FE appendix)
+\usepackage{siunitx}   % jkp-rep-using-cz.tex S columns (time-FE appendix)
 \usepackage{url}
 
 % Permit row-only generated fragments to be input inside tabular environments.
@@ -65,8 +65,8 @@
 }
 
 % For self-contained generated tables that already carry their own
-% table/longtable environment, caption, and centering (e.g. the SA15
-% exhibits). Unlike \previewtable, it adds no center/\small wrapper, which a
+% table/longtable environment, caption, and centering (e.g. the time-FE
+% robustness exhibits). Unlike \previewtable, it adds no center/\small wrapper, which a
 % longtable would fight with.
 \newcommand{\previewinput}[2]{%
   \exhibitgroup{#1}%
@@ -268,19 +268,19 @@
 \previewtable{Table IA.9}{samp_split_summary.tex}
 \previewfigure{Figure IA.4}{break_vs_sampend.pdf}
 
-\previewsection{Time-FE Robustness (SA15)}
+\previewsection{Time-FE Robustness}
 
-% Opt-in appendix, built by Appendices/SA15_TimeFERobustness/run.R into
+% Opt-in appendix, built by Appendices/TimeFERobustness/run.R into
 % ../Results/TimeFERobustness. These tables are not (yet) referenced by the
 % manuscript; they are previewed here so the pipeline output can be inspected.
 % Each generated file is a complete table/longtable, so it is included with
 % \previewinput rather than \previewtable.
 
-\previewinput{SA15 summary: robustness to time FE}{TimeFERobustness/s6-timefe-summary.tex}
-\previewinput{SA15: MP and quality-screened CZ, normalized}{TimeFERobustness/mp-cz-normalized.tex}
-\previewinput{SA15: JKP weighting and normalization}{TimeFERobustness/jkp-cz-normalized.tex}
-\previewinput{SA15: alternative CZ portfolio constructions}{TimeFERobustness/cz-alternative-specs.tex}
-\previewinput{SA15: JKP constructions rebuilt from CZ signals}{TimeFERobustness/jkp-rep-using-cz.tex}
-\previewinput{SA15: JKP/CZ date metadata}{TimeFERobustness/jkp-cz-date-comparison.tex}
+\previewinput{Summary: robustness to time FE}{TimeFERobustness/s6-timefe-summary.tex}
+\previewinput{MP and quality-screened CZ, normalized}{TimeFERobustness/mp-cz-normalized.tex}
+\previewinput{JKP weighting and normalization}{TimeFERobustness/jkp-cz-normalized.tex}
+\previewinput{Alternative CZ portfolio constructions}{TimeFERobustness/cz-alternative-specs.tex}
+\previewinput{JKP constructions rebuilt from CZ signals}{TimeFERobustness/jkp-rep-using-cz.tex}
+\previewinput{JKP/CZ date metadata}{TimeFERobustness/jkp-cz-date-comparison.tex}
 
 \end{document}

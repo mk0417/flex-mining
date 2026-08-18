@@ -3,7 +3,7 @@
 # terciles.
 #
 # How to run: from flex-mining/, normally through
-#   Rscript Appendices/SA15_TimeFERobustness/run.R build
+#   Rscript Appendices/TimeFERobustness/run.R build
 # Inputs:  the pinned JKP factor returns, underlying-portfolio archives, and
 #            factor_details.xlsx, all downloaded here on first use
 #          the pinned CZ portfolio returns, signal documentation, and
@@ -40,7 +40,7 @@
 # additional time-FE publication effect is smaller than its baseline effect,
 # and its standard error is not recoverable from the published table.
 
-source("Appendices/SA15_TimeFERobustness/setup.R")
+source("Appendices/TimeFERobustness/setup.R")
 
 out_dir <- timefeSettings$paths$output
 raw_dir <- timefeSettings$paths$jkp
@@ -66,7 +66,7 @@ check(
   length(missing_inputs) == 0L,
   paste0(
     "Missing downloaded input(s):\n  %s\n",
-    "Run `Rscript Appendices/SA15_TimeFERobustness/run.R download` first."
+    "Run `Rscript Appendices/TimeFERobustness/run.R download` first."
   ),
   paste(missing_inputs, collapse = "\n  ")
 )

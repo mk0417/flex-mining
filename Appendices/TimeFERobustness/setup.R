@@ -2,7 +2,7 @@
 #
 # How to run: sourced by every stage; the stages are launched from the
 #   repository root by
-#   Rscript Appendices/SA15_TimeFERobustness/run.R <command>
+#   Rscript Appendices/TimeFERobustness/run.R <command>
 # Inputs:  optional TIMEFE_{RAW,PROCESSED,RESULTS}_DIR environment overrides,
 #   which redirect the storage roots for isolated validation.
 # Outputs: defines timefeSettings and the helpers below, loads the shared
@@ -25,10 +25,10 @@ suppressPackageStartupMessages({
 
 # Every stage runs as its own Rscript with the repository root as the working
 # directory; run.R sets it. Check it here so a hand-run stage fails clearly.
-if (!file.exists("Appendices/SA15_TimeFERobustness/setup.R")) {
+if (!file.exists("Appendices/TimeFERobustness/setup.R")) {
   stop(
     "error: run this module from the flex-mining/ working directory, ",
-    "normally through Appendices/SA15_TimeFERobustness/run.R",
+    "normally through Appendices/TimeFERobustness/run.R",
     call. = FALSE
   )
 }
@@ -78,7 +78,7 @@ resultsDir <- Sys.getenv(
 )
 
 pathSettings <- list(
-  module = "Appendices/SA15_TimeFERobustness",
+  module = "Appendices/TimeFERobustness",
   raw = rawDir,
   processed = processedDir,
   # Downloaded JKP factor returns and factor metadata.

@@ -2,7 +2,7 @@
 # them and the results behind them.
 #
 # How to run: from flex-mining/, normally through
-#   Rscript Appendices/SA15_TimeFERobustness/run.R tables
+#   Rscript Appendices/TimeFERobustness/run.R tables
 # Inputs:  the regression and date-comparison CSVs under
 #          ../Data/Processed/TimeFERobustness/output
 # Outputs: six TeX fragments under ../Results/TimeFERobustness
@@ -10,7 +10,7 @@
 # The checks at the end run in the same process because they verify exactly
 # what was just written, and read the same result tables.
 
-source("Appendices/SA15_TimeFERobustness/setup.R")
+source("Appendices/TimeFERobustness/setup.R")
 
 exhibit_dir <- timefeSettings$paths$exhibits
 result_files <- setNames(
@@ -126,7 +126,7 @@ tableSettings <- list(
 
 check(
   all(file.exists(result_files)),
-  paste0("Missing %s. Run `Rscript Appendices/SA15_TimeFERobustness/run.R ",
+  paste0("Missing %s. Run `Rscript Appendices/TimeFERobustness/run.R ",
          "build` before generating the LaTeX exhibits."),
   paste(result_files[!file.exists(result_files)], collapse = ", ")
 )

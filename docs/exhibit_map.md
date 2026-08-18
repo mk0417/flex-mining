@@ -162,7 +162,7 @@ separate manuscript repository.
 | Table B.3        | Annual-accounting decay regressions with time FE    | Table_MPStyleRegsTimeFE_AccountingOnly.tex       | Appendices/SA14_MPStyleRegsAccountingOnly.R |
 
 The opt-in time-fixed-effects robustness pipeline is kept in
-`Appendices/SA15_TimeFERobustness/`. It produces six private-note/response
+`Appendices/TimeFERobustness/`. It produces six private-note/response
 tables under `../Results/TimeFERobustness/`; they are not currently wired into
 the manuscript:
 

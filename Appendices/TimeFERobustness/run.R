@@ -1,7 +1,7 @@
 # Driver for the time-fixed-effects robustness appendix.
 #
 # How to run: from anywhere,
-#   Rscript Appendices/SA15_TimeFERobustness/run.R [command]
+#   Rscript Appendices/TimeFERobustness/run.R [command]
 #   commands: build (default), exhibits, preflight, download. Run with --help
 #             for one-line descriptions.
 # Inputs:  pinned external inputs under ../Data/Raw/TimeFERobustness and caches
@@ -23,7 +23,7 @@ if (length(file_argument) != 1L) {
 module_dir <- normalizePath(dirname(sub("^--file=", "", file_argument)))
 setwd(normalizePath(file.path(module_dir, "..", "..")))
 
-module <- "Appendices/SA15_TimeFERobustness"
+module <- "Appendices/TimeFERobustness"
 estimate <- file.path(module, "estimate.R")
 terciles <- file.path(module, "cz_terciles.R")
 exhibits <- file.path(module, "exhibits.R")
@@ -44,7 +44,7 @@ arguments <- commandArgs(trailingOnly = TRUE)
 command <- if (length(arguments)) arguments[[1L]] else "build"
 
 if (command %in% c("help", "--help")) {
-  cat("Usage: Rscript Appendices/SA15_TimeFERobustness/run.R [command]\n\n")
+  cat("Usage: Rscript Appendices/TimeFERobustness/run.R [command]\n\n")
   cat(sprintf("  %-12s %s\n", names(descriptions), descriptions), sep = "")
   quit(save = "no", status = 0L)
 }

@@ -7,11 +7,11 @@ Pedersen (JKP), and multiple Chen--Zimmermann (CZ) portfolio constructions.
 Run commands from any directory:
 
 ```sh
-Rscript Appendices/SA15_TimeFERobustness/run.R --help
-Rscript Appendices/SA15_TimeFERobustness/run.R preflight
-Rscript Appendices/SA15_TimeFERobustness/run.R download
-Rscript Appendices/SA15_TimeFERobustness/run.R build
-Rscript Appendices/SA15_TimeFERobustness/run.R exhibits
+Rscript Appendices/TimeFERobustness/run.R --help
+Rscript Appendices/TimeFERobustness/run.R preflight
+Rscript Appendices/TimeFERobustness/run.R download
+Rscript Appendices/TimeFERobustness/run.R build
+Rscript Appendices/TimeFERobustness/run.R exhibits
 ```
 
 `download` is deliberately separate from `build`. It downloads the pinned

@@ -3,7 +3,7 @@
 # value-weighted form.
 #
 # How to run: from flex-mining/, normally through
-#   Rscript Appendices/SA15_TimeFERobustness/run.R build
+#   Rscript Appendices/TimeFERobustness/run.R build
 # Inputs:  the CZ signal panel and signal documentation under
 #            ../Data/{Raw,Processed}/TimeFERobustness (see download.R)
 #          CRSP.MSF, MSENAMES, and MSEDELIST via WRDS, cached after the first
@@ -30,7 +30,7 @@
 # Set CZ_SIGNAL_REBUILD=1 or CZ_SIGNAL_WEIGHTED_REBUILD=1 to rebuild the
 # cached tercile returns instead of reading them.
 
-source("Appendices/SA15_TimeFERobustness/setup.R")
+source("Appendices/TimeFERobustness/setup.R")
 suppressPackageStartupMessages({
   library(arrow)
   library(dplyr)
@@ -74,7 +74,7 @@ next_yyyymm <- function(x) {
 check(
   dir.exists(timefeSettings$files$signal_panel),
   paste0("%s does not exist. Run `Rscript ",
-         "Appendices/SA15_TimeFERobustness/run.R download` first."),
+         "Appendices/TimeFERobustness/run.R download` first."),
   timefeSettings$files$signal_panel
 )
 signal_dataset <- open_dataset(timefeSettings$files$signal_panel,

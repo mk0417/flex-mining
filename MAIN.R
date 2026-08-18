@@ -99,7 +99,7 @@ if (runStages$appendices) {
 # external data, multi-gigabyte caches, and may require a WRDS connection.
 
 if (runStages$time_fe_robustness) {
-  run_script("Appendices/SA15_TimeFERobustness/run.R")
+  run_script("Appendices/TimeFERobustness/run.R")
 }
 
 # Chapter 9: data exports -------------------------------------------------

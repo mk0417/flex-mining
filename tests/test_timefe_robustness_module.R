@@ -2,13 +2,13 @@
 # robustness appendix.
 #
 # How to run: from flex-mining/, `Rscript tests/test_timefe_robustness_module.R`
-# Inputs:  Appendices/SA15_TimeFERobustness source files. No pinned external
+# Inputs:  Appendices/TimeFERobustness source files. No pinned external
 #          data is required; the helper tests run on a synthetic panel.
 # Outputs: console assertion summary; no files are written.
 
 pdf(NULL)
 
-module_dir <- "Appendices/SA15_TimeFERobustness"
+module_dir <- "Appendices/TimeFERobustness"
 files <- list.files(module_dir, pattern = "[.]R$", full.names = TRUE)
 stopifnot(
   identical(basename(files),
