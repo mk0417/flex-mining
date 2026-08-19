@@ -11,8 +11,7 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
 \usepackage{multirow}
-\usepackage{longtable} % cz-alternative-specs.tex (time-FE appendix)
-\usepackage{siunitx}   % jkp-rep-using-cz.tex S columns (time-FE appendix)
+\usepackage{longtable} % timefe-robustness.tex (time-FE appendix)
 \usepackage{url}
 
 % Permit row-only generated fragments to be input inside tabular environments.
@@ -240,6 +239,12 @@
 \previewtable{Table IA.4}{theme_ez_decayinSampEnd2000.tex}
 \previewtable{Table IA.5}{theme_ez_decayinSampEnd2010.tex}
 
+% Time-FE robustness. Opt-in appendix, built by
+% Appendices/TimeFERobustness/run.R into ../Results/TimeFERobustness. The
+% generated file is a complete longtable, so it is included with \previewinput
+% rather than \previewtable (which would wrap it in a center/\small it fights).
+\previewinput{Table IA.6}{TimeFERobustness/timefe-robustness.tex}
+
 \previewfigure{Figure IA.1}{Fig_DecayVsWords_Names2.pdf}
 
 \exhibitgroup{Figure IA.2}
@@ -249,7 +254,7 @@
   \previewpanel[.42\textwidth]{Fig_Risk_via_FF5.pdf}
 \end{center}
 
-\exhibitgroup{Table IA.6}
+\exhibitgroup{Table IA.7}
 \previewfile{SignalsByTheoryAndJournal.tex}
 \begin{center}
 \begin{tabular}{lrrr}
@@ -263,24 +268,9 @@
 
 \previewfigure{Figure IA.3}{Fig_DecayVsJournal_Means.pdf}
 
-% Table IA.7 is defined inline in the paper and has no generated Results file.
-\previewtable{Table IA.8}{Table_FactorAdjusted_TimeVarying_AnyModelVsNoModel_ff4_t2.tex}
-\previewtable{Table IA.9}{samp_split_summary.tex}
+% Table IA.8 is defined inline in the paper and has no generated Results file.
+\previewtable{Table IA.9}{Table_FactorAdjusted_TimeVarying_AnyModelVsNoModel_ff4_t2.tex}
+\previewtable{Table IA.10}{samp_split_summary.tex}
 \previewfigure{Figure IA.4}{break_vs_sampend.pdf}
-
-\previewsection{Time-FE Robustness}
-
-% Opt-in appendix, built by Appendices/TimeFERobustness/run.R into
-% ../Results/TimeFERobustness. These tables are not (yet) referenced by the
-% manuscript; they are previewed here so the pipeline output can be inspected.
-% Each generated file is a complete table/longtable, so it is included with
-% \previewinput rather than \previewtable.
-
-\previewinput{Summary: robustness to time FE}{TimeFERobustness/s6-timefe-summary.tex}
-\previewinput{MP and quality-screened CZ, normalized}{TimeFERobustness/mp-cz-normalized.tex}
-\previewinput{JKP weighting and normalization}{TimeFERobustness/jkp-cz-normalized.tex}
-\previewinput{Alternative CZ portfolio constructions}{TimeFERobustness/cz-alternative-specs.tex}
-\previewinput{JKP constructions rebuilt from CZ signals}{TimeFERobustness/jkp-rep-using-cz.tex}
-\previewinput{JKP/CZ date metadata}{TimeFERobustness/jkp-cz-date-comparison.tex}
 
 \end{document}
