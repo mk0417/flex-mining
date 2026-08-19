@@ -19,18 +19,18 @@
 # settings read as globalSettings$<group>$<name>.
 
 # Pipeline stage switches (read by MAIN.R) ---------------------------------
-# Each stage runs as its own Rscript subprocess; see MAIN.R.
+# Each stage runs as its own Rscript subprocess; see MAIN.R for the full stage
+# list. A stage gets a switch only when skipping it is a real decision: the
+# stage is slow, destructive, or needs external resources. Everything cheap
+# runs together under `exhibits`, and any single driver can still be run on its
+# own -- e.g. `Rscript S3_Learning.R` -- while iterating on one exhibit.
 runStages <- list(
-  download_and_clean       = FALSE,  # Re-pull ../Data/Raw; changes the vintage
-  data_mining              = FALSE,  # Chapter 2; hours
-  precompute               = TRUE,   # Chapter 3; slow reusable analysis
-  research_vs_data_mining  = TRUE,   # Section 2, plus the introduction figure
-  learning                 = TRUE,   # Section 3
-  heterogeneity            = TRUE,   # Section 4
-  best_predictors          = TRUE,   # Section 5
-  appendices               = TRUE,   # Appendices
-  time_fe_robustness       = FALSE,  # Large optional appendix; may need WRDS
-  export_data_to_csv       = TRUE    # Chapter 9
+  download_and_clean  = FALSE,  # Re-pull ../Data/Raw; changes the vintage
+  data_mining         = FALSE,  # Chapter 2; ~4 hours
+  precompute          = TRUE,   # Chapter 3; ~40-55 min of reusable analysis
+  exhibits            = TRUE,   # S2-S5, SA_Appendices, 9_Export; ~10 min total
+  appendices_pca      = TRUE,   # Appendix SA11 correlation/PCA; ~1 hour
+  time_fe_robustness  = FALSE   # Large optional appendix; may need WRDS
 )
 
 # Data vintage and mined-universe construction (Chapter 2) -----------------

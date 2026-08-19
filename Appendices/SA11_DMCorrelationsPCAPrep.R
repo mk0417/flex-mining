@@ -1,6 +1,6 @@
 # Precompute pairwise correlations and PCA summaries for data-mined strategies.
 #
-# How to run: normally run through SA_Appendices.R from flex-mining/.
+# How to run: normally run through SA_AppendicesPCA.R from flex-mining/.
 # Inputs:  ../Data/Processed/<dataVersion> LongShort.RData
 # Outputs: ../Data/Processed/PairwiseCorrelationsDM_{ew,vw}.RDS
 #          ../Data/Processed/dm_correlation_quantiles.RDS
