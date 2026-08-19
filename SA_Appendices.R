@@ -6,7 +6,8 @@
 # Outputs: appendix PDFs and TeX under ../Results
 #
 # Appendix variants emitted alongside a main-text exhibit remain owned by that
-# main-text chapter and are not rerun here.
+# main-text chapter and are not rerun here. The slow SA11 correlation/PCA
+# robustness scripts run from SA_AppendicesPCA.R instead.
 
 settings_env <- new.env(parent = globalenv())
 sys.source("config.R", envir = settings_env)
@@ -46,10 +47,6 @@ run_script("Appendices/SA03_StructuralBreak.R")
 run_script("Appendices/SA04_DecayVsWordcountPlot.R")
 run_script("Appendices/SA05_DecayVsModelcountPlot.R")
 run_script("Appendices/SA06_DecayVsJournal.R")
-run_script("Appendices/SA11_DMCorrelationsPCAPrep.R")
-run_script("Appendices/SA11_DMCorrelationsPCATables.R")
-run_script("Appendices/SA11_DMSpanPCAPrep.R")
-run_script("Appendices/SA11_DMSpanPCAPlots.R")
 run_script("Appendices/SA12_EZThemesRobustness.R")
 run_script("Appendices/SA13_MPStyleRegsIndividualDM.R")
 run_script("Appendices/SA14_MPStyleRegsAccountingOnly.R")

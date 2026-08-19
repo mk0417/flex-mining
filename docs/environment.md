@@ -35,6 +35,7 @@ Collected from the packages referenced by the workflow's R files, excluding
 arrow 24.0.0            fuzzyjoin 0.1.6.1       readxl 1.4.5
 BiocManager 1.30.27     getPass 0.2.4           reshape2 1.4.4
 data.table 1.17.8       ggplot2 3.5.2           roll 1.1.7
+digest 0.6.37           httr 1.4.7              withr 3.0.2
 doParallel 1.0.17       ggrepel 0.9.6           RPostgres 1.4.8
 dotenv 1.0.3            glue 1.8.0              sandwich 3.1.1
 dplyr 1.1.4             googledrive 2.1.1       splitstackshape 1.4.8
@@ -46,7 +47,7 @@ fst 0.9.8               janitor 2.2.1           tibble 3.2.1
                         latex2exp 0.9.6         tidyr 1.3.1
                         lexicon 1.2.1           tidyverse 2.0.0
                         lmtest 0.9.40           udpipe 0.8.11
-                        lubridate 1.9.4         word2vec 0.4.0
+OpenSourceAP.DownloadR 0.0.0.9000  lubridate 1.9.4  word2vec 0.4.0
                         multcomp 1.4.28         writexl 1.5.4
                         pcaMethods 2.2.0        xtable 1.8.4
                         quanteda 4.3.1          zoo 1.8.14

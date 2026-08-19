@@ -11,6 +11,7 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
 \usepackage{multirow}
+\usepackage{longtable} % timefe-robustness.tex (time-FE appendix)
 \usepackage{url}
 
 % Permit row-only generated fragments to be input inside tabular environments.
@@ -60,6 +61,16 @@
     \small
     \input{\exhibitspath/#2}
   \end{center}
+}
+
+% For self-contained generated tables that already carry their own
+% table/longtable environment, caption, and centering (e.g. the time-FE
+% robustness exhibits). Unlike \previewtable, it adds no center/\small wrapper, which a
+% longtable would fight with.
+\newcommand{\previewinput}[2]{%
+  \exhibitgroup{#1}%
+  \previewfile{#2}%
+  \input{\exhibitspath/#2}%
 }
 
 \newcommand{\previewpanel}[2][.48\textwidth]{%
@@ -228,6 +239,12 @@
 \previewtable{Table IA.4}{theme_ez_decayinSampEnd2000.tex}
 \previewtable{Table IA.5}{theme_ez_decayinSampEnd2010.tex}
 
+% Time-FE robustness. Opt-in appendix, built by
+% Appendices/TimeFERobustness/run.R into ../Results/TimeFERobustness. The
+% generated file is a complete longtable, so it is included with \previewinput
+% rather than \previewtable (which would wrap it in a center/\small it fights).
+\previewinput{Table IA.6}{TimeFERobustness/timefe-robustness.tex}
+
 \previewfigure{Figure IA.1}{Fig_DecayVsWords_Names2.pdf}
 
 \exhibitgroup{Figure IA.2}
@@ -237,7 +254,7 @@
   \previewpanel[.42\textwidth]{Fig_Risk_via_FF5.pdf}
 \end{center}
 
-\exhibitgroup{Table IA.6}
+\exhibitgroup{Table IA.7}
 \previewfile{SignalsByTheoryAndJournal.tex}
 \begin{center}
 \begin{tabular}{lrrr}
@@ -251,9 +268,9 @@
 
 \previewfigure{Figure IA.3}{Fig_DecayVsJournal_Means.pdf}
 
-% Table IA.7 is defined inline in the paper and has no generated Results file.
-\previewtable{Table IA.8}{Table_FactorAdjusted_TimeVarying_AnyModelVsNoModel_ff4_t2.tex}
-\previewtable{Table IA.9}{samp_split_summary.tex}
+% Table IA.8 is defined inline in the paper and has no generated Results file.
+\previewtable{Table IA.9}{Table_FactorAdjusted_TimeVarying_AnyModelVsNoModel_ff4_t2.tex}
+\previewtable{Table IA.10}{samp_split_summary.tex}
 \previewfigure{Figure IA.4}{break_vs_sampend.pdf}
 
 \end{document}

@@ -1,6 +1,6 @@
 # Render appendix correlation-quantile and PCA tables from appendix caches.
 #
-# How to run: normally run through SA_Appendices.R from flex-mining/.
+# How to run: normally run through SA_AppendicesPCA.R from flex-mining/.
 # Inputs:  ../Data/Processed/dm_correlation_quantiles.RDS
 #          ../Data/Processed/dm_pca_table.RDS
 # Outputs: ../Results/quantilesCorDM.tex

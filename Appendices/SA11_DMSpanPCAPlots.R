@@ -1,6 +1,6 @@
 # Appendix exhibit: correlation- and PCA-spanning plots from chapter-3 caches.
 #
-# How to run: normally run through SA_Appendices.R with the working directory set to
+# How to run: normally run through SA_AppendicesPCA.R with the working directory set to
 #   flex-mining/.
 # Inputs:  ../Data/Processed/dm_span_analysis.RDS
 # Outputs: ../Results/Fig_DM_unspan_match_t_g_PCA.pdf

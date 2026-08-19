@@ -16,8 +16,8 @@ calculation and paper artifact, and whether the manuscript consumes it.
 - **Producer:** the script whose write target (`ggsave`, `writeLines`,
   `saveRDS`, `kbl`, …) matches the exhibit basename.
 - **Calculation:** the analysis calculation is run by `MAIN.R` at the default
-  `runStages` (config.R): stages 3, S2–SA, and 9 on; stages 1
-  (`download_and_clean`) and 2 (`data_mining`) off.
+  `runStages` (config.R): `precompute`, `exhibits`, and `appendices_pca` on;
+  `download_and_clean`, `data_mining`, and `time_fe_robustness` off.
 - **Paper artifact:** the producer writes the file that the manuscript can
   consume. For the six S4b-owned group tables this is distinct from the nested
   audit output.
@@ -36,12 +36,15 @@ MAIN.R  (reads runStages from config.R)
   2_DataMining.R            -> 2a 2c                  [chapter 2; off by default]
   3_Precompute.R            -> 3a 3b 3c_FactorAdjusted
                                                         (prep caches; no exhibits)
-  S2_ResearchVsDataMining.R -> S2a S2b S2d S2e
-  S3_Learning.R             -> S3a S3b
-  S4_Heterogeneity.R        -> S4a S4b
-  S5_BestPredictors.R       -> S5a
-  SA_Appendices.R           -> selected Appendices/SA01 through SA14 scripts
-  9_ExportDataToCsv.R
+  S2_ResearchVsDataMining.R -> S2a S2b S2d S2e                    [exhibits]
+  S3_Learning.R             -> S3a S3b                            [exhibits]
+  S4_Heterogeneity.R        -> S4a S4b                            [exhibits]
+  S5_BestPredictors.R       -> S5a                                [exhibits]
+  SA_Appendices.R           -> selected Appendices/SA01 through SA14 scripts,
+                               excluding SA11                     [exhibits]
+  9_ExportDataToCsv.R                                             [exhibits]
+  SA_AppendicesPCA.R        -> the four Appendices/SA11 scripts
+                                                    [appendices_pca; ~1 hour]
 ```
 
 `S4b_RVsDM_ByGroup.R` owns the sample-specific source artifacts for Tables 6,
@@ -160,6 +163,20 @@ separate manuscript repository.
 | ---------------- | --------------------------------------------------- | ------------------------------------------------ | ------------------------------------------- |
 | Table B.2        | Annual-accounting decay regressions without time FE | Table_MPStyleRegsNoTimeFE_AccountingOnly.tex     | Appendices/SA14_MPStyleRegsAccountingOnly.R |
 | Table B.3        | Annual-accounting decay regressions with time FE    | Table_MPStyleRegsTimeFE_AccountingOnly.tex       | Appendices/SA14_MPStyleRegsAccountingOnly.R |
+
+The opt-in time-fixed-effects robustness pipeline is kept in
+`Appendices/TimeFERobustness/`. It produces six private-note/response
+tables under `../Results/TimeFERobustness/`; they are not currently wired into
+the manuscript:
+
+| Output                       | Description                                      |
+| ---------------------------- | ------------------------------------------------ |
+| `s6-timefe-summary.tex`      | Six-panel summary with and without time FE       |
+| `mp-cz-normalized.tex`       | MP and quality-screened CZ comparison            |
+| `jkp-cz-normalized.tex`      | JKP weighting and normalization comparison       |
+| `cz-alternative-specs.tex`   | Alternative CZ portfolio constructions           |
+| `jkp-rep-using-cz.tex`       | JKP portfolio constructions rebuilt from CZ data |
+| `jkp-cz-date-comparison.tex` | Quality-screened JKP/CZ date comparison           |
 
 ## Gaps
 
