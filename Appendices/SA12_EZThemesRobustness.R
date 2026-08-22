@@ -3,6 +3,7 @@
 # How to run: normally run through SA_Appendices.R from flex-mining/.
 # Inputs:  cleaned published returns and chapter-2 mined strategies
 # Outputs: ../Results/theme_ez_decayinSampEnd*.tex
+#          ../Results/theme_corr_academic.tex  (DM-theme vs published correlations)
 # Setup --------------------------------------------------------
 
 rm(list = ls())
@@ -239,5 +240,131 @@ for (j in 1:nrow(samplePeriods)) {
   )
   
   writeLines(tex, paste0('../Results/theme_ez_decay', 'inSampEnd', samplePeriods$insampEnd[j], '.tex'))
-  
+
 } # End loop over in-sample periods
+
+
+# =====================================================================
+# Correlations of the top DM themes with published predictors
+# =====================================================================
+# For the single most in-sample-significant DM numerator group in each
+# economic theme (the litcats used in theme_ez_decay.tex), find the academic
+# (CZ) predictors whose full-sample long-short returns are most correlated
+# with it. Uses the baseline 1963-1980 in-sample window (as in the main
+# theme_ez_decay.tex table), and reuses dm_rets / czret / czsum / dm_linktable
+# already loaded above.
+
+# how many academic predictors to show per DM anchor
+n_acad_per_anchor <- 10
+# minimum overlapping months to trust a correlation
+nmonth_corr_min <- 60
+
+# baseline in-sample window (matches theme_ez_decay.tex)
+insampBase <- tibble(start = as.yearmon('Jul 1963'), end = as.yearmon('Dec 1980'))
+
+# select DM predictors and sign them in the baseline window
+corrpred <- list()
+corrpred$sum <- dm_rets[
+  yearm <= insampBase$end & yearm >= insampBase$start &
+    nstock_long >= nstock_min & nstock_short >= nstock_min
+] %>%
+  .[, .(rbar = mean(ret), tstat = mean(ret) / sd(ret) * sqrt(.N), nmonth = .N), by = id] %>%
+  mutate(sign = sign(rbar)) %>%
+  transmute(id, sign, tstat = sign * tstat, nmonth) %>%
+  filter(nmonth >= nmonth_min)
+
+# signed full-sample DM returns
+corrpred$ret <- merge(dm_rets, corrpred$sum[, .(id, sign)], by = 'id') %>%
+  filter(nstock_long >= nstock_min & nstock_short >= nstock_min) %>%
+  transmute(id, yearm, ret_signed = sign * ret) %>%
+  setDT()
+
+# map id -> numerator group (keep signal_form for the litcat join)
+corrstrat <- corrpred$sum %>%
+  merge(dm_linktable %>% transmute(id = dmcode, v1, signal_form,
+                                   numer = paste0(signal_form, v1long)), by = 'id') %>%
+  mutate(sweight = substr(id, 1, 2),
+         numer = str_replace_all(numer, 'd_', '$\\\\Delta$'),
+         numer = str_replace_all(numer, '&', '\\\\&'))
+
+corrgroup <- corrstrat %>%
+  group_by(sweight, signal_form, v1, numer) %>%
+  summarize(tstat = mean(tstat), .groups = 'drop') %>%
+  arrange(-tstat)
+
+# litcats (same source as theme_ez_decay.tex)
+litinfo <- tibble(
+  litcat0 = c('investment', 'diff investment', 'external financing', 'accruals',
+              'diff profitability', 'debt structure')
+) %>%
+  mutate(order = row_number(), litcat = paste(order, litcat0, sep = '|')) %>%
+  select(-order) %>%
+  mutate(litcat = if_else(litcat == '2|diff investment', '1|investment', litcat))
+
+groupsumcat <- readxl::read_xlsx('DataInput/DM-Numerator-LitCat.xlsx') %>%
+  transmute(signal_form, v1, litcat0 = LitCat) %>%
+  left_join(litinfo, by = 'litcat0')
+
+# ANCHOR = most in-sample-significant group within each litcat (from top 20)
+anchors <- corrgroup %>%
+  head(20) %>%
+  left_join(groupsumcat %>% select(signal_form, v1, litcat), by = c('signal_form', 'v1')) %>%
+  filter(!is.na(litcat)) %>%
+  group_by(litcat) %>%
+  slice_max(tstat, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
+  arrange(litcat) %>%
+  mutate(anchor_label = paste0(numer, ' (', sweight, '), $t=$ ', sprintf('%.1f', tstat)))
+
+# group-averaged signed return series per anchor
+id2group <- corrstrat %>% transmute(id, sweight, signal_form, v1) %>% setDT()
+groupret <- merge(corrpred$ret, id2group, by = 'id') %>%
+  merge(as.data.table(anchors %>% select(sweight, signal_form, v1, anchor_label)),
+        by = c('sweight', 'signal_form', 'v1')) %>%
+  .[, .(gret = mean(ret_signed)), by = .(anchor_label, yearm)]
+
+# correlate each anchor with every published predictor (raw full-sample LS returns)
+czslim <- czret[, .(signalname, yearm = date, ret)]
+corr_tab <- lapply(anchors$anchor_label, function(lab) {
+  g <- groupret[anchor_label == lab, .(yearm, gret)]
+  merge(czslim, g, by = 'yearm') %>%
+    .[, .(corr = cor(ret, gret), nmonth = .N), by = signalname] %>%
+    .[nmonth >= nmonth_corr_min] %>%
+    .[order(-corr)] %>%
+    head(n_acad_per_anchor) %>%
+    .[, anchor_label := lab]
+}) %>% rbindlist()
+
+# attach published descriptions / author-year, order within anchor
+corr_tab <- corr_tab %>%
+  merge(czsum[, .(signalname, LongDescription, Authors, Year)], by = 'signalname') %>%
+  mutate(authoryear = paste0(Authors, ' ', Year),
+         anchor_label = factor(anchor_label, levels = anchors$anchor_label)) %>%
+  arrange(anchor_label, -corr)
+
+# escape latex specials in free text
+escLatex <- function(x) {
+  x <- str_replace_all(x, '&', '\\\\&')
+  x <- str_replace_all(x, '%', '\\\\%')
+  x <- str_replace_all(x, '_', '\\\\_')
+  x
+}
+
+tabout <- corr_tab %>%
+  transmute(Description = escLatex(LongDescription),
+            `Author-Year` = escLatex(authoryear),
+            Corr = sprintf('%.2f', corr),
+            anchor_label)
+
+grp <- tabout %>% count(anchor_label)
+grp_index <- setNames(grp$n, as.character(grp$anchor_label))
+
+tabout %>%
+  select(-anchor_label) %>%
+  kable('latex', booktabs = TRUE, linesep = '', escape = FALSE, align = 'llr') %>%
+  pack_rows(index = grp_index, escape = FALSE, bold = FALSE, italic = TRUE) %>%
+  as.character() %>%
+  writeLines('../Results/theme_corr_academic.tex')
+
+print(paste0('Wrote ../Results/theme_corr_academic.tex: ', nrow(tabout),
+             ' published rows across ', nrow(anchors), ' DM anchors.'))
