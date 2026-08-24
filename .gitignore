@@ -45,3 +45,6 @@ slides_*.pdf
 
 # LaTeX preview build artifact
 LatexPreview/exhibits.pdf
+
+# test code
+dev/
