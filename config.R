@@ -30,7 +30,7 @@ runStages <- list(
   precompute          = TRUE,   # Chapter 3; ~40-55 min of reusable analysis
   exhibits            = TRUE,   # S2-S5, SA_Appendices, 9_Export; ~10 min total
   appendices_pca      = TRUE,   # Appendix SA11 correlation/PCA; ~1 hour
-  time_fe_robustness  = FALSE   # Large optional appendix; may need WRDS
+  time_fe_robustness  = TRUE   # Large optional appendix; may need WRDS
 )
 
 # Data vintage and mined-universe construction (Chapter 2) -----------------
