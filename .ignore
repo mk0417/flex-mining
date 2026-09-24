@@ -1,3 +1,8 @@
-# set ignore/unignore for Codex autocomplete.
+# ripgrep / Codex search settings, layered on .gitignore.
 
+# Codex autocompletes .git/ files unless we ignore
 .git
+
+# Do search the built paper and paper scratch drafts.
+!/paper/*.pdf
+!paper/dev/

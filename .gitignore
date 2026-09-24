@@ -1,39 +1,57 @@
+# Private companion repo: its own git repository, never part of this one.
+private/
 
-DataIntermediate/freq_obs_Annual.csv
-DataIntermediate/validDenomsCombinations.csv
+# Data and pipeline outputs live beside the code, outside version control.
+/Data/
+/Results/
+
+# Agent guidelines are local only, at any depth.
+AGENTS.md
+CLAUDE.md
+
 .env
-/CLAUDE.md
-/AGENTS.md
+.DS_Store
 
 # R outputs
 *.log
 Rplots.pdf
+code/DataIntermediate/freq_obs_Annual.csv
+code/DataIntermediate/validDenomsCombinations.csv
 
-#LaTeX outputs
+# LaTeX outputs
 *.aux
-*.log
-*.sty
-*.cls
-*.bst
 *.bbl
+*.bbl*
+*.bcf
 *.blg
+*.fls
+*.fdb_latexmk
 *.idx
 *.ilg
 *.ind
 *.lof
 *.lot
 *.out
+*.run.xml
 *.toc
-*.fls
-*.fdb_latexmk
-*.synctex.gz
-*.synctex(busy)
-*.synctex.gz(busy)
-*.synctex.gz(busy)
+*.synctex*
+*.xdv
+*.dvi
 # LaTeX beamer aux
 *.nav
 *.snm
 *.vrb
+# Class and style files are fetched per build, except the paper's own style.
+*.sty
+*.cls
+*.bst
+!paper/zimstyle.sty
+
+# Built paper; exhibits stay tracked so a clone builds without the pipeline.
+/paper/*.pdf
+
+# LaTeX preview build artifact
+code/LatexPreview/exhibits.pdf
 
 # Slide decks: internal, kept locally only.
 # These are responses to a named discussant and this remote is public.
@@ -41,10 +59,10 @@ Rplots.pdf
 slides_*.tex
 slides_*.pdf
 
-.DS_Store
-
-# LaTeX preview build artifact
-LatexPreview/exhibits.pdf
-
-# test code
+# Scratch directories (code/dev/, paper/dev/)
 dev/
+temp/
+scratch.md
+
+# Claude Code local settings
+.claude/settings.local.json
