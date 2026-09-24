@@ -117,22 +117,15 @@ Table reports the 20 accounting ratio numerator and stock weight (equal- or valu
 % =====================================================
 \clearpage
 \newpage
-\section{Why Do Published Predictors Decay?}\label{sec:ia-decay}
-
-Table \ref{tab:samp-split} illustrates two methods for documenting peer-reviewed predictability decay:
-\begin{enumerate}
-  \item Split at the end of the publication's sample period, following \citet{mclean2016does}
-  \item Split in 2004 when high-speed internet became widely available, consistent with \citet{Chordia2014Have} and \citet{chen2022zeroing}
-\end{enumerate}
-Both approaches yield similar empirical results: a mean split date around 2000, a decay of about 50\%, with 85\% of predictors showing reduced effectiveness after the split.
+\section{Structural Break Tests}\label{sec:ia-decay}
 
 %%
-% EXHIBIT-NUMBER: Table IA.7
+% EXHIBIT-NUMBER: Table IA.6
 \begin{table}[!h]
-  \caption{Why Do Peer-Reviewed Returns Decay?}\label{tab:samp-split}
+  \caption{Returns Around Alternative Structural Break Dates}\label{tab:samp-split}
   \small
   
-  Table compares splitting samples using various methods: (1) the end of the original sample period, (2) when high speed internet became widely available, and (3) by minimizing the mean squared residual a la \citet{bai1998estimating}. Each method leads to a similar average break date, magnitude of decay, and frequency of decay.  It is unclear which sample split best explains why peer-reviewed predictability decays.
+  The table reports mean long-short returns before and after three candidate break dates: the end of each paper's original sample period, December 2004 following \citet{chen2022zeroing}, and a break date estimated separately for each predictor. Estimated break dates minimize the residual sum of squares from a one-break constant-mean model (\citealt{bai1998estimating}). Mean date is the average break date across predictors; \% of signals with decay is the share with a lower mean return after the break.
   \vspace{2ex}
   
   \centering
@@ -140,25 +133,17 @@ Both approaches yield similar empirical results: a mean split date around 2000, 
   \input{\exhibitspath/samp_split_summary.tex}
 \end{table}
 
-Which split best explains why peer-reviewed predictability decays? To examine this, we compute data driven breaks for each predictor by minimizing the mean squared residual (as in \citet{bai1998estimating}). We then compare the data-driven breaks with the breaks specified by the two methods above.
-
-Figure \ref{fig:break-vs-sampend} shows the result. The scatter shows at best a mild relationship between the data-driven breaks and the papers' sample ends. Similarly, there is some clustering around the 2004 break, but the evidence is far from definitive. 
-
 %%
-% EXHIBIT-NUMBER: Figure IA.3
+% EXHIBIT-NUMBER: Figure IA.1
 \begin{figure}[!h]
-  \caption{Data-Driven Breaks vs Paper Sample Ends}
+  \caption{Estimated Structural Break Dates and Paper Sample Ends}
   \label{fig:break-vs-sampend}
-  Each marker is one published predictor. Data-driven breaks split the predictor's sample into two periods to minimize the mean squared residual (as in \citet{bai1998estimating}).
+  Each marker is one published predictor. The horizontal axis shows the end of the paper's original sample period; the vertical axis shows the estimated break date from a one-break constant-mean model. The dashed line marks the December 2004 break used by \citet{chen2022zeroing}. Horizontal positions are jittered to separate overlapping markers.
   \vspace{0.15in}
   
   \centering
   \includegraphics[width=0.55\textwidth]{\exhibitspath/break_vs_sampend.pdf}
 \end{figure}
-
-This result is natural given the noise in long-short returns. The typical monthly volatility is 350 bps, implying the standard error of a 60-month mean is 45 bps, making it impossible to tell if a predictor decays  in a particular 5-year period.
-
-Thus, it is difficult to determine the fundamental cause of the relative decay of peer-reviewed and data-mined predictors. This observation leads to our focus on making inferences about post-sample performance. 
 
 \clearpage{}
 \newpage{}
