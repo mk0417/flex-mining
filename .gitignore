@@ -7,6 +7,9 @@ private/
 /Data/
 /Results/
 
+# Local git worktrees.
+/.wt/
+
 # Agent guidelines are local only, at any depth.
 AGENTS.md
 CLAUDE.md
