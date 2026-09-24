@@ -112,7 +112,7 @@ Additionally, we investigate whether predictability studied in \citet{fama1992cr
 
 The remainder of this section discusses implications and related literature. Section \ref{sec:pubvs} shows peer-reviewed research is similar to data mining in out-of-sample tests. Section \ref{sec:learn} examines learning from academics versus learning from the data, finding little additional post-publication decay relative to data-mined controls.
 
-Section \ref{sec:famous} compares \citet{fama1992cross}, \citet{jegadeesh1993returns}, and \citet{banz1981relationship} with data mining. Section \ref{sec:conclusion} concludes. Robustness is in the Appendix.
+Section \ref{sec:quality} compares \citet{fama1992cross}, \citet{jegadeesh1993returns}, and \citet{banz1981relationship} with data mining. Section \ref{sec:conclusion} concludes. Robustness is in the Appendix.
 
 
 
@@ -545,24 +545,15 @@ This result is at odds with \emph{Learning-from-Academics}, which implies that $
 
 
 % ==============================
-\section{The Most Renowned Research vs Data Mining}\label{sec:famous}
+\section{Highest Quality Research vs Data Mining}\label{sec:quality}
 
-Section \ref{sec:robust,disc} showed that journal ranking has relatively little effect. But perhaps one needs to go beyond journal ranking, and focus on the very best research, to find notable outperformance relative to data mining.
+% motivate
+Our main results treat all peer-reviewed research alike, but research varies in quality. This section examines the possibility that the highest quality research outperforms.
 
-To examine this possibility, we take a closer look at the predictability studied in \citet{fama1992cross}, \citet{jegadeesh1993returns}, and \citet{banz1981relationship}. These papers are renowned for studying the predictive power of B/M, momentum, and size, respectively. These findings are not only among the most renowned, but are arguably the ones with the strongest supporting evidence, both theoretical and empirical.  
+\subsection{Journal Rankings}\label{sec:quality,journal}
 
-Theoretical foundations for B/M include \citet{berk1999optimal}, \citet{gomes2003equilibrium}, \citet{campbell2004bad}, \citet{zhang2005value}, and \citet{lettau2007long}. Many of these papers also provide a theoretical foundation for size (see also \citealt{berk1995critique}). Theoretical foundations for momentum include \citet{hong1999unified}, \citet{brav2002competing}, \citet{holden2002news}, and \citet{da2014frog}.\footnote{% 
-Other theoretical foundations for B/M and size include \citet{gabaix2008variable}, \citet{papanikolaou2011investment}, and \citet{chen2018general}. For other theoretical foundations for momentum, see \citealt{subrahmanyam2018equity}.
-} % end footnote
-Many of these theories are themselves award-winning and renowned papers.
+Table \ref{tab:hetero-byjournal} cuts the data by discipline and journal ranking. Finance predictors outperform accounting predictors post-sample, earning 59 to 78 bps per month compared to 43 to 48 bps. Relative to data mining, however, the outperformance is modest. Finance predictors beat data mining by 11 to 15 bps per month, while accounting predictors underperform it. The top 3 finance journals (JF, JFE, RFS) look similar to finance overall, beating data mining by 10 to 17 bps, with only the CAPM comparison significant at the 5\% level.
 
-Almost all of these theories provide equilibrium foundations, that is, stable relationships between firm characteristics and expected returns. One might argue that the behavioral equilibria are unstable, but others will argue that psychological biases are fundamental, as are limits to arbitrage. And while the multiplicity of theories could be viewed as ``model dredging,'' it could also be viewed as robustness. Theoretical robustness is a feature of physics and statistics, in which core phenomena can be derived from multiple perspectives.\footnote{% begin footnote
-Thermodynamic phenomena (e.g. ideal gas law) can be derived from the laws of thermodynamics,  classical mechanics, or quantum mechanics. Core statistical formulas (e.g. regression coefficients), can be derived from method of moments, maximum likelihood, Bayesian assumptions, or data fitting. 
-} % end footnote
-
-These renowned papers provide robust empirical evidence. Indeed, \citet{fama1992cross} is in essence a robustness check on \citet{stattman1980book} and \citet{banz1981relationship}. But other empirical papers provide even more robustness (e.g., \citealt{fama1993common}; \citealt{lakonishok1994contrarian}; \citealt{chan1996momentum}; \citealt{asness2013value}). 
-
-Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findings to data-mined alternatives. The alternatives come from searching the 29,000 accounting ratios for t-stats and mean returns that are each within 10\% of the original findings. This filtering ensures the alternatives are similar to the original findings in terms of statistical support. As before,  data-mined t-stats and mean returns use the original papers' stock weighting and sample periods.
 
 % EXHIBIT-NUMBER: Table 5
 \begin{table}[!h]
@@ -581,6 +572,21 @@ Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findi
    \end{center}
 \end{table}
 
+Journal rankings are surely an imperfect measure of quality. Nevertheless, Table \ref{tab:hetero-byjournal} provides evidence that even the highest quality research performs similarly to data-mining, post-sample.
+
+\subsection{Size, B/M, and Momentum}\label{sec:quality,famous}
+
+B/M (\citealt{fama1992cross}), momentum (\citealt{jegadeesh1993returns}), and size (\citealt{banz1981relationship}) are perhaps the most famous predictors in asset pricing research. These predictors have an immense amount of supporting evidence, both theoretical and empirical. 
+
+Theoretical foundations for B/M and size include \citet{berk1995critique}, \citet{berk1999optimal}, \citet{gomes2003equilibrium}, \citet{campbell2004bad}, \citet{zhang2005value}, and \citet{lettau2007long}. Theoretical foundations for momentum include \citet{hong1999unified}, \citet{brav2002competing}, \citet{holden2002news}, and \citet{da2014frog}.\footnote{% 
+Other theoretical foundations for B/M and size include \citet{gabaix2008variable}, \citet{papanikolaou2011investment}, and \citet{chen2018general}. For other theoretical foundations for momentum, see \citealt{subrahmanyam2018equity}.
+} % end footnote
+Most of these theories provide equilibrium foundations, and their multiplicity can be viewed as robustness, much as core results in physics and statistics can be derived from multiple perspectives.\footnote{% begin footnote
+Thermodynamic phenomena (e.g. ideal gas law) can be derived from the laws of thermodynamics,  classical mechanics, or quantum mechanics. Core statistical formulas (e.g. regression coefficients), can be derived from method of moments, maximum likelihood, Bayesian assumptions, or data fitting. 
+} % end footnote
+The empirical evidence is also robust (e.g., \citealt{fama1993common}; \citealt{lakonishok1994contrarian}; \citealt{chan1996momentum}; \citealt{asness2013value}).
+
+Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these findings to data-mined accounting ratios with t-stats and mean returns within 10\% of the originals, using the original papers' stock weighting and sample periods.
 
 % EXHIBIT-NUMBER: Table 6
 \begin{table}[p]
@@ -672,14 +678,10 @@ Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findi
 \end{table}
 
 
-% walk through one table
-Table \ref{tab:closer_bmdec} applies this exercise to \citepos{fama1992cross} B/M. It lists 20 of the 51 data-mined predictors that performed similarly to B/M in \citepos{fama1992cross} 1963-1990 sample period. The predictors are sorted by the absolute difference in the original sample mean return. By this metric, the most similar predictor to B/M is $\Delta \text{[PPE net]} / \text{lag [Common equity]}$, which can be thought of as a measure of investment. This predictor earned 95 bps per month in the original sample period, compared to 96 bps for B/M. The `1991-2023' column shows that $\Delta \text{[PPE net]} / \text{lag [Common equity]}$ slightly outperforms B/M post-sample, earning 66 bps per month compared to 61 bps for B/M. 
+% walk through the tables
+Table \ref{tab:closer_bmdec} lists 20 of the 51 data-mined predictors that match B/M in the 1963-1990 sample. The closest match, $\Delta \text{[PPE net]} / \text{lag [Common equity]}$, is an investment measure that earned 95 bps per month in-sample (vs 96 bps for B/M) and 66 bps post-sample (vs 61 bps). Other matches relate to equity issuance and asset growth. On average, the matches earn 81 bps post-sample, outperforming B/M.
 
-Other data-mined alternatives to B/M include those related to equity issuance ([Stock issuance]/ [Debt in current liab]) and asset growth ($\Delta$ [Assets]/ lag [Cost of goods sold]). The post-sample performance of these data-mined alternatives varies. On average, they outperform \citet{fama1992cross}. Trading on Fama and French's finding would have earned 61 bps per month post-sample, compared to 81 bps for the typical data mined alternative.
-
-Table \ref{tab:closer_mom12m} applies the same exercise to \citepos{jegadeesh1993returns} 12-month momentum. Since momentum has a much higher mean return, only 4 data-mined alternatives are found. All four scale unadjusted retained earnings by another accounting variable. Here, data mining underperforms, earning 17 bps on average compared to 72 bps for \citepos{jegadeesh1993returns} finding. However, Table \ref{tab:closer_size} shows data mining outperforming, earning 36 bps compared to 15 bps for \citepos{banz1981relationship} size.
-
-Averaging across the three tables, data mining performs similarly to these renowned findings, earning 45 bps per month post-sample compared to 49 bps. Though the samples are small, they suggest that focusing on the best research does not significantly affect our results.  
+Data mining underperforms momentum (Table \ref{tab:closer_mom12m}), earning 17 bps vs 72 bps, though only 4 matches are found. It outperforms size (Table \ref{tab:closer_size}), earning 36 bps vs 15 bps. Averaging across the three findings, data mining earns 45 bps per month post-sample, compared to 49 bps for the renowned findings. Though the samples are small, they suggest that even the best research does not notably outperform data mining.
 
 % ===================
 \section{Conclusion and Limitations}\label{sec:conclusion}
