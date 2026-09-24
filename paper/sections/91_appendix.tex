@@ -1,29 +1,6 @@
 % !TEX root = ../research_vs.tex
 
-\section{Robustness}\label{sec:robust}
-
-\subsection{Robustness: Research vs Data Mining}\label{sec:robust,research-vs}
-
-
-% EXHIBIT-NUMBER: Figure IA.1
-\begin{figure}[h]\caption{Excluding Data-Mined Predictors Correlated with Any Existing Research}
-  \label{fig:decay-unspanned}
-  We compare published predictors (solid) to data-mined predictors made with t-stats $>$ 2.0, but separate predictors by correlation and in-sample t-stats. Panel (a) uses the maximum pairwise correlation with any existing published predictor. Panel (b) uses the $R^2$ from regressing the data-mined return on 5 principal components of existing predictors computed using probabilistic PCA. 
-  
-  \vspace{2 ex}
-  \centering
-  \subfloat[Any Correlation\label{fig:abnormal_published_1}]{
-      \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig_DM_unspan_match_t_g_cor.pdf}
-  }    
-  \subfloat[PPCA\label{fig:abnormal_published_2}]{
-      \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig_DM_unspan_match_t_g_PCA.pdf}
-  }
-\end{figure}
-
-
-\clearpage
-
-\subsection{Robustness: Research vs Data Mining}\label{sec:robust,learning}
+\section{Robustness: Decay Regressions}\label{sec:robust}
 
 % EXHIBIT-NUMBER: Table B.1
 \begin{table}[H]
