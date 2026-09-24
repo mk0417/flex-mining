@@ -1,5 +1,7 @@
 # Private companion repo: its own git repository, never part of this one.
 private/
+# Retired writing clone; keep any local copy out of the public repo.
+/writing/
 
 # Data and pipeline outputs live beside the code, outside version control.
 /Data/
