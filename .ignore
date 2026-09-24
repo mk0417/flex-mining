@@ -4,5 +4,5 @@
 .git
 
 # Do search the built paper and paper scratch drafts.
-!paper/research_vs.pdf
+!/paper/*.pdf
 !paper/dev/

@@ -1,0 +1,91 @@
+% Appendices
+\usepackage[title]{appendix}
+
+% Margins
+\usepackage[margin={1in}]{geometry}
+
+% sideways tables and figures
+\usepackage{rotating, lscape}
+\usepackage{graphicx, color, subfig}
+\usepackage{url}
+
+% Tables
+\usepackage{threeparttable, booktabs, longtable, threeparttablex, tabularx, bigstrut}
+
+% references
+\usepackage[backend=biber,natbib=true,style=authoryear,uniquename=false,minbibnames=3, maxbibnames=10]{biblatex}
+\renewbibmacro{in:}{}
+\usepackage{authblk}
+
+
+% fonts that are nicer than defaults
+\usepackage[sc]{mathpazo}
+\usepackage{courier}
+
+% Use 8-bit encoding that has 256 glyphs, pretty please
+% \usepackage[utf8]{inputenc}
+% \usepackage[T1]{fontenc}
+
+% Spacing
+\usepackage{setspace}
+\usepackage{footmisc}
+\setlength{\footnotesep}{\baselineskip}
+\renewcommand{\footnotelayout}{\onehalfspacing}
+
+% math support
+\usepackage{amssymb,amsmath,mathrsfs,amsthm, bbm}
+
+% Slightly tweak font spacing for aesthetics
+\usepackage{microtype}
+
+% Links
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+\usepackage{multirow}
+\usepackage{pdflscape}
+\usepackage[capitalize]{cleveref}
+
+% lazy math commands
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\Corr}{\text{Corr}}
+\newcommand{\bias}{\text{bias}}
+\newcommand{\pub}{\text{pub}}
+\newcommand{\rbarstar}{\bar{r}^\ast}
+\newcommand{\rbar}{\bar{r}}
+\newcommand{\SE}{\text{SE}}
+\newcommand{\FDR}{\text{FDR}}
+\newcommand{\obs}{\text{obs}}
+
+% define colors
+\definecolor{ChadBlue}{rgb}{.1,.1,.5}  
+
+% theorem environments
+\newtheorem{lemma}{Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{defn}{Definition}
+
+% possessive citation + hyperref
+\newcommand{\citepos}[1]{\citeauthor{#1}'s \citeyearpar{#1}}
+\DeclareCiteCommand{\citeyear}
+    {}
+    {\bibhyperref{\printdate}}
+    {\multicitedelim}
+    {}
+
+\DeclareCiteCommand{\citeyearpar}
+    {}
+    {\mkbibparens{\bibhyperref{\printdate}}}
+    {\multicitedelim}
+    {}
+
+
+% default outline depth
+\hypersetup{
+    bookmarksopen=true,
+    bookmarksopenlevel=1 % use \maxdimen to open all levels
+}    
+
+% custom bookmark levels
+\usepackage{bookmark}

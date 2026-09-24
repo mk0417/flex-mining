@@ -1,0 +1,398 @@
+% !TEX root = ../risk_vs.tex
+
+\begin{center}
+\Large{\textbf{Internet Appendix for ``Does Peer-Reviewed Research Help Predict Stock Returns''}}
+\end{center}
+
+% results that are not needed to justify main results go here
+% this includes additional color 
+\section{Additional Results on Data-Mined Predictability}\label{sec:intapp-dm-additional}
+\begin{table}[!h]
+  \caption{Out-of-Sample Returns from Mining Accounting Data: 2004-2020}
+  \label{tab:dm-sum-2004}
+  
+  \begin{singlespace}
+  \noindent 
+  We sort 29,000 accounting ratios each June into 5 bins based on past 30-year long-short returns (in-sample) and compute the mean return over the next year within each bin (out-of-sample). Statistics are calculated by strategy, then averaged within bins, then averaged across sorting years. Decay is the percentage decrease in mean return out-of-sample relative to in-sample. We omit decay for bin 4 because the mean return in-sample is negligible. Out-of-sample returns are calculated using only data from 2004-2020.
+  \end{singlespace}
+  \begin{centering}
+  \vspace{-3ex}
+  \par\end{centering}
+  \centering{}\setlength{\tabcolsep}{1.0ex} \small
+  \begin{center}
+  \begin{tabular}{crrrrrrrrrrrr} \toprule 
+  % \multicolumn{13}{c}{Panel (b): Out-of-Sample Returns 2004-2020} \\ 
+  In- &   & \multicolumn{5}{c}{Equal-Weighted Long-Short Deciles} &   & \multicolumn{5}{c}{Value-Weighted Long-Short Deciles} \\ \cmidrule{3-7}\cmidrule{9-13}Sample &   & \multicolumn{2}{c}{Past 30 Years (IS)} &   & \multicolumn{2}{c}{Next Year (OOS)} &   & \multicolumn{2}{c}{Past 30 Years (IS)} &   & \multicolumn{2}{c}{Next Year (OOS)} \\ \cmidrule{3-4}\cmidrule{6-7}\cmidrule{9-10}\cmidrule{12-13}Bin &   & \multicolumn{1}{c}{Return} & \multicolumn{1}{c}{\multirow{2}[2]{*}{t-stat}} &   & \multicolumn{1}{c}{Return} & \multicolumn{1}{c}{Decay} &   & \multicolumn{1}{c}{Return} & \multicolumn{1}{c}{\multirow{2}[2]{*}{t-stat}} &   & \multicolumn{1}{c}{Return} & \multicolumn{1}{c}{Decay} \\   &   & \multicolumn{1}{c}{(bps pm)} &   &   & \multicolumn{1}{c}{(bps pm)} & \multicolumn{1}{c}{(\%)} &   & \multicolumn{1}{c}{(bps pm)} &   &   & \multicolumn{1}{c}{(bps pm)} & \multicolumn{1}{c}{(\%)} \\ \cmidrule{1-1}\cmidrule{3-4}\cmidrule{6-7}\cmidrule{9-10}\cmidrule{12-13}
+  
+  \input{exhibits/dm-sortsPost2003.tex}
+  
+  \bottomrule \end{tabular}%   
+  \end{center} 
+\end{table}
+
+
+\begin{table}[!h]
+  \caption{Pairwise Correlations of Data-Mined Predictors}
+  \label{tab:dm-cor}
+  
+  \begin{singlespace}
+  \noindent Data-mined predictors are represented by strategies with t-statistics greater than 2.0 in at least 10\% of the in-sample periods from Table \ref{tab:dm-oos}.  The table reports percentiles of Pearson correlation coefficients computed over pairwise-complete return observations. 
+  \end{singlespace}
+  \begin{centering}
+  \vspace{-2ex}
+  \par\end{centering}
+  \centering{}\setlength{\tabcolsep}{1.7ex} \small
+  \begin{center}
+  % ==== begin paste
+  \begin{tabular}{clccccccccccc}
+  \toprule
+   \multicolumn{11}{c}{Panel (a): Pairwise correlations} \\
+  \midrule
+  Percentile & & 1 & 5 & 10 & 25 & 50 & 75 & 90 & 95 & 99 \\
+  \midrule
+  \input{exhibits/quantilesCorDM.tex}
+  \bottomrule
+  \end{tabular}
+  \end{center}
+\end{table}
+
+% =====================================================
+\clearpage
+\newpage
+\section{Data-Mined Themes in Other Samples}\label{sec:intapp-themes}
+
+%%
+\begin{table}[!h]
+\caption{Themes from Mining Accounting Ratios in 1990}\label{tab:dm-theme1990}
+\small
+
+Table reports the 20 accounting ratio numerator and stock weight (equal- or value-) combinations with the largest mean t-stats using returns in the years 1963-1990 (IS). `ew' is equal-weight, `vw' is value-weight. Strategies are signed to have positive mean returns IS. `Pct Short' is the share of strategies that short the ratio.  `t-stat' and  `Mean Return' are averages across the 65 possible denominators. 
+\vspace{2ex}
+
+\centering
+
+\setlength{\tabcolsep}{1.0ex}
+\input{exhibits/theme_ez_decayinSampEnd1990.tex}
+
+\end{table}
+
+
+%%
+\begin{table}
+\caption{Themes from Mining Accounting Ratios in 2000}\label{tab:dm-theme2000}
+\small
+
+Table reports the 20 accounting ratio numerator and stock weight (equal- or value-) combinations with the largest mean t-stats using returns in the years 1963-2000 (IS).  `ew' is equal-weight, `vw' is value-weight. Strategies are signed to have positive mean returns IS. `Pct Short' is the share of strategies that short the ratio.  `t-stat' and  `Mean Return' are averages across the 65 possible denominators. 
+\vspace{2ex}
+
+\centering
+
+\setlength{\tabcolsep}{1.0ex}
+\input{exhibits/theme_ez_decayinSampEnd2000.tex}
+
+\end{table}
+
+
+%%
+\begin{table}
+\caption{Themes from Mining Accounting Ratios in 2010}\label{tab:dm-theme2010}
+\small
+
+Table reports the 20 accounting ratio numerator and stock weight (equal- or value-) combinations with the largest mean t-stats using returns in the years 1963-2010 (IS).  `ew' is equal-weight, `vw' is value-weight. Strategies are signed to have positive mean returns IS. `Pct Short' is the share of strategies that short the ratio.  `t-stat' and  `Mean Return' are averages across the 65 possible denominators. 
+\vspace{2ex}
+
+\centering
+
+\setlength{\tabcolsep}{1.0ex}
+\input{exhibits/theme_ez_decayinSampEnd2010.tex}
+
+\end{table}
+
+
+% =====================================================
+\clearpage
+\newpage
+\section{Full Sample Risk Adjustments}\label{sec:intapp-fullsamplerisk}
+
+As a robustness check, we present results using full sample risk adjustments instead of sample-specific alphas. In the full sample approach, betas are estimated over the entire available period from the sample start date onwards, rather than separately for in-sample and out-of-sample periods.
+
+\begin{figure}[!h]
+   \caption{Research vs Data-Mining: Full Sample Factor-Adjusted Returns}
+   \label{fig:pub-vs-dm-factor-fs}
+   We repeat Figure \ref{fig:pub-vs-dm-2} using full sample risk adjustments, where $\hat{\beta}_i$ is estimated using all available data from the sample start date onwards. Shaded area shows one standard error for the published predictors, clustered by calendar month and predictor. 
+   \vspace{0.15in}
+   
+   \centering
+   \subfloat[CAPM-Adjusted]{
+   \includegraphics[width=0.48\textwidth]{exhibits/Fig_FullSampleRiskAdj_capm_alpha_fs_t2.pdf} 
+   }
+   \subfloat[FF3-Adjusted]{
+   \includegraphics[width=0.48\textwidth]{exhibits/Fig_FullSampleRiskAdj_ff3_alpha_fs_t2.pdf}
+   }
+\end{figure}
+
+\input{exhibits/Table_RiskAdjusted_FullSample_Appendix.tex}
+
+\input{exhibits/Table_RiskAdjusted_FullSample_DisciplineJournal_Appendix.tex}
+\clearpage
+
+
+% ==============================
+\clearpage
+\newpage
+\section{Alternative Measures of Risk}\label{sec:intapp-riskalt}
+
+\subsection{Risk vs Mispricing Words}\label{sec:intapp-risk-vs-words}
+
+In Section \ref{sec:hetero-method}, the risk vs mispricing categorization is binary. To make a more continuous measure, we count risk and mispricing words in the published papers. We remove stopwords, lowercase and lemmatize all words using standard methods. 
+
+We consider as risk words the following terms and
+their grammatical variations: \textquotedbl utility,\textquotedbl{}
+\textquotedbl maximize,\textquotedbl{} \textquotedbl minimize,\textquotedbl{}
+\textquotedbl optimize,\textquotedbl{} \textquotedbl premium,\textquotedbl{}
+\textquotedbl premia,\textquotedbl{} \textquotedbl premiums,\textquotedbl{}
+\textquotedbl consume,\textquotedbl{} \textquotedbl marginal,\textquotedbl{}
+\textquotedbl equilibrium,\textquotedbl{} \textquotedbl sdf,\textquotedbl{}
+\textquotedbl investment-based,\textquotedbl{} and \textquotedbl theoretical.\textquotedbl{}
+We also count as risk words appearances of \textquotedblleft risk\textquotedblright{}
+that are not preceded by \textquotedblleft lower,\textquotedblright{}
+and appearances of \textquotedblleft aversion,\textquotedblright{}
+\textquotedblleft rational,\textquotedblright{} and \textquotedblleft risky\textquotedblright{}
+that are not preceded by \textquotedblleft not.\textquotedblright{}
+
+
+The mispricing words consist of \textquotedbl{}
+\textquotedbl anomaly,\textquotedbl{} \textquotedbl behavioral,\textquotedbl{}
+\textquotedbl optimistic,\textquotedbl{} \textquotedbl pessimistic,\textquotedbl{}
+\textquotedbl sentiment,\textquotedbl{} \textquotedbl underreact,\textquotedbl{}
+\textquotedbl overreact,\textquotedbl{}
+\textquotedbl failure,\textquotedbl{} \textquotedbl bias,\textquotedbl{}
+\textquotedbl overvalue,\textquotedbl{} \textquotedbl misvalue,\textquotedbl{}
+\textquotedbl undervalue,\textquotedbl{} \textquotedbl attention,\textquotedbl{}
+\textquotedbl underperformance,\textquotedbl{} \textquotedbl extrapolate,\textquotedbl{}
+\textquotedbl underestimate,\textquotedbl{} \textquotedbl misreaction,\textquotedbl{}
+\textquotedbl inefficiency,\textquotedbl{} \textquotedbl delay,\textquotedbl{}
+\textquotedbl suboptimal,\textquotedbl{} \textquotedbl mislead,\textquotedbl{}
+\textquotedbl overoptimism,\textquotedbl{} \textquotedbl arbitrage,\textquotedbl{}
+\textquotedbl factor unlikely,\textquotedbl{} and their grammatical
+variations. We further count as mispricing the terms \textquotedbl not
+rewarded,\textquotedbl{} \textquotedbl little risk,\textquotedbl{}
+\textquotedbl risk cannot {[}explain{]},\textquotedbl{} \textquotedbl{}
+low {[}type of{]} risk,\textquotedbl{} \textquotedbl unrelated {[}to
+the type of{]} risk,\textquotedbl{} \textquotedbl fail {[}to{]} reflect,\textquotedbl{}
+and \textquotedbl market failure,\textquotedbl{} where the terms
+in brackets are captured using regular expressions or correspond to
+stopwords.
+
+Figure \ref{fig:decay_vs_words} plots post-sample returns against the ratio of risk words (e.g., ``utility,'' ``equilibrium'') to mispricing words (e.g., ``sentiment,'' ``underreact'') in the published papers.  The relationship is negative, consistent with Table \ref{tab:hetero-bytheory}.
+
+\clearpage
+
+\begin{figure}[!h]
+\caption{Post-Sample Returns vs Risk to Mispricing Words}
+\label{fig:decay_vs_words}
+
+Each marker represents one published predictor's mean return.  The regression line is fitted with OLS.  The full reference for each acronym can be found at \url{https://github.com/OpenSourceAP/CrossSection/blob/master/SignalDoc.csv}.  The relationship between risk words and post-sample returns is negative.
+\vspace{0.15in}
+
+\centering
+\includegraphics[width=0.75\textwidth]{exhibits/Fig_DecayVsWords_Names2.pdf}      
+\end{figure}
+
+\subsection{Factor Model Measures of Risk}\label{sec:intapp-risk-factor}
+
+One can alternatively measure risk using factor models, as follows. For each published long-short portfolio $i$, we estimate exposure to factor $k$ using time-series regressions on the original papers' sample periods.  According to the factor models, the estimated expected return is $\sum_k \hat{\beta}_{k, i} \bar{f}_{k}$, where $\bar{f}_k$ is the original-sample mean return of factor $k$.  \citet{fama1993common} state that $\hat{\beta}_{i,k}$  with respect to their SMB and HML factors have ``a clear interpretation as risk-factor sensitivities.''  If this interpretation is both correct and stable, then the estimated expected return should remain post-sample. 
+
+Figure \ref{fig:risk-alt} plots the post-sample mean return against the factor model expected returns, using the CAPM, Fama-French 3 (FF3), or Fama-French 5 (FF5) models.  We normalize by the original-sample mean return for ease of interpretation.  With this normalization, the position on the x-axis ([Predicted by Risk Model]/[In-Sample]) represents the share of predictability due to risk.
+
+
+\begin{figure}[!h]
+\caption{Mean Returns Post-Sample vs Factor Model Predictions}
+\label{fig:risk-alt}
+Each marker is one published long-short strategy.  [Post-Sample]/[In-Sample] is the mean return post-sample divided by the mean return in-sample.  [Predicted by Risk Model] is $\sum_k \hat{\beta}_{k, i} \bar{f}_{k}$, where $\bar{f}_k$ is the in-sample mean return of factor $k$ and $\hat{\beta}_{k,i}$ comes from an in-sample time series regression of long-short returns on factor realizations. FF3 and FF5 are the Fama-French 3- and 5-factor models. The blue line is the OLS fit. The axes zoom in on the interpretable region of the chart and omits outliers.  Factor models attribute a minority of in-sample predictability to risk, at best.  Post-sample decay is the distance between the horizontal line at 1.0 and the regression line, and this decay is near 50\% even for predictors that are entirely due to risk according to the CAPM and FF3.  For FF5, decay is smaller for predictors that are more than 75\% due to risk, but these predictors are rare.
+\vspace{0.15in}
+
+\centering
+\subfloat[Post-Sample Return vs CAPM Prediction]{
+\includegraphics[width=0.45\textwidth]{exhibits/Fig_Risk_via_CAPM} 
+}
+\subfloat[Post-Sample Return vs FF3 Prediction]{
+\includegraphics[width=0.45\textwidth]{exhibits/Fig_Risk_via_FF3}
+}\\
+\subfloat[Post-Sample Return vs FF5 Prediction]{
+\includegraphics[width=0.45\textwidth]{exhibits/Fig_Risk_via_FF5} 
+}
+\end{figure} % --------------------------------------------
+
+
+The figure shows that a minority of in-sample predictability is attributed to risk, at best.  Using the CAPM (Panel (a)), nearly all predictability is less than 25\% due to risk (to the left of the vertical line at 0.25), and many predictors have a \textit{negative} risk share.  FF3 (Panel (b)) implies more predictability is due to risk, but still the vast majority of predictors lie to the left of 0.50.  
+
+
+\citet{fama2015five} are more cautious than \citet{fama1993common}, and describe the risk-based ICAPM as ``the more ambitious interpretation'' of the five factor model. Under the more ambitious interpretation, FF5 implies that most predictors are less than 50\% due to risk. These results are consistent with our manual reading of the papers, which typically attribute predictability to mispricing (Table \ref{tab:hetero-count}). 
+
+The regression lines in Figure \ref{fig:risk-alt} show negative or mildly positive relationships between factor model risk and post-sample returns. The regression fits for the CAPM and FF3 models never stray far from 50\%, implying that even predictors that are entirely due to risk are little different than the typical predictor in terms of post-sample robustness.  FF5 risk shows a stronger relationship with post-sample returns, but even the rare predictors that are 75\% due to risk decay by roughly 40\% post-sample. Moreover, the \citet{fama2015five} model may have the benefit of hindsight, as the median publication year for the \citet{ChenZimmermann2021} predictors is 2006.
+    
+% =====================================================
+\clearpage
+\newpage
+\section{Additional Results on Published Predictors}\label{sec:intapp-pub-additional}
+
+\begin{table}[ht]
+  \caption{Signals by Theory and Published Journal}
+  \label{tab:journal_theory}
+  
+  \begin{singlespace}
+  \noindent This table lists the number of signals by theory and published journal.  Finance journals find risk explanations more frequently than accounting journals, but risk explanations still account for a small minority of predictors in finance journals.
+  \end{singlespace}
+  \begin{centering}
+  \vspace{2ex}
+  \par\end{centering}
+  \centering
+  \begin{tabular}{l|r|r|r}
+    \toprule
+   & Agnostic & Mispricing & Risk \\ 
+    \midrule
+    \input{exhibits/SignalsByTheoryAndJournal.tex}
+  \bottomrule
+  \end{tabular}
+  \end{table}
+
+\begin{figure}[!h]
+\caption{Decay vs Journal}
+Plot shows the ratio of post-sample to in-sample returns for each predictor, grouped by journal type. Journal types are Top 5 Economics (QJE, JPE), Top 3 Finance (JF, JFE, RFS), Top 3 Accounting (JAR, JAE, AR), and Other journals. Each point represents one predictor. The blue diamonds show the mean ratio within each journal group. The horizontal gray lines show ratios of 0 and 1. A ratio of 1 means the predictor maintains its full predictive power out-of-sample, while a ratio of 0 means the predictor completely fails out-of-sample. Text labels identify notable predictors and the top performers within each journal group. The blue line connects group means to highlight the pattern across journal types.
+\label{fig:decay-vs-journal}
+
+\vspace{0.15in}
+
+\centering
+\includegraphics[width=0.75\textwidth]{exhibits/Fig_DecayVsJournal_Means}      
+\end{figure}
+
+
+\begin{table}[!h]\caption{Regression Estimates of Risk vs Mispricing Effects on Predictability Decay}
+  \label{tab:mp-theory-no-reg}
+  
+  \begin{singlespace}
+  \noindent We regress monthly long-short returns on indicator variables to quantify the effects of peer-reviewed risk vs mispricing explanations on predictability decay. ``Post-Sample'' is 1 if the month occurs after the predictor's sample ends and is zero otherwise. ``Post-Pub'' is defined similarly. ``Risk'' is 1 if peer review argues for a risk-based explanation (Table \ref{tab:hetero-count}) and 0 otherwise. ``Mispricing'' and ``Post-2004'' are defined similarly. Parentheses show standard errors clustered by month.  ``Null: Risk No Decay'' shows the $p$-value that tests whether risk-based returns do not decrease post-sample ((1) and (3)) or post-publication ((2) and (4)).  Risk-based predictors decay more than other predictors, but the difference is only marginally significant. The decay in risk-based predictors overall is highly significant.
+  \end{singlespace}
+  \begin{centering}
+  \vspace{0ex}
+  \par\end{centering}
+  \centering{}\setlength{\tabcolsep}{2.0ex} \small
+  \begin{center}
+  % ==== begin paste
+  % Table generated by Excel2LaTeX from sheet 'MP theory' 
+  \begin{tabular}{lcccccc} \toprule 
+   & \multicolumn{5}{c}{LHS:  Long-Short Strategy Return (bps pm, scaled) } \\
+     \hline
+  RHS Variables & (1) & (2) & (3) & (4) & (5) \\ 
+     \hline
+  Intercept & 71.4 & 71.4 & 71.4 & 71.4 & 73.0 \\ 
+     & (3.7) & (3.7) & (3.7) & (3.7) & (3.9) \\ 
+    Post-Sample & -28.9 & -25.4 & -25.5 & -22.9 & -5.6 \\ 
+     & (5.6) & (7.1) & (6.6) & (10.7) & (8.2) \\ 
+    Post-Pub &  & -4.2 &  & -3.0 &  \\ 
+     &  & (7.8) &  & (12.5) &  \\ 
+    Post-Sample x Risk & -19.1 & -7.6 & -22.5 & -10.1 & -15.6 \\ 
+     & (7.7) & (10.2) & (8.5) & (12.9) & (7.6) \\ 
+    Post-Pub x Risk &  & -15.2 &  & -16.4 &  \\ 
+     &  & (13.3) &  & (15.9) &  \\ 
+    Post-Sample x Mispricing &  &  & -4.5 & -3.2 &  \\ 
+     &  &  & (5.8) & (11.0) &  \\ 
+    Post-Pub x Mispricing &  &  &  & -1.8 &  \\ 
+     &  &  &  & (12.0) &  \\ 
+    Post-2004 &  &  &  &  & -33.7 \\ 
+     &  &  &  &  & (9.9) \\ 
+     \hline
+  Null: Risk No Decay & $<$ 0.1\% & $<$ 0.1\% & $<$ 0.1\% & $<$ 0.1\% & $<$ 0.1\% \\ 
+  \bottomrule
+  \end{tabular}% 
+  % ==== end paste
+  \end{center} 
+  \end{table}
+  \clearpage
+  
+\begin{table}[!h]
+   \caption{Model vs No Model}
+   \label{tab:hetero-model}
+   
+   \begin{singlespace}
+   \noindent This table compares predictors with any mathematical model (stylized, dynamic, or quantitative) versus those without formal models. `Raw' shows unadjusted returns. `CAPM' and `FF4' adjust for the CAPM and Fama-French three-factor model plus momentum, respectively, using sample-specific alphas. All returns are normalized to have a mean of 100 bps per month in the original papers' samples. Numbers in parentheses are standard errors clustered by calendar month and predictor.
+   \end{singlespace}
+   \begin{centering}
+   \vspace{0ex}
+   \par\end{centering}
+   \centering{}\setlength{\tabcolsep}{2.0ex} \small
+   \begin{center}
+   \begin{tabular}{lcccccc}
+      \toprule
+      & \multicolumn{2}{c}{Raw} & \multicolumn{2}{c}{CAPM} & \multicolumn{2}{c}{FF4} \\
+      \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+      & Return & Outperf. & Return & Outperf. & Return & Outperf. \\
+      % FF4 figures copied from exhibits/ff4/Table_RiskAdjusted_AnyModelVsNoModel_ff4_t2.tex
+      \midrule
+      No Model  & 56 & 5 & 62 & 9 & 71 & -4 \\
+                & (3) & (3) & (3) & (3) & (3) & (4) \\
+      Any Model & 49 & 7 & 50 & 0 & 45 & -48 \\
+                & (13) & (13) & (14) & (17) & (11) & (22) \\
+      \bottomrule
+   \end{tabular}
+   \end{center} 
+\end{table}
+
+\input{exhibits/Table_RiskAdjusted_FullSample_AnyModelVsNoModel_Appendix.tex}
+
+
+% =====================================================
+\clearpage
+\newpage
+\section{Why Do Published Predictors Decay?}\label{sec:intapp-struct-break}
+
+Table \ref{tab:samp-split} illustrates two methods for documenting peer-reviewed predictability decay:
+\begin{enumerate}
+  \item Split at the end of the publication's sample period, following \citet{mclean2016does}
+  \item Split in 2004 when high-speed internet became widely available, consistent with \citet{Chordia2014Have} and \citet{chen2022zeroing}
+\end{enumerate}
+Both approaches yield similar empirical results: a mean split date around 2000, a decay of about 50\%, with 85\% of predictors showing reduced effectiveness after the split.
+
+%%
+\begin{table}[!h]
+  \caption{Why Do Peer-Reviewed Returns Decay?}\label{tab:samp-split}
+  \small
+  
+  Table compares splitting samples using various methods: (1) the end of the original sample period, (2) when high speed internet became widely available, and (3) by minimizing the mean squared residual a la \citet{bai1998estimating}. Each method leads to a similar average break date, magnitude of decay, and frequency of decay.  It is unclear which sample split best explains why peer-reviewed predictability decays.
+  \vspace{2ex}
+  
+  \centering
+  \setlength{\tabcolsep}{1.0ex}
+  \input{exhibits/samp_split_summary.tex}
+\end{table}
+
+Which split best explains why peer-reviewed predictability decays? To examine this, we compute data driven breaks for each predictor by minimizing the mean squared residual (as in \citet{bai1998estimating}). We then compare the data-driven breaks with the breaks specified by the two methods above.
+
+Figure \ref{fig:break-vs-sampend} shows the result. The scatter shows at best a mild relationship between the data-driven breaks and the papers' sample ends. Similarly, there is some clustering around the 2004 break, but the evidence is far from definitive. 
+
+%%
+\begin{figure}[!h]
+  \caption{Data-Driven Breaks vs Paper Sample Ends}
+  \label{fig:break-vs-sampend}
+  Each marker is one published predictor. Data-driven breaks split the predictor's sample into two periods to minimize the mean squared residual (as in \citet{bai1998estimating}).
+  \vspace{0.15in}
+  
+  \centering
+  \includegraphics[width=0.55\textwidth]{exhibits/break_vs_sampend.pdf}
+\end{figure}
+
+This result is natural given the noise in long-short returns. The typical monthly volatility is 350 bps, implying the standard error of a 60-month mean is 45 bps, making it impossible to tell if a predictor decays  in a particular 5-year period.
+
+Thus, it is difficult to determine the fundamental cause of the relative decay of peer-reviewed and data-mined predictors. This observation leads to our focus on making inferences about post-sample performance. 
+
+% =============================================
+\end{appendices}
+
+
+
+\clearpage{}
+\newpage{}
+
+
