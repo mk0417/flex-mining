@@ -1,6 +1,6 @@
 # Intermediate data-file inventory (`../Data/Processed/`)
 
-Last verified: 2026-08-16 00:56 EDT
+Historical size snapshot: 2026-08-16. Consumer names updated 2026-09-24.
 
 This is the maintained inventory of the current `CZ-style-v8b` processed-data
 directory. Producer and consumer claims were checked against live source;
@@ -18,9 +18,9 @@ directory currently contains 27 files totaling 0.84 GB (0.78 GiB).
 | TextAnalysis.csv                          | <1 MB | External / historical      | No live source reference     |
 ```
 
-The two text-analysis CSVs remain on disk, but the current source tree reads
-`DataIntermediate/TextClassification.csv` instead. Their provenance should be
-confirmed before deletion.
+The two text-analysis CSVs are historical and have no live consumer. The
+retired text-analysis scripts and their tracked inputs were removed from the
+active pipeline.
 
 ## Chapter 2: mined universes and matching caches
 
@@ -48,19 +48,19 @@ from the same broad accounting `|t| > 2` selection as the raw benchmark.
 ```text
 | File                                      | Size   | Produced by                | Read by / status                    |
 |-------------------------------------------|--------|----------------------------|-------------------------------------|
-| dmcomp_sumstats.RDS                       | 139 MB | 3a_PrepDMBenchmarks.R      | S2a; current                        |
-| dmtic_sumstats.RDS                        | 14 MB  | 3a_PrepDMBenchmarks.R      | S2a; current                        |
+| dmcomp_sumstats.RDS                       | 139 MB | 3a_PrepDMBenchmarks.R      | S4b; current                        |
+| dmtic_sumstats.RDS                        | 14 MB  | 3a_PrepDMBenchmarks.R      | S2b; current                        |
 | raw_dm_benchmarks.RDS                     | 8 MB   | 3a_PrepDMBenchmarks.R      | S2e, S3a; current                   |
-| factor_adjusted_dm_benchmarks.RDS           | 4 MB   | 3c_FactorAdjustedDMPrep.R  | S2e, S4b; current                   |
+| factor_adjusted_dm_benchmarks.RDS           | 4 MB   | 3c_FactorAdjustedDMPrep.R  | S2e, S4a; current                   |
 | ret_for_plot0.RDS                         | 3 MB   | 3a_PrepDMBenchmarks.R      | S2a; current                        |
-| ret_for_plot1.RDS                         | 2 MB   | 3a_PrepDMBenchmarks.R      | S2a; current                        |
-| PairwiseCorrelationsDM_ew.RDS             | 241 MB | Appendix SA11 PCA prep     | appendix-only cache                 |
-| PairwiseCorrelationsDM_vw.RDS             | 18 MB  | Appendix SA11 PCA prep     | appendix-only cache                 |
+| ret_for_plot1.RDS                         | 2 MB   | 3a_PrepDMBenchmarks.R      | Other exhibits; current                        |
+| PairwiseCorrelationsDM_ew.RDS             | 241 MB | 3d_DMCorrelationsPCA.R     | Chapter 3 cache                 |
+| PairwiseCorrelationsDM_vw.RDS             | 18 MB  | 3d_DMCorrelationsPCA.R     | Chapter 3 cache                 |
 | Summary_StatisticsDM_ew.csv               | <1 MB  | 3b_DataMiningSummary.R     | S2b; current                        |
 | Summary_StatisticsDM_vw.csv               | <1 MB  | 3b_DataMiningSummary.R     | S2b; current                        |
-| dm_pca_table.RDS                          | <1 MB  | Appendix SA11 PCA prep     | appendix-only                       |
-| dm_correlation_quantiles.RDS              | <1 MB  | Appendix SA11 PCA prep     | appendix-only                       |
-| dm_span_analysis.RDS                      | 5 MB   | Appendix SA11 span prep    | appendix-only                       |
+| dm_pca_table.RDS                          | <1 MB  | 3d_DMCorrelationsPCA.R     | S2c table                              |
+| dm_correlation_quantiles.RDS              | <1 MB  | 3d_DMCorrelationsPCA.R     | S2c table                              |
+| dm_span_analysis.RDS                      | 5 MB   | 3e_DMSpanPCA.R    | SA11 spanning plots                    |
 | sumsignal_oos_30y_*.csv (6 files)         | <1 MB  | 3b_DataMiningSummary.R     | S2b / export; current               |
 ```
 
@@ -114,9 +114,8 @@ writes for
 `plotdat0.RDS` and `dm_pca_span_classification.RDS` were removed, so chapter-3
 runs will not recreate them. Their file-specific wrappers, dead preprocessing,
 and diagnostic-only calculations were also removed. The remaining benchmark
-calculations feed live Chapter 3 outputs; PCA is isolated to Appendix SA11.
+calculations feed live Chapter 3 outputs; PCA runs in Chapter 3 because its table is in the main text.
 
-The two text-analysis CSVs add another 13 MB with no live reference, but their
-external provenance makes them a confirm-before-removal category. The former
+The two historical text-analysis CSVs add another 13 MB with no live reference. The former
 2.35 GB factor-adjusted pair cache and summary have been replaced by two focused
 contracts totaling under 8 MB.

@@ -1,210 +1,53 @@
-# Exhibit map: script → output → exhibit
+# Exhibit map
 
-Which script builds each paper exhibit, whether `MAIN.R` rebuilds its
-calculation and paper artifact, and whether the manuscript consumes it.
+Run all commands from `code/`. `MAIN.R` runs the enabled stages as separate
+`Rscript` processes. The default stages are `precompute`, `exhibits`, and
+`time_fe_robustness`; data acquisition and data mining are disabled in
+`config.R`. The paper reads live files from `../Results/`, and
+`paper/check-exhibits.sh --sync` copies referenced files into `paper/exhibits/`.
 
-- **Contract:** analysis scripts write paper artifacts to top-level
-  `../Results/`. For live writing, the paper source repository sets
-  `\exhibitspath` to `../../Results`; its `exhibits/` directory mirrors the
-  referenced basenames for arXiv packaging. The current snapshot holds 47 files,
-  all referenced by `sections/*.tex` and all R-generated — the Section 3
-  MP-style tables
-  (`Table_MPStyleRegs{NoTimeFE,TimeFE,IndividualDM}.tex`) and the six S4b
-  factor-adjusted tables included. No hand-formatted `HandTable` MP-style variants
-  remain; the one hand-transcribed number (Table IA.7) is pasted inline in the
-  paper `.tex`, not a file.
-- **Producer:** the script whose write target (`ggsave`, `writeLines`,
-  `saveRDS`, `kbl`, …) matches the exhibit basename.
-- **Calculation:** the analysis calculation is run by `MAIN.R` at the default
-  `runStages` (config.R): `precompute`, `exhibits`, and `appendices_pca` on;
-  `download_and_clean`, `data_mining`, and `time_fe_robustness` off.
-- **Paper artifact:** the producer writes the file that the manuscript can
-  consume. For the six S4b-owned group tables this is distinct from the nested
-  audit output.
-- **Wired:** the manuscript references the generated artifact rather than
-  containing copied numbers.
+## Pipeline
 
-## MAIN.R chain (default runStages)
+| Driver | Children | Purpose |
+| --- | --- | --- |
+| `3_Precompute.R` | `3a`, `3b`, `3c`, `3d_DMCorrelationsPCA.R`, `3e_DMSpanPCA.R` | Build reusable caches. The two PCA scripts run last in separate processes. |
+| `S2_ResearchVsDataMining.R` | `S2a`, `S2b`, `S2c_DMCorrelationsPCATables.R`, `S2d`, `S2e` | Introduction and Section 2. |
+| `S3_Learning.R` | `S3a`, `S3b` | Section 3 regressions. |
+| `S4_Quality.R` | `S4a_ByJournal.R`, `S4b_RenownedMatches.R` | Section 4 journal rankings and renowned matches. |
+| `SA_Appendices.R` | `SA03`, `SA11_DMSpanPCAPlots.R`, `SA12`, `SA13`, `SA14` | Appendix exhibits. |
+| `Appendices/TimeFERobustness/run.R` | time-FE module | Time-FE robustness table. |
 
-`MAIN.R` runs each chapter as a separate `Rscript`; the exhibit-producing leaf
-scripts each chapter runs are listed below. Chapter 3 builds reusable caches and
-emits no exhibit.
+## Main text
 
-```
-MAIN.R  (reads runStages from config.R)
-  1_Download_and_Clean.R                            [chapter 1; off by default]
-  2_DataMining.R            -> 2a 2c                  [chapter 2; off by default]
-  3_Precompute.R            -> 3a 3b 3c_FactorAdjusted
-                                                        (prep caches; no exhibits)
-  S2_ResearchVsDataMining.R -> S2a S2b S2d S2e                    [exhibits]
-  S3_Learning.R             -> S3a S3b                            [exhibits]
-  S4_Heterogeneity.R        -> S4a S4b                            [exhibits]
-  S5_BestPredictors.R       -> S5a                                [exhibits]
-  SA_Appendices.R           -> selected Appendices/SA01 through SA14 scripts,
-                               excluding SA11                     [exhibits]
-  9_ExportDataToCsv.R                                             [exhibits]
-  SA_AppendicesPCA.R        -> the four Appendices/SA11 scripts
-                                                    [appendices_pca; ~1 hour]
-```
+| Exhibit | Result in `../Results/` | Producer |
+| --- | --- | --- |
+| Figure 1 | `Fig_DM_t_min_2_se_indicators_calendar.pdf` | `S2a_ResearchVsDMPlots.R` |
+| Table 1, panel A | `dm-sortsFull.tex` | `S2b_DataMiningSummaryTables.R` |
+| Table 1, panel B | `DM_pca.tex` | `S2c_DMCorrelationsPCATables.R`, from `3d` cache |
+| Table 2 | `theme_ez_decay.tex` | `S2d_EZThemes.R` |
+| Figure 2, panels A–D | `Fig2a_FactorAdj.pdf`, `Fig2b_PubSampleLimits.pdf`, `Fig2c_MatchedExclCorr.pdf`, `Fig2d_AltMining.pdf` | `S2e_Fig2Plots.R` |
+| Section 3 regressions | `Table_MPStyleRegsNoTimeFE.tex`, `Table_MPStyleRegsTimeFE.tex` | `S3b_MPStyleDecayTables.R` |
+| Section 4 journal ranking | `Table_FactorAdjusted_TimeVarying_DisciplineJournal_ff4_t2.tex` | `S4a_ByJournal.R` |
+| Section 4 renowned matches | `inspect-summary.tex` | `S4b_RenownedMatches.R` |
 
-`S4b_RVsDM_ByGroup.R` owns the sample-specific source artifacts for Tables 6,
-7, and IA.8.
+## Appendices
 
-Figure 2 consumes calculation-owned Chapter 3 contracts.
-`3a_PrepDMBenchmarks.R` writes `raw_dm_benchmarks.RDS`, which contains the raw
-mining variants and matched-uncorrelated event-time panel. Pair identities are
-kept in memory during preparation and recomputed in memory for Table B.1. Next,
-`3c_FactorAdjustedDMPrep.R` applies sample-specific CAPM/FF4 to the exact same
-broad accounting `|t| > 2` pair universe. It writes compact published and
-data-mined panels; no broad pair-month cache is written.
-`S2e_Fig2Plots.R` reads the raw and factor-adjusted benchmark files, imposes
-Figure-specific samples, computes rolling display statistics, and renders the
-four panels with standard-error bands into `../Results/`.
+| Exhibit | Result in `../Results/` | Producer |
+| --- | --- | --- |
+| Individual-DM regressions | `Table_MPStyleRegsIndividualDM.tex` | `Appendices/SA13_MPStyleRegsIndividualDM.R` |
+| Accounting-only regressions | `Table_MPStyleRegsNoTimeFE_AccountingOnly.tex`, `Table_MPStyleRegsTimeFE_AccountingOnly.tex` | `Appendices/SA14_MPStyleRegsAccountingOnly.R` |
+| Time-FE robustness | `TimeFERobustness/timefe-robustness.tex` | `Appendices/TimeFERobustness/exhibits.R` |
+| Post-2003 DM summary | `dm-sortsPost2003.tex` | `S2b_DataMiningSummaryTables.R` |
+| DM correlations | `quantilesCorDM.tex` | `S2c_DMCorrelationsPCATables.R`, from `3d` cache |
+| Themes by sample end | `theme_ez_decayinSampEnd{1990,2000,2010}.tex` | `Appendices/SA12_EZThemesRobustness.R` |
+| Unspanned DM | `Fig_DM_unspan_match_t_g_{cor,PCA}.pdf` | `Appendices/SA11_DMSpanPCAPlots.R`, from `3e` cache |
+| Structural breaks | `samp_split_summary.tex`, `break_vs_sampend.pdf` | `Appendices/SA03_StructuralBreak.R` |
+| Renowned-match detail | `inspect-{BMdec,Mom12m,Size}.tex` | `S4b_RenownedMatches.R` |
 
-### `S2e_Fig2Plots.R` outputs
+`S4a_ByJournal.R` also writes sample-specific audit CSV and TeX files under
+`../Results/FactorAdjusted/TstatFilter/`. They are validation artifacts and
+are not included by the paper. `S2e_Fig2Plots.R` can write diagnostic RDS
+files when `FIG2_DATA_OUTPUT_DIR` is set.
 
-The normal run writes the four panels of main-text Figure 2. Each panel shades
-one standard error around every series.
-
-| Panel | Main-text output                  | Comparison |
-| ----- | --------------------------------- | ---------- |
-| a     | `Fig2a_FactorAdj.pdf`             | CAPM and FF3+Mom factor-adjusted returns |
-| b     | `Fig2b_PubSampleLimits.pdf`       | Annual-accounting and pre-2003 publication samples |
-| c     | `Fig2c_MatchedExclCorr.pdf`       | Matched data mining, with and without correlated matches |
-| d     | `Fig2d_AltMining.pdf`             | Top-5% accounting and ticker-symbol mining |
-
-For diagnostics, setting `FIG2_OUTPUT_DIR` redirects the four PDFs away from
-`../Results/`. Setting `FIG2_DATA_OUTPUT_DIR` additionally writes
-`fig2_panel_long.RDS` and `fig2_panel_agg.RDS` to the requested directory; these
-opt-in data files are validation artifacts, not manuscript exhibits.
-
-## LaTeX preview
-
-`LatexPreview/exhibits.tex` assembles the live files in `../Results/` into a
-navigable PDF, grouped and numbered like the paper but without captions. From
-the repository root, build it with:
-
-```bash
-./LatexPreview/build.sh
-```
-
-The build writes `LatexPreview/exhibits.pdf`; it does not rerun any R stages.
-
-## Code Result → producer
-
-Paper numbers are from the compiled paper in the separate writing repository.
-The map itself keys on exhibit basenames and does not depend on the writing
-repository's relative location.
-Each exhibit carries its manuscript section as a prefix: `§N` in the main
-text, `§B` in Appendix B, and `§IA.N` in the internet appendix. Each row
-points to a single exhibit; Tab 1 and Fig B.2 recur because several producers
-feed one exhibit.
-
-Only one row is **hand-transcribed**: Table IA.7 has its numbers pasted inline
-in the paper `.tex`; every other exhibit is generated by the script in its
-Producer column. All six S4b-owned tables have all three states — their
-calculations run in chain, S4b generates paper-specific fragments, and the
-manuscript inputs those fragments.
-
-Abbreviations used below to keep the columns narrow:
-
-- `§N`, `§B`, and `§IA.N` = manuscript section IDs (Exhibit column).
-- `(inline)` = number pasted inline in the paper `.tex`, hand-copied.
-- `*` in the Code Result column abbreviates part of a file basename.
-
-### Main text
-
-| Exhibit     | Description                           | Code Result                               | Producer                      | Wired? |
-| ----------- | ------------------------------------- | ----------------------------------------- | ----------------------------- | ------ |
-| §1 Fig 1    | Decay plot research vs DM             | Fig_DM_t_min_2_se_indicators_calendar.pdf | S2a_ResearchVsDMPlots.R       | yes    |
-| §2 Tab 1a   | Sum stats DM                          | dm-sortsFull.tex                          | S2b_DataMiningSummaryTables.R | yes    |
-| §2 Tab 2    | Decay by economic theme               | theme_ez_decay.tex                        | S2d_EZThemes.R                | yes    |
-| §2 Fig 2a   | Factor-adjusted decay                  | Fig2a_FactorAdj.pdf                       | S2e_Fig2Plots.R               | yes    |
-| §2 Fig 2b   | Decay in restricted publication samples | Fig2b_PubSampleLimits.pdf               | S2e_Fig2Plots.R               | yes    |
-| §2 Fig 2c   | Matched decay excluding correlated DM  | Fig2c_MatchedExclCorr.pdf                 | S2e_Fig2Plots.R               | yes    |
-| §2 Fig 2d   | Decay under alternative mining methods | Fig2d_AltMining.pdf                       | S2e_Fig2Plots.R               | yes    |
-| §3 Tab 3    | Decay regressions without time FE     | Table_MPStyleRegsNoTimeFE.tex             | S3b_MPStyleDecayTables.R      | yes    |
-| §3 Tab 4    | Decay regressions with time FE        | Table_MPStyleRegsTimeFE.tex               | S3b_MPStyleDecayTables.R      | yes    |
-| §4 Tab 5    | Predictor counts by theory/journal    | ApproachVsJournalsPart1/2/3.tex           | S4a_DataCounts.R              | yes    |
-| §4 Tab 6    | Factor adjustment by theory/model       | Table_FactorAdjusted_TimeVarying_ff4_t2.tex | S4b_RVsDM_ByGroup.R           | yes    |
-| §4 Tab 7    | Factor adjustment by discipline/journal | Table_*_DisciplineJournal_ff4_t2.tex      | S4b_RVsDM_ByGroup.R           | yes    |
-| §5 summary  | Top matches for B/M, momentum, size   | inspect-summary.tex                       | S5a_InspectTables.R           | yes    |
-| §5 Tab 8    | Matched DM for book-to-market         | inspect-BMdec.tex                         | S5a_InspectTables.R           | yes    |
-| §5 Tab 9    | Matched DM for momentum               | inspect-Mom12m.tex                        | S5a_InspectTables.R           | yes    |
-| §5 Tab 10   | Matched DM for size                   | inspect-Size.tex                          | S5a_InspectTables.R           | yes    |
-
-### Appendices
-
-| Exhibit           | Description                                       | Code Result                                      | Producer                                                  | Wired? |
-| ----------------- | ------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------- | ------ |
-| §B Tab B.1        | Decay regressions by DM predictor                 | Table_MPStyleRegsIndividualDM.tex                | Appendices/SA13_MPStyleRegsIndividualDM.R                 | yes    |
-| §B Fig B.1a–b     | Unspanned DM PCA and correlations                 | Fig_DM_unspan_match_t_g_PCA/cor.pdf              | Appendices/SA11_DMSpanPCAPlots.R                          | yes    |
-| §IA.1 Tab IA.1    | Post-2003 sum stats DM                            | dm-sortsPost2003.tex                             | S2b_DataMiningSummaryTables.R                             | yes    |
-| §IA.1 Tab IA.2a   | DM return correlations                            | quantilesCorDM.tex                               | Appendices/SA11_DMCorrelationsPCATables.R                | yes    |
-| §IA.1 Tab IA.2b   | DM PCA explained variance                         | DM_pca.tex                                       | Appendices/SA11_DMCorrelationsPCATables.R                | yes    |
-| §IA.2 Tab IA.3    | Decay by theme through 1990                       | theme_ez_decayinSampEnd1990.tex                  | Appendices/SA12_EZThemesRobustness.R                      | yes    |
-| §IA.2 Tab IA.4    | Decay by theme through 2000                       | theme_ez_decayinSampEnd2000.tex                  | Appendices/SA12_EZThemesRobustness.R                      | yes    |
-| §IA.2 Tab IA.5    | Decay by theme through 2010                       | theme_ez_decayinSampEnd2010.tex                  | Appendices/SA12_EZThemesRobustness.R                      | yes    |
-| §IA.4 Tab IA.6    | Predictor counts by theory/journal                | SignalsByTheoryAndJournal.tex                    | S4a_DataCounts.R                                          | yes    |
-| §IA.4 Tab IA.7    | Predictor counts by theory                        | tab:mp-theory-no-reg (inline)                    | Excel2LaTeX (sheet "MP theory")                           | inline |
-| §IA.4 Tab IA.8    | Factor adjustment by model use                      | Table_*_AnyModelVsNoModel_ff4_t2.tex             | S4b_RVsDM_ByGroup.R                                       | yes    |
-| §IA.5 Tab IA.9    | Returns by sample split                           | samp_split_summary.tex                           | Appendices/SA03_StructuralBreak.R                         | yes    |
-| §IA.3 Fig IA.1    | Decay vs paper word count                         | Fig_DecayVsWords_Names2.pdf                      | Appendices/SA04_DecayVsWordcountPlot.R                    | yes    |
-| §IA.3 Fig IA.2a–c | Risk-vs-mispricing diagnostics                    | Fig_Risk_via_CAPM/FF3/FF5.pdf                    | Appendices/SA01_RiskVsMispricingPlots.R                   | yes    |
-| §IA.4 Fig IA.3    | Decay by journal                                  | Fig_DecayVsJournal_Means.pdf                     | Appendices/SA06_DecayVsJournal.R                          | yes    |
-| §IA.5 Fig IA.4    | Break dates vs sample ends                        | break_vs_sampend.pdf                             | Appendices/SA03_StructuralBreak.R                         | yes    |
-
-### Preview-only candidates
-
-The exhibit preview proposes the following additions immediately after Figure
-B.2. They are generated by the appendix pipeline but are not yet wired into the
-separate manuscript repository.
-
-| Proposed exhibit | Description                                         | Code Result                                      | Producer                                    |
-| ---------------- | --------------------------------------------------- | ------------------------------------------------ | ------------------------------------------- |
-| Table B.2        | Annual-accounting decay regressions without time FE | Table_MPStyleRegsNoTimeFE_AccountingOnly.tex     | Appendices/SA14_MPStyleRegsAccountingOnly.R |
-| Table B.3        | Annual-accounting decay regressions with time FE    | Table_MPStyleRegsTimeFE_AccountingOnly.tex       | Appendices/SA14_MPStyleRegsAccountingOnly.R |
-
-The opt-in time-fixed-effects robustness pipeline is kept in
-`Appendices/TimeFERobustness/`. It produces six private-note/response
-tables under `../Results/TimeFERobustness/`; they are not currently wired into
-the manuscript:
-
-| Output                       | Description                                      |
-| ---------------------------- | ------------------------------------------------ |
-| `s6-timefe-summary.tex`      | Six-panel summary with and without time FE       |
-| `mp-cz-normalized.tex`       | MP and quality-screened CZ comparison            |
-| `jkp-cz-normalized.tex`      | JKP weighting and normalization comparison       |
-| `cz-alternative-specs.tex`   | Alternative CZ portfolio constructions           |
-| `jkp-rep-using-cz.tex`       | JKP portfolio constructions rebuilt from CZ data |
-| `jkp-cz-date-comparison.tex` | Quality-screened JKP/CZ date comparison           |
-
-## Gaps
-
-At its default stages, `MAIN.R` rebuilds the source outputs for every generated
-exhibit referenced by the paper. It does **not** install those outputs into a
-writing-repository `exhibits/` directory; that directory is outside this repo
-and its location is deliberately unspecified.
-
-For live writing, the manuscript reads exhibit basenames directly from top-level
-`../Results/` (the writing repository sets `\exhibitspath` to
-`../../Results`). For an arXiv package, copy those
-basenames into the writing repository's `exhibits/` directory and switch
-`\exhibitspath` to `exhibits`; the checked-in copies there verify that alternate
-path and preserve the package snapshot.
-
-The only paper number `MAIN.R` does not produce with an R script is:
-
-1. Table IA.7 — transcribed from an Excel sheet; no R script.
-
-## Notes
-
-- `4c4_FactorAdjustedResearchVsDMPlotsTVFF4.R` was split and its factor-adjusted
-  logic folded into `S4b_RVsDM_ByGroup.R`; every float in the compiled paper is
-  accounted for. (Fig. B.4a/B.4b are the two panels of Fig. B.4, already
-  listed.)
-- In-chain scripts that produce no exhibit are upstream prep: chapter 2
-  (`2a` and `2c`), chapter 3 (`3a`–`3c`, reusable caches), Appendix SA11 PCA
-  preparation, and `Appendices/SA02`/`Appendices/SA05` (decay
-  tables/plots outside the paper contract, e.g. for slides or the referee
-  response).
+`LatexPreview/exhibits.tex` assembles the live outputs into a review PDF.
+Build it with `./LatexPreview/build.sh` from `code/`; the build does not run R.

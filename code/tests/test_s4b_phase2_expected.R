@@ -1,9 +1,9 @@
-# Validate the corrected phase-two Tables 6, 7, and IA.8 outputs.
+# Validate the retained factor-adjusted audit tables.
 #
 # How to run: set the working directory to flex-mining/, run
-#   Rscript S4b_RVsDM_ByGroup.R
+#   Rscript S4a_ByJournal.R
 #   Rscript tests/test_s4b_phase2_expected.R
-# Inputs:  the six live files under ../Results/FactorAdjusted/TstatFilter
+# Inputs:  the six audit files under ../Results/FactorAdjusted/TstatFilter
 # Outputs: no files; exits nonzero on a displayed-value or output-contract change
 
 live_dir <- "../Results/FactorAdjusted/TstatFilter"
@@ -59,4 +59,4 @@ if (!identical(actual_files, expected_files)) {
   )
 }
 
-message("All six retained outputs match the corrected phase-two expectations.")
+message("The six audit outputs match the corrected phase-two expectations.")

@@ -1,6 +1,6 @@
-# Inspect matched strategies and render the Section 5 example-match tables.
+# Inspect matched strategies and render the Section 4 renowned-match tables.
 #
-# How to run: normally run through S5_BestPredictors.R with the working directory set to
+# How to run: normally run through S4_Quality.R with the working directory set to
 #   flex-mining/.
 # Inputs:  ../Data/Processed/dmcomp_sumstats.RDS
 #          ../Data/Processed/<dataVersion> LongShort.RData
@@ -266,15 +266,6 @@ tab = readxl::read_xlsx(paste0(outpath,'InspectMatch.xlsx'), sheet = 'Size') %>%
 write_tex_from_tab(tab, id1 = 1:10, id2 = 101:105, 
                    signalnamelong = 'Size (Banz 1981)',
                    filename = 'inspect-Size.tex')
-
-# Tuzel
-tab = readxl::read_xlsx(paste0(outpath,'InspectMatch.xlsx'), sheet = 'realestate') %>% 
-  janitor::clean_names() %>% 
-  as.data.frame()
-
-write_tex_from_tab(tab, id1 = 1:10, id2 = 101:105, 
-                   signalnamelong = 'Real Estate (Tuzel 2010)',
-                   filename = 'inspect-realestate.tex')
 
 # Summary table: top matches and counts for the renowned findings ------------------
 # Output: inspect-summary.tex, the body of a tabular with columns

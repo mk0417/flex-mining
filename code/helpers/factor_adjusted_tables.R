@@ -432,32 +432,6 @@ paper_standard_row <- function(label, summary, bold = FALSE) {
   )
 }
 
-write_paper_theory_model_tabular <- function(theory, model, overall, file) {
-  lines <- c(
-    paper_table_header(TRUE),
-    "   \\multicolumn{7}{l}{\\textbf{Theoretical Foundation}} \\\\",
-    paper_standard_row("Agnostic", theory[["Agnostic"]]),
-    paper_standard_row("Mispricing", theory[["Mispricing"]]),
-    paper_standard_row("Risk", theory[["Risk"]]),
-    "   \\addlinespace",
-    "   \\multicolumn{7}{l}{\\textbf{Equilibrium Modeling}} \\\\",
-    paper_standard_row("No Model", model[["No Model"]]),
-    paper_standard_row("Stylized", model[["Stylized"]])
-  )
-  dynamic <- paper_summary_cells(model[["Dynamic or Quantitative"]])
-  lines <- c(
-    lines,
-    paste0("   Dynamic or & ", paste(dynamic$values, collapse = " & "), " \\\\"),
-    paste0("   Quantitative & ", paste(dynamic$ses, collapse = " & "), " \\\\"),
-    "   \\addlinespace",
-    paper_standard_row("Overall", overall, bold = TRUE),
-    "   \\bottomrule",
-    "\\end{tabular}"
-  )
-  writeLines(lines, file)
-  invisible(file)
-}
-
 write_paper_discipline_journal_tabular <- function(discipline, journal, file) {
   lines <- c(
     paper_table_header(TRUE),
@@ -476,17 +450,6 @@ write_paper_discipline_journal_tabular <- function(discipline, journal, file) {
   invisible(file)
 }
 
-write_paper_anymodel_tabular <- function(anymodel, file) {
-  lines <- c(
-    paper_table_header(FALSE),
-    paper_standard_row("No Model", anymodel[["No Model"]]),
-    paper_standard_row("Any Model", anymodel[["Any Model"]]),
-    "   \\bottomrule",
-    "\\end{tabular}"
-  )
-  writeLines(lines, file)
-  invisible(file)
-}
 compute_overall_summary <- function(plot_data, ret_col, dm_col) {
   result <- summarize_outperformance_group(
     plot_data, ret_col, dm_col, "group=Overall"

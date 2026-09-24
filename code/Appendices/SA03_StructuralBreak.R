@@ -129,13 +129,10 @@ tabdat <- foreach(split_type = c("sampend", "date_break", "it_date"), .combine =
     arrange(split_type) %>%
     print()
 
-# make latex
-tabdat %>%
-    kable("latex", booktabs = T, linesep = "", escape = F, digits = 0) %>%
-    cat(file = "../Results/temp.tex")
+# format LaTeX in memory
+tex <- capture.output(cat(kable(tabdat, "latex", booktabs = T, linesep = "", escape = F, digits = 0)))
 
 # make it beautiful
-tex <- readLines("../Results/temp.tex")
 mcol <- function(x) paste0("\\multicolumn{1}{c}{", x, "}")
 tex[2] <- "\\begin{tabular}{lcccc}"
 tex[4] <- paste0(

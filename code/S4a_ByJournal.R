@@ -1,10 +1,10 @@
-# Render sample-specific factor-adjusted by-group tables for Section 4.
+# Render Section 4 journal rankings and retain factor-adjusted audit tables.
 #
-# How to run: normally run through S4_Heterogeneity.R.
+# How to run: normally run through S4_Quality.R.
 # Inputs: raw_dm_benchmarks.RDS, factor_adjusted_dm_benchmarks.RDS, and
 #   DataInput/SignalsTheoryChecked.csv
 # Outputs: sample-specific CAPM/FF4 audit tables under
-#   ../Results/FactorAdjusted/TstatFilter and paper-facing fragments under
+#   ../Results/FactorAdjusted/TstatFilter and the paper-facing journal fragment under
 #   ../Results.
 #
 # Factor fitting and DM alpha screening belong to 3c_FactorAdjustedDMPrep.R.
@@ -224,23 +224,10 @@ export_audit_tabular(
   )), headers
 )
 
-write_paper_theory_model_tabular(
-  tv_theory_data, tv_model_data, tv_overall_data,
-  file.path("../Results", paste0(
-    "Table_FactorAdjusted_TimeVarying", suffix, ".tex"
-  ))
-)
 write_paper_discipline_journal_tabular(
   tv_discipline_data, tv_journal_data,
   file.path("../Results", paste0(
     "Table_FactorAdjusted_TimeVarying_DisciplineJournal", suffix, ".tex"
   ))
 )
-write_paper_anymodel_tabular(
-  tv_anymodel_data,
-  file.path("../Results", paste0(
-    "Table_FactorAdjusted_TimeVarying_AnyModelVsNoModel", suffix, ".tex"
-  ))
-)
-
-message("Wrote corrected sample-specific source artifacts for Tables 6, 7, and IA.8.")
+message("Wrote sample-specific journal and audit tables.")
