@@ -347,7 +347,10 @@ Data mining fails this last robustness result. Post-sample, published returns fa
 Overall, Figure \ref{fig:pub-vs-dm-2} shows our finding is robust. Factor exposures, stricter restrictions on the published signals, controlling for data-mined performance, excluding correlated signals, alternative t-stat screens: they all have little effect on our main result. However, there are limits: data mining is not so effective that it obtains research-level performance from ticker symbols.
 
 % further robustness
-Section \ref{sec:hetero} shows additional robustness. Importantly, it shows that predictors with theoretical support also fail to outperform data mining. Indeed, if anything, predictors with that \emph{lack} a theoretical foundation show the most promise for outperformance. [tbc: do we keep the most reknown section?]
+Appendix \ref{sec:robust,research-vs} reports additional checks, including excluding with 
+
+
+on data-mined predictors' correlation with existing research, journal discipline and ranking, regression samples, and portfolio construction.
 
 \providecommand{\Cor}{\text{Cor}}
 
@@ -560,6 +563,24 @@ Thermodynamic phenomena (e.g. ideal gas law) can be derived from the laws of the
 These renowned papers provide robust empirical evidence. Indeed, \citet{fama1992cross} is in essence a robustness check on \citet{stattman1980book} and \citet{banz1981relationship}. But other empirical papers provide even more robustness (e.g., \citealt{fama1993common}; \citealt{lakonishok1994contrarian}; \citealt{chan1996momentum}; \citealt{asness2013value}). 
 
 Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findings to data-mined alternatives. The alternatives come from searching the 29,000 accounting ratios for t-stats and mean returns that are within 10\% and 30\% of the original findings. This filtering ensures the alternatives are similar to the original findings in terms of statistical support. As before,  data-mined t-stats and mean returns use the original papers' stock weighting and sample periods.
+
+% EXHIBIT-NUMBER: Table 3
+\begin{table}[!h]
+   \caption{Post-Sample Outperformance by Discipline and Journal Ranking}
+   \label{tab:hetero-byjournal}
+
+   \begin{singlespace}
+   \noindent Strategies are normalized to have 100 bps per month performance in-sample. `Post-Sample' is the performance of predictor-papers in bps per month. `Versus Data Mining' is `Post-Sample' minus the performance of data-mined benchmarks. `Discipline' categorizes the journal of publication. `JF,' `JFE,' and `RFS' includes papers in the Journal of Finance, Journal of Financial Economics, and Review of Financial Studies. `AR,' `JAR,' and `JAE' includes papers in the Accounting Review, Journal of Accounting Research, and Journal of Accounting and Economics. CAPM and FF3 + momentum alphas use regressions specific to the sample periods (in-sample or post-sample). Standard errors (parentheses) are clustered by calendar month and predictor. Finance, and particularly top-ranked finance journals show some signs of outperformance relative to data mining, but the improvement is modest.
+   \end{singlespace}
+   \begin{centering}
+   \vspace{0ex}
+   \par\end{centering}
+   \centering{}\setlength{\tabcolsep}{1.2ex} \small
+   \begin{center}
+   \input{\exhibitspath/Table_FactorAdjusted_TimeVarying_DisciplineJournal_ff4_t2.tex}
+   \end{center}
+\end{table}
+
 
 % EXHIBIT-NUMBER: Table 6
 \begin{table}[p]
