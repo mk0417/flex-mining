@@ -117,54 +117,6 @@ Table reports the 20 accounting ratio numerator and stock weight (equal- or valu
 % =====================================================
 \clearpage
 \newpage
-\section{Removing Correlated Data-Mined Predictors}\label{sec:app-robust-manycor}
-
-One may be interested in whether our results are robust to excluding data-mined predictors that are highly correlated with published predictors. This question is perhaps natural given the central role of correlations in classical asset pricing theory. 
-
-However, excluding highly correlated data-mined predictors is not important for our main question. Equation \eqref{eq:painfully_clear} implies \emph{matching} covariance patterns across data-mined and published predictors; that is, we should exclude data-mined predictors that have \emph{low} correlation with published predictors. 
-
-Figure \ref{fig:decay-unspanned} aims to remove data-mined predictors that are highly correlated with all previously-published predictors, defined by sample end dates. Panel (a) measures this idea using the data-mined return's maximum pairwise correlation with any previously-published predictor. Panel (b) uses the $R^2$ from regressing the data-mined return on the first five factors extracted from previously-published returns via probabilistic principal component analysis (PPCA, \citet{roweis1997algorithms}; \citealt{chen2023missing}). For signals with low correlation, we further separate data-mined returns based on their in-sample t-stats. 
-
-% EXHIBIT-NUMBER: Figure IA.1
-\begin{figure}\caption{Excluding Data-Mined Predictors Correlated with Any Existing Research}
-  \label{fig:decay-unspanned}
-  We compare published predictors (solid) to data-mined predictors made with t-stats $>$ 2.0, but separate predictors by correlation and in-sample t-stats. Panel (a) uses the maximum pairwise correlation with any existing published predictor. Panel (b) uses the $R^2$ from regressing the data-mined return on 5 principal components of existing predictors computed using probabilistic PCA. 
-  
-  \vspace{2 ex}
-  \centering
-  \subfloat[Any Correlation\label{fig:abnormal_published_1}]{
-      \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig_DM_unspan_match_t_g_cor.pdf}
-  }    
-  \subfloat[PPCA\label{fig:abnormal_published_2}]{
-      \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig_DM_unspan_match_t_g_PCA.pdf}
-  }
-\end{figure}
-
-Excluding data-mined predictors that are highly correlated with all previously-published predictors leads to slightly worse post-sample performance. A worsening is natural, as over time the published literature will capture more and more of the strong predictive components of the data, of which there is a finite number (Table \ref{tab:dm-oos}, Panel (b)). The magnitude of the effect is modest, however, and is only noticeable if we focus on data-mined predictors with low in-sample t-stats. Overall, the similarity in post-sample performance of published and data-mined predictors is robust, and holds even if we purposefully make the data-mined predictors less similar to published ones.
-
-An interesting feature of Figure \ref{fig:decay-unspanned} is that the trailing 5-year returns are correlated, even across groups of returns that have low monthly return correlations.  Given the near-zero autocorrelation in monthly returns, this is likely due to slow movements in long-run expected returns like the post-2004 decay in Appendix Table \ref{tab:dm-sum-2004} (see also \citealt{stambaugh2012short}; \citealt{yan2017fundamental}; \citealt{chen2022zeroing}).
-
-\clearpage
-\newpage
-\section{Additional Results on Published Predictors}\label{sec:intapp-pub-additional}
-
-% EXHIBIT-NUMBER: Figure IA.2
-\begin{figure}[!h]
-\caption{Decay vs Journal}
-Plot shows the ratio of post-sample to in-sample returns for each predictor, grouped by journal type. Journal types are Top 5 Economics (QJE, JPE), Top 3 Finance (JF, JFE, RFS), Top 3 Accounting (JAR, JAE, AR), and Other journals. Each point represents one predictor. The blue diamonds show the mean ratio within each journal group. The horizontal gray lines show ratios of 0 and 1. A ratio of 1 means the predictor maintains its full predictive power out-of-sample, while a ratio of 0 means the predictor completely fails out-of-sample. Text labels identify notable predictors and the top performers within each journal group. The blue line connects group means to highlight the pattern across journal types.
-\label{fig:decay-vs-journal}
-
-\vspace{0.15in}
-
-\centering
-\includegraphics[width=0.75\textwidth]{\exhibitspath/Fig_DecayVsJournal_Means}      
-\end{figure}
-
-
-
-% =====================================================
-\clearpage
-\newpage
 \section{Why Do Published Predictors Decay?}\label{sec:intapp-struct-break}
 
 Table \ref{tab:samp-split} illustrates two methods for documenting peer-reviewed predictability decay:

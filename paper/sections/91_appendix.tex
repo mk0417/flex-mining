@@ -1,44 +1,44 @@
 % !TEX root = ../research_vs.tex
 
-\section{A Model of Post-Sample Performance}\label{sec:app-model}
-We present a simple model for interpreting our results. $\mathcal{D}$ is a set of data-mined return signals (e.g. 29,000 accounting ratios). For signal $i\in \mathcal{D}$, the in-sample and post-sample returns follow
-\begin{align}
-\bar{r}_{i}^{IS} & = \mu_i + \bar{\varepsilon}_i^{IS} \\
-  \bar{r}_{i}^{PS} & = \mu_i + \Delta \mu_i + \bar{\varepsilon}_i^{PS}, \label{eq:r-ps}
-\end{align}
-where $\mu_i$ is the stable component of expected returns, $\Delta \mu_i$ is an unstable component of expected returns, and $\bar{\varepsilon}_i^{IS}$ and $\bar{\varepsilon}_i^{PS}$ are unpredictable. 
+\section{Robustness}\label{sec:app-robust}
 
-Peer review replaces $\mathcal{D}$ with a different set $\mathcal{P}$ (e.g. signals consistent with neoclassical Q-theory). Controlling for $\bar{r}_{i}^{IS}$, the expected post-sample returns differ by:
-\begin{align}
-  E\left(\bar{r}_{i}^{PS}  \mid i\in\mathcal{P}, \bar{r}_{i}^{IS}\right) 
-  &- E\left(\bar{r}_{i}^{PS}  \mid i\in\mathcal{D}, \bar{r}_{i}^{IS}\right) 
-  \label{eq:ps-diff}
-  \\
-  &= E\left(\mu_i  \mid i\in\mathcal{P}, \bar{r}_{i}^{IS}\right) 
-    - E\left(\mu_i  \mid i\in\mathcal{D}, \bar{r}_{i}^{IS}\right) 
-    \label{eq:ps-diff-1}
-    \\
-  &\hphantom{=}+ E\left(\Delta \mu_i  \mid i\in\mathcal{P}, \bar{r}_{i}^{IS}\right) 
-    - E\left(\Delta \mu_i  \mid i\in\mathcal{D}, \bar{r}_{i}^{IS}\right),
-    \label{eq:ps-diff-2}
-\end{align}
-where the $\bar{\varepsilon}_i^{PS}$ terms vanish because they are unpredictable. 
+\subsection{Robustness: Research vs Data Mining}\label{sec:hetero-discipline}
 
-Thus, there are two reasons why $\mathcal{P}$ may have stronger post-sample performance than $\mathcal{D}$: (1) $\mathcal{P}$ finds a larger stable expected return component $\mu_i$ or (2) $\mathcal{P}$ finds a more positive unstable expected return component $\Delta \mu_i$. 
 
-Ideally, the modern theoretical evidence in the peer review process helps with both. When researchers observe $\bar{r}_{i}^{IS}$, theory should help determine whether it reflects stable expected returns $\mu_i$ or unpredictable noise $\bar{\varepsilon}_i^{IS}$. The core of modern theory is finding equilibrium, which means solving for $\mu_i$ in a model market. Theory should also predict how expected returns change. For example, if returns compensate for risk, we may expect $\Delta \mu_i \ge 0$ as investors will either not adjust their portfolios or adjust to reduce risk exposure. This potential of theory is described in Chapter 7 of \citet{cochrane2009asset}, which states ``In my opinion, the best hope for finding pricing factors that are robust out of sample and across different markets, is to try to understand the fundamental macroeconomic sources of risk.''
+% EXHIBIT-NUMBER: Figure IA.1
+\begin{figure}[h]\caption{Excluding Data-Mined Predictors Correlated with Any Existing Research}
+  \label{fig:decay-unspanned}
+  We compare published predictors (solid) to data-mined predictors made with t-stats $>$ 2.0, but separate predictors by correlation and in-sample t-stats. Panel (a) uses the maximum pairwise correlation with any existing published predictor. Panel (b) uses the $R^2$ from regressing the data-mined return on 5 principal components of existing predictors computed using probabilistic PCA. 
+  
+  \vspace{2 ex}
+  \centering
+  \subfloat[Any Correlation\label{fig:abnormal_published_1}]{
+      \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig_DM_unspan_match_t_g_cor.pdf}
+  }    
+  \subfloat[PPCA\label{fig:abnormal_published_2}]{
+      \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig_DM_unspan_match_t_g_PCA.pdf}
+  }
+\end{figure}
 
-However, there are reasons why peer-reviewed theoretical evidence may not help. If the theory is so flexible that it can accommodate \emph{any} potential predictor, then it cannot separate $\mu_i$ from $\bar{\varepsilon}_i^{IS}$ (\citealt{fama1991efficient}). This problem can be formalized as $\mathcal{P} = \mathcal{D}$, in which case expected post-sample returns are identical. But even if $\mathcal{P}$ is in some sense smaller than $\mathcal{D}$, there is the chance that theory is unable to separate $\mu_i$ from $\bar{\varepsilon}_i^{IS}$. If the theoretical investors are concerned about risks that are irrelevant to real-world investors, then the theory may mistake $\mu_i$ for $\bar{\varepsilon}_i^{IS}$, or incorrectly predict $\Delta \mu_i \ge 0$. 
+% EXHIBIT-NUMBER: Table 3
+\begin{table}[!h]
+   \caption{Post-Sample Outperformance by Discipline and Journal Ranking}
+   \label{tab:hetero-byjournal}
 
-Perhaps most importantly, the peer-reviewed process may lead to a more negative $\Delta \mu_i$ by publicizing mispricing. In contrast, data-mined predictors may avoid this effect, if information about the mispricing must diffuse from the data directly to investors, without the assistance of academics. 
+   \begin{singlespace}
+   \noindent Strategies are normalized to have 100 bps per month performance in-sample. `Post-Sample' is the performance of predictor-papers in bps per month. `Versus Data Mining' is `Post-Sample' minus the performance of data-mined benchmarks. `Discipline' categorizes the journal of publication. `JF,' `JFE,' and `RFS' includes papers in the Journal of Finance, Journal of Financial Economics, and Review of Financial Studies. `AR,' `JAR,' and `JAE' includes papers in the Accounting Review, Journal of Accounting Research, and Journal of Accounting and Economics. CAPM and FF3 + momentum alphas use regressions specific to the sample periods (in-sample or post-sample). Standard errors (parentheses) are clustered by calendar month and predictor. Finance, and particularly top-ranked finance journals show some signs of outperformance relative to data mining, but the improvement is modest.
+   \end{singlespace}
+   \begin{centering}
+   \vspace{0ex}
+   \par\end{centering}
+   \centering{}\setlength{\tabcolsep}{1.2ex} \small
+   \begin{center}
+   \input{\exhibitspath/Table_FactorAdjusted_TimeVarying_DisciplineJournal_ff4_t2.tex}
+   \end{center}
+\end{table}
 
-Overall, the model suggests that the relative importance of theoretical evidence is unclear, a priori. Thus, it is important to conduct an empirical analysis.
 
-\section{Robustness}\label{sec:app-robust-other}
-
-\section{Robustness of the Decay Regressions}\label{sec:app-robust}
-
-\subsection{Individual Data-Mined Strategies}\label{sec:app-individual-dm}
+\clearpage
 
 % EXHIBIT-NUMBER: Table B.1
 \begin{table}[H]
@@ -55,7 +55,6 @@ Overall, the model suggests that the relative importance of theoretical evidence
     \input{\exhibitspath/Table_MPStyleRegsIndividualDM.tex}
 \end{table}
 
-\subsection{Controlling for Data Source}\label{sec:app-robust-data}
 
 % EXHIBIT-NUMBER: Table B.2
 \begin{table}[H]
