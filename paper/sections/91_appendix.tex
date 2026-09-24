@@ -2,12 +2,12 @@
 
 \section{Robustness: Decay Regressions}\label{sec:robust}
 
-% EXHIBIT-NUMBER: Table B.1
+% EXHIBIT-NUMBER: Table A.1
 \begin{table}[H]
     \caption{Individual data-mined returns post-sample and post-publication}\label{tab:MPdecayIndividualDM}
     \small
 
-    The table shows regressions of individual data-mined strategies on indicators for the sample-end and publication dates of their matched academic predictors. As in Tables \ref{tab:MPdecaymain}--\ref{tab:MPdecaytimefe}, strategies have at least 60 original-sample months, match the academic predictor within 10\% on its original-sample t-statistic and 30\% on its mean return, and exclude pairs with signed-return correlations above 10\%. For computational reasons, we sample at most 100 strategies for each academic predictor.
+    The table shows regressions of individual data-mined strategies on indicators for the sample-end and publication dates of their matched academic predictors. As in Tables \ref{tab:MPdecaymain}--\ref{tab:MPdecaytimefe}, strategies have at least 60 original-sample months, match the academic predictor within 10\% on both its original-sample t-statistic and its mean return, and exclude pairs with signed-return correlations above 10\%. For computational reasons, we sample at most 100 strategies for each academic predictor.
     Scaled returns are normalized such that a strategy's mean return is 100 bps per month in the sample of the original matched predictor. Standard errors are clustered at the data-mined strategy and calendar month levels and are shown in parentheses.
     \vspace{2ex}
 
@@ -18,7 +18,7 @@
 \end{table}
 
 
-% EXHIBIT-NUMBER: Table B.2
+% EXHIBIT-NUMBER: Table A.2
 \begin{table}[H]
     \caption{Decay regressions using only annual accounting predictors}\label{tab:MPdecayacctonly}
     \small
@@ -32,7 +32,7 @@
     \input{\exhibitspath/Table_MPStyleRegsNoTimeFE_AccountingOnly.tex}
 \end{table}
 
-% EXHIBIT-NUMBER: Table B.3
+% EXHIBIT-NUMBER: Table A.3
 \begin{table}[H]
     \caption{Decay regressions using only annual accounting predictors, controlling for time effects}\label{tab:MPdecayacctonlytimefe}
     \small

@@ -281,7 +281,7 @@ We measure performance using the mean long-short return of strategies formed fol
 
 For each of these published strategies, we construct a data-mined benchmark by applying the same statistical treatment to the 29,000 accounting ratios. For each ratio, we construct t-stats based on the original papers' stock weighting and sample periods, filter for t-stats $>$ 2.0, sign and normalize to have $+100$ bps mean return in the original samples. Since finding t-stats $>$ 2.0 is rather common (Table \ref{tab:dm-oos}), on average, this process selects roughly 6,000 data-mined strategies for each published predictor. The benchmark return is the average across the selected ratios' returns.
 
-Some tests use variations on this baseline benchmark. One variation filters the data-mined strategies to those that match the published signals in terms of in-sample performance: sample mean returns are within 30\% and t-stats within 10\% of those of the published signals. This performance match is applied in place of the $|t|>2.0$ screen. Another variation drops data-mined strategies that have returns that are more than 10\% correlated with the published signals' returns.
+Some tests use variations on this baseline benchmark. One variation filters the data-mined strategies to those that match the published signals in terms of in-sample performance: sample mean returns and t-stats are each within 10\% of those of the published signals. This performance match is applied in place of the $|t|>2.0$ screen. Another variation drops data-mined strategies that have returns that are more than 10\% correlated with the published signals' returns.
 
 \subsection{Post-Sample Performance: Research vs Data Mining}\label{sec:pubvs,results}
 
@@ -331,7 +331,7 @@ Published predictors exhibit some outperformance relative to data-mined benchmar
 Panel (b) drops published predictors that are arguably difficult to evaluate in our tests. Since our data mining process uses only annual accounting data, one might argue that we should not use it to evaluate published predictors that use other data types. One might also worry that published predictors with shorter post-publication samples may lead to noisy artifacts for trailing returns far from the original sample. The panel addresses the first concern by restricting to the 66 published predictors built from annual Compustat data, and the second by restricting to the 61 predictors published before 2003, which have at least two decades of post-publication returns. In both subsets, published and data-mined predictors track each other post-sample, leading to similar results as in Figure \ref{fig:intro}. In each case the data-mined benchmark is the baseline construction (Section \ref{sec:pubvs,bench}) restricted to the corresponding subset of published predictors.
 
 % 2c controlling for sum-stats, excluding corr
-One might also worry that we should not compare published and data-mined strategies that differ strongly in in-sample performance. Panel (c) addresses this concern by requiring data-mined strategies to have at least 60 original-sample months and to match the published signals within 10\% on t-statistics and 30\% on mean returns (Section \ref{sec:pubvs,bench}). This filter has little effect on our main result.
+One might also worry that we should not compare published and data-mined strategies that differ strongly in in-sample performance. Panel (c) addresses this concern by requiring data-mined strategies to have at least 60 original-sample months and to match the published signals within 10\% on both t-statistics and mean returns (Section \ref{sec:pubvs,bench}). This filter has little effect on our main result.
 
 Perhaps the similar post-sample performance is due to data mining picking up the same, or very similar, signals as the  research process? The short dash line in Panel (c) shows this is not the case. It imposes the in-sample performance match \emph{and} drops data-mined strategies that are more than 10\% correlated with the published signals (Section \ref{sec:pubvs,bench}).
 
@@ -472,7 +472,7 @@ where $y_{i,t}$ is the dependent variable of interest (e.g. $r_{i,t}^{DM}$), $\a
 
 Table \ref{tab:MPdecaymain} shows regressions of the form \eqref{eq:mp-reg}, without time fixed effects.
 
-% EXHIBIT-NUMBER: Table 4
+% EXHIBIT-NUMBER: Table 3
 \begin{table}
     \caption{Regression of Signal Returns on Post-Sample and Post-Publication Indicators}\label{tab:MPdecaymain}
     \small
@@ -508,7 +508,7 @@ Columns (4)-(6) repeat the analysis using unscaled returns, for robustness. The 
 % Introduce time fixed effects table
 A simple form of \emph{Learning-from-Data} is that, as aggregate information technology improves, investors are able to more quickly impound information into prices. One can absorb this story by using time fixed effects, as in Table \ref{tab:MPdecaytimefe}.
 
-% EXHIBIT-NUMBER: Table 5
+% EXHIBIT-NUMBER: Table 4
 \begin{table}
     \caption{Regressions on Sample Indicators, Controlling for Time Effects}\label{tab:MPdecaytimefe}
     \small
@@ -562,9 +562,9 @@ Thermodynamic phenomena (e.g. ideal gas law) can be derived from the laws of the
 
 These renowned papers provide robust empirical evidence. Indeed, \citet{fama1992cross} is in essence a robustness check on \citet{stattman1980book} and \citet{banz1981relationship}. But other empirical papers provide even more robustness (e.g., \citealt{fama1993common}; \citealt{lakonishok1994contrarian}; \citealt{chan1996momentum}; \citealt{asness2013value}). 
 
-Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findings to data-mined alternatives. The alternatives come from searching the 29,000 accounting ratios for t-stats and mean returns that are within 10\% and 30\% of the original findings. This filtering ensures the alternatives are similar to the original findings in terms of statistical support. As before,  data-mined t-stats and mean returns use the original papers' stock weighting and sample periods.
+Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findings to data-mined alternatives. The alternatives come from searching the 29,000 accounting ratios for t-stats and mean returns that are each within 10\% of the original findings. This filtering ensures the alternatives are similar to the original findings in terms of statistical support. As before,  data-mined t-stats and mean returns use the original papers' stock weighting and sample periods.
 
-% EXHIBIT-NUMBER: Table 3
+% EXHIBIT-NUMBER: Table 5
 \begin{table}[!h]
    \caption{Post-Sample Outperformance by Discipline and Journal Ranking}
    \label{tab:hetero-byjournal}
@@ -588,7 +588,7 @@ Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findi
 \label{tab:closer_bmdec}
 
 \begin{singlespace}
-\noindent Table lists 20 of the 163 data-mined predictors that performed similarly to Fama and French's \citeyearpar{fama1992cross} B/M in the original sample period. It includes predictors with t-stats within 10\% and mean returns within 30\% of the original findings. Signals are ranked by the absolute difference in mean return. Sign = -1 indicates that a high signal implies a lower mean return in-sample. Data mining performs similarly to trading on \citepos{fama1992cross} B/M.
+\noindent Table lists 20 of the 51 data-mined predictors that performed similarly to Fama and French's \citeyearpar{fama1992cross} B/M in the original sample period. It includes predictors with t-stats and mean returns each within 10\% of the original findings. Signals are ranked by the absolute difference in mean return. Sign = -1 indicates that a high signal implies a lower mean return in-sample. Data mining outperforms \citepos{fama1992cross} B/M.
 \end{singlespace}
 \begin{centering}
 \vspace{0ex}
@@ -618,7 +618,7 @@ Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findi
 \label{tab:closer_mom12m}
 
 \begin{singlespace}
-\noindent Table lists 20 of the 44 data-mined predictors that performed similarly to Jegadeesh and Titman's \citeyearpar{jegadeesh1993returns} 12-month momentum in the original sample period. It includes predictors with t-stats within 10\% and mean returns within 30\% of the original findings. Signals are ranked by the absolute difference in mean return. Sign = -1 indicates that a high signal implies a lower mean return in-sample. Data mining somewhat underperforms \citepos{jegadeesh1993returns} momentum.
+\noindent Table lists all 4 data-mined predictors that performed similarly to Jegadeesh and Titman's \citeyearpar{jegadeesh1993returns} 12-month momentum in the original sample period. It includes predictors with t-stats and mean returns each within 10\% of the original findings. Signals are ranked by the absolute difference in mean return. Sign = -1 indicates that a high signal implies a lower mean return in-sample. Data mining underperforms \citepos{jegadeesh1993returns} momentum.
 \end{singlespace}
 \begin{centering}
 \vspace{0ex}
@@ -650,7 +650,7 @@ Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findi
     \label{tab:closer_size}
     
     \begin{singlespace}
-    \noindent Table lists 20 of the 220 data-mined predictors that performed similarly to Banz's \citeyearpar{banz1981relationship} size in the original sample period. It includes predictors with t-stats within 10\% and mean returns within 30\% of the original findings. Signals are ranked by the absolute difference in mean return. Sign = -1 indicates that a high signal implies a lower mean return in-sample. Data mining outperforms \citepos{banz1981relationship} size.
+    \noindent Table lists 20 of the 181 data-mined predictors that performed similarly to Banz's \citeyearpar{banz1981relationship} size in the original sample period. It includes predictors with t-stats and mean returns each within 10\% of the original findings. Signals are ranked by the absolute difference in mean return. Sign = -1 indicates that a high signal implies a lower mean return in-sample. Data mining outperforms \citepos{banz1981relationship} size.
     \end{singlespace}
     \begin{centering}
     \vspace{-1ex}
@@ -673,13 +673,13 @@ Tables \ref{tab:closer_bmdec}-\ref{tab:closer_size} compare these renowned findi
 
 
 % walk through one table
-Table \ref{tab:closer_bmdec} applies this exercise to \citepos{fama1992cross} B/M. It lists 20 of the 163 data-mined predictors that performed similarly to B/M in \citepos{fama1992cross} 1963-1990 sample period. The predictors are sorted by the absolute difference in the original sample mean return. By this metric, the most similar predictor to B/M is $\Delta \text{[PPE net]} / \text{lag [Sales]}$, which can be thought of as a measure of investment. This predictor earned 96 bps per month in the original sample period, identical to B/M. The `1991-2023' column shows that $\Delta \text{[PPE net]} / \text{lag [Sales]}$ slightly outperforms B/M post-sample, earning 73 bps per month compared to 61 bps for B/M. 
+Table \ref{tab:closer_bmdec} applies this exercise to \citepos{fama1992cross} B/M. It lists 20 of the 51 data-mined predictors that performed similarly to B/M in \citepos{fama1992cross} 1963-1990 sample period. The predictors are sorted by the absolute difference in the original sample mean return. By this metric, the most similar predictor to B/M is $\Delta \text{[PPE net]} / \text{lag [Common equity]}$, which can be thought of as a measure of investment. This predictor earned 95 bps per month in the original sample period, compared to 96 bps for B/M. The `1991-2023' column shows that $\Delta \text{[PPE net]} / \text{lag [Common equity]}$ slightly outperforms B/M post-sample, earning 66 bps per month compared to 61 bps for B/M. 
 
-Other data-mined alternatives to B/M include those related to equity issuance ([Stock issuance]/ [Debt in current liab]) and accruals ($\Delta$ [Receivables]/ lag [Assets]). The post-sample performance of these data-mined alternatives varies. But on average, they are quite similar to \citet{fama1992cross}. Trading on Fama and French's finding would have earned 61 bps per month post-sample, compared to 65 bps for the typical data mined alternative.
+Other data-mined alternatives to B/M include those related to equity issuance ([Stock issuance]/ [Debt in current liab]) and asset growth ($\Delta$ [Assets]/ lag [Cost of goods sold]). The post-sample performance of these data-mined alternatives varies. On average, they outperform \citet{fama1992cross}. Trading on Fama and French's finding would have earned 61 bps per month post-sample, compared to 81 bps for the typical data mined alternative.
 
-Table \ref{tab:closer_mom12m} applies the same exercise to \citepos{jegadeesh1993returns} 12-month momentum. Since momentum has a much higher mean return, only 44 data-mined alternatives are found. Here, data mining underperforms on average, earning 52 bps compared to 72 bps for \citepos{jegadeesh1993returns} finding. However, Table \ref{tab:closer_size} shows data mining outperforming, earning 42 bps compared to 15 bps for \citepos{banz1981relationship} size.
+Table \ref{tab:closer_mom12m} applies the same exercise to \citepos{jegadeesh1993returns} 12-month momentum. Since momentum has a much higher mean return, only 4 data-mined alternatives are found. All four scale unadjusted retained earnings by another accounting variable. Here, data mining underperforms, earning 17 bps on average compared to 72 bps for \citepos{jegadeesh1993returns} finding. However, Table \ref{tab:closer_size} shows data mining outperforming, earning 36 bps compared to 15 bps for \citepos{banz1981relationship} size.
 
-Averaging across the three tables, data mining performs similarly to these renowned findings. Though the samples are small, they suggest that focusing on the best research does not significantly affect our results.  
+Averaging across the three tables, data mining performs similarly to these renowned findings, earning 45 bps per month post-sample compared to 49 bps. Though the samples are small, they suggest that focusing on the best research does not significantly affect our results.  
 
 % ===================
 \section{Conclusion and Limitations}\label{sec:conclusion}

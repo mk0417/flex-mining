@@ -169,10 +169,13 @@ write_tex_from_tab = function(
     print() 
   ncol = dim(tab2)[2]
   
-  # insert blanks
-  blank1 = tibble(source = '2_dm', id = max(id1)+1,signal =  '. . .')
-  blank2 = tibble(source = '2_dm', id = max(id2)+1,signal =  '. . .') 
-  tab3 = tab2 %>% bind_rows(blank1) %>% bind_rows(blank2) %>%  
+  # insert blanks only where shown rows skip over matches, so short lists
+  # (e.g. momentum, with few matches) print without stray ellipses
+  shown = sort(unique(c(id1, id2, id3)))
+  shown = shown[shown >= 1 & shown <= nsignal]
+  gaps = shown[shown < nsignal & !((shown + 1) %in% shown)]
+  blanks = tibble(source = '2_dm', id = gaps + 0.5, signal = rep('. . .', length(gaps)))
+  tab3 = tab2 %>% bind_rows(blanks) %>%
     arrange(source, id) %>% 
     mutate(id = if_else(signal == '. . .', NA_real_, id)) %>%     
     print()
@@ -241,7 +244,7 @@ tab = readxl::read_xlsx(paste0(outpath,'InspectMatch.xlsx'), sheet = 'BMdec') %>
   janitor::clean_names() %>% 
   as.data.frame()
 
-write_tex_from_tab(tab, id1 = 1:10, id2 = 101:105, 
+write_tex_from_tab(tab, id1 = 1:10, id2 = 25:29, 
                    signalnamelong = 'Book / Market (Fama-French 1992)',
                    filename = 'inspect-BMdec.tex')
 
