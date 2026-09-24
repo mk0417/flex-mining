@@ -2,7 +2,7 @@
 """Compile the research-vs paper and annotate each LaTeX float with its PDF number.
 
 Run: python3 update_exhibit_numbers.py [research-vs] [--from-aux]
-Inputs: risk_vs.tex and its included sources, exhibits,
+Inputs: research_vs.tex and its included sources, exhibits,
 and bibliography (pdflatex, biber, pdfinfo required).
 With --from-aux, read existing AUX files after a successful build; do not compile.
 Outputs: EXHIBIT-NUMBER comments in the paper's LaTeX sources; builds are temporary.
@@ -22,7 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 PAPERS = (
-    ROOT / "risk_vs.tex",
+    ROOT / "research_vs.tex",
 )
 
 FLOAT_TOKEN_RE = re.compile(

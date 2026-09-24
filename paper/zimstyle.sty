@@ -57,6 +57,17 @@
 \newcommand{\SE}{\text{SE}}
 \newcommand{\FDR}{\text{FDR}}
 \newcommand{\obs}{\text{obs}}
+\newcommand{\hl}[1]{%
+  \par\smallskip
+  \noindent
+  \setlength{\fboxsep}{4pt}%
+  \colorbox{yellow}{%
+    \parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+      \textbf{Comment:} #1%
+    }%
+  }%
+  \par\smallskip
+}
 
 % define colors
 \definecolor{ChadBlue}{rgb}{.1,.1,.5}  

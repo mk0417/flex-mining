@@ -1,6 +1,8 @@
-% !TEX root = ../risk_vs.tex
+% !TEX root = ../research_vs.tex
 
-\section{A Model of Post-Sample Performance}\label{sec:app-model}
+\section{\texorpdfstring
+  {A Model of Post-Sample Performance}
+  {Appendix A: A Model of Post-Sample Performance}}\label{sec:app-model}
 We present a simple model for interpreting our results. $\mathcal{D}$ is a set of data-mined return signals (e.g. 29,000 accounting ratios). For signal $i\in \mathcal{D}$, the in-sample and post-sample returns follow
 \begin{align}
 \bar{r}_{i}^{IS} & = \mu_i + \bar{\varepsilon}_i^{IS} \\
@@ -34,109 +36,73 @@ Perhaps most importantly, the peer-reviewed process may lead to a more negative 
 
 Overall, the model suggests that the relative importance of theoretical evidence is unclear, a priori. Thus, it is important to conduct an empirical analysis.
 
-\section{Robustness}\label{sec:app-robust}
+\section{\texorpdfstring
+  {Robustness of the Decay Regressions}
+  {Appendix B: Robustness of the Decay Regressions}}\label{sec:app-robust}
 
-\subsection{Controlling for Data Source}\label{sec:app-robust-data} 
+\subsection{Individual Data-Mined Strategies}\label{sec:app-individual-dm}
 
-The data-mined predictors use annual accounting data. A natural question is whether Equation \eqref{eq:painfully_clear} is affected by controlling for this data source. Figure \ref{fig:accounting-vs-dm} limits the published predictors to those that use annual accounting data. This filter drops roughly 50\% of the published predictors. The post-sample patterns are similar to our baseline Figures \ref{fig:intro} and \ref{fig:pub-vs-dm-2}.
+% EXHIBIT-NUMBER: Table B.1
+\begin{table}[H]
+    \caption{Individual data-mined returns post-sample and post-publication}\label{tab:MPdecayIndividualDM}
+    \small
 
-\begin{figure}[!h]
-  \caption{Published annual accounting predictors against data-mined benchmarks}
-  \label{fig:accounting-vs-dm}
-  We repeat Figures \ref{fig:intro} and \ref{fig:pub-vs-dm-2} but now limit published predictors to those that use annual accounting data. 
+    The table shows regressions of individual data-mined strategies on indicators for the sample-end and publication dates of their matched academic predictors. As in Tables \ref{tab:MPdecaymain}--\ref{tab:MPdecaytimefe}, strategies have at least 60 original-sample months, match the academic predictor within 10\% on its original-sample t-statistic and 30\% on its mean return, and exclude pairs with signed-return correlations above 10\%. For computational reasons, we sample at most 100 strategies for each academic predictor.
+    Scaled returns are normalized such that a strategy's mean return is 100 bps per month in the sample of the original matched predictor. Standard errors are clustered at the data-mined strategy and calendar month levels and are shown in parentheses.
+    \vspace{2ex}
 
-  \vspace{0.15in}
-  
-  \centering
-  \subfloat[Raw Returns, $|t|>2$]{
-    \includegraphics[width=0.48\textwidth]{exhibits/Fig_DM_t_min_2_AccountingOnly_CalendarSE.pdf}
-  }
-  \subfloat[Raw Returns, Top 5\% $|t|$]{
-    \includegraphics[width=0.48\textwidth]{exhibits/Fig_DM_t_top5Pct_AccountingOnly_CalendarSE.pdf}
-  }
-  
-  \subfloat[CAPM Alpha, $|t|>2$]{
-    \includegraphics[width=0.48\textwidth]{exhibits/Fig_DM_CAPM_tv_AccountingOnly_CalendarSE.pdf}
-  }
-  \subfloat[FF4 Alpha, $|t|>2$]{
-    \includegraphics[width=0.48\textwidth]{exhibits/Fig_DM_FF4_tv_AccountingOnly_CalendarSE.pdf}
-  }
+    \centering
 
-\end{figure}
+    \setlength{\tabcolsep}{2.0ex}
+    \input{\exhibitspath/Table_MPStyleRegsIndividualDM.tex}
+\end{table}
 
+\subsection{Controlling for Data Source}\label{sec:app-robust-data}
 
-\subsection{Controlling for Sample Mean Returns, and $t$-stats}\label{sec:app-robust-stats} 
+% EXHIBIT-NUMBER: Table B.2
+\begin{table}[H]
+    \caption{Decay regressions using only annual accounting predictors}\label{tab:MPdecayacctonly}
+    \small
 
-Predictors with stronger statistical evidence may have stronger post-sample performance. Additionally, our normalization to 100 bps per month in-sample may fail to control for leverage effects. 
+    The table repeats Table \ref{tab:MPdecaymain} after restricting the academic predictors to those built from annual accounting data, the same data source as the data-mined strategies. Following Figure \ref{fig:pub-vs-dm-2}, Panel (b), we begin from the accounting category of \citet{ChenZimmermann2021} and then drop quarterly, analyst-based, and discrete signals, which leaves 66 of the 173 predictors. Post-sample is one in months after the end of the original sample and zero otherwise. Post-pub (Add'l) is one in months after publication and zero otherwise. Standard errors (parentheses) are clustered by predictor and calendar month.
+    \vspace{2ex}
 
-The long-dash lines in Figure \ref{fig:pub-vs-dm-controls} control for these issues. These lines include only data-mined predictors with t-statistics within 10\% and mean returns within 30\% of the published predictors.  Figure \ref{fig:pub-vs-dm-controls_robust} uses a tighter mean return filter of 10\%. This analysis requires dropping published predictors, as some published predictors lack data-mined counterparts that meet this filter. Figure \ref{fig:pub-vs-dm-controls} drops 12 published predictors, while Figure \ref{fig:pub-vs-dm-controls_robust} drops 33. Overall, the patterns are similar to those in Sections \ref{sec:pubvs} and \ref{sec:hetero}. 
+    \centering
 
-\begin{figure}[!h]\caption{Controlling for Sample Mean Returns, t-stats, Correlations}
-  \label{fig:pub-vs-dm-controls}
-  We repeat Figure \ref{fig:intro} but now we drop data-mined predictors if they have t-stats that differ by more than 10\% or mean returns that differ by more than 30\% (long-dash). We additionally drop data-mined strategies that are more than 10\% correlated with published strategies in the original sample (short-dash). 
+    \setlength{\tabcolsep}{2.0ex}
+    \input{\exhibitspath/Table_MPStyleRegsNoTimeFE_AccountingOnly.tex}
+\end{table}
 
-  \vspace{2 ex}
-  \centering
-  \subfloat[All]{
-  \includegraphics[width=0.45\textwidth]{exhibits/Fig_PublicationsVsDataMining_All_DM_Correlation10} 
-  }
-  \subfloat[Risk-based]{
-  \includegraphics[width=0.45\textwidth]{exhibits/Fig_PublicationsVsDataMining_risk_DM_Correlation10}
-  }\\
-  \subfloat[Mispricing-based]{
-  \includegraphics[width=0.45\textwidth]{exhibits/Fig_PublicationsVsDataMining_mispricing_DM_Correlation10} 
-  }
-  \subfloat[Agnostic]{
-  \includegraphics[width=0.45\textwidth]{exhibits/Fig_PublicationsVsDataMining_agnostic_DM_Correlation10}
-  }
-\end{figure}
+% EXHIBIT-NUMBER: Table B.3
+\begin{table}[H]
+    \caption{Decay regressions using only annual accounting predictors, controlling for time effects}\label{tab:MPdecayacctonlytimefe}
+    \small
 
-\begin{figure}[!h]\caption{Controlling for Sample Mean Returns, t-stats, Correlations}
-  \label{fig:pub-vs-dm-controls_robust}
-  We repeat Figure \ref{fig:intro} but now we drop data-mined predictors if they have t-stats that differ by more than 10\% or mean returns that differ by more than 10\% (long-dash). We additionally drop data-mined strategies that are more than 10\% correlated with published strategies in the original sample (short-dash). 
+    The table repeats Table \ref{tab:MPdecaytimefe} on the annual accounting predictors of Table \ref{tab:MPdecayacctonly}, adding time fixed effects to the specification. It uses the same benchmark construction and the same common sample as Table \ref{tab:MPdecayacctonly}. Post-sample is one in months after the end of the original sample and zero otherwise. Post-pub (Add'l) is one in months after publication and zero otherwise. Standard errors (parentheses) are clustered by predictor and calendar month.
+    \vspace{2ex}
 
-  
-  \vspace{2 ex}
-  \centering
-  \subfloat[All]{
-  \includegraphics[width=0.45\textwidth]{exhibits/Fig_PublicationsVsDataMining_All_DM_Correlation_10_d_mean_0.1.pdf} 
-  }
-  \subfloat[Risk-based]{
-  \includegraphics[width=0.45\textwidth]{exhibits/Fig_PublicationsVsDataMining_risk_DM_Correlation10_d_mean_0.1.pdf}
-  }\\
-  \subfloat[Mispricing-based]{
-  \includegraphics[width=0.45\textwidth]{exhibits/Fig_PublicationsVsDataMining_mispricing_DM_Correlation10_d_mean_0.1.pdf} 
-  }
-  \subfloat[Agnostic]{
-  \includegraphics[width=0.45\textwidth]{exhibits/Fig_PublicationsVsDataMining_agnostic_DM_Correlation10_d_mean_0.1.pdf}
-  }
-\end{figure}
+    \centering
 
+    \setlength{\tabcolsep}{2.0ex}
+    \input{\exhibitspath/Table_MPStyleRegsTimeFE_AccountingOnly.tex}
+\end{table}
 
-\subsection{Removing Correlated Data-Mined Predictors}\label{sec:app-robust-manycor}
+\subsection{Alternative Portfolio Constructions}\label{sec:app-robust-construction}
 
-One may be interested in whether our results are robust to excluding data-mined predictors that are highly correlated with published predictors. This question is perhaps natural given the central role of correlations in classical asset pricing theory. 
+% EXHIBIT-NUMBER: Table B.4
+\begingroup
+\captionsetup{type=table}
+\caption{Post-sample and post-publication decay across portfolio constructions}\label{tab:timefe-robustness}
+\small
 
-However, excluding highly correlated data-mined predictors is not important for our main question. Equation \eqref{eq:painfully_clear} implies \emph{matching} covariance patterns across data-mined and published predictors---that is, we should exclude data-mined predictors that have \emph{low} correlation with published predictors. 
+The table repeats the decay regressions of Tables \ref{tab:MPdecaymain} and \ref{tab:MPdecaytimefe} across twelve constructions of the published long-short portfolios. Within each panel, the first row uses predictor fixed effects only, as in Table \ref{tab:MPdecaymain}, and the second row adds time fixed effects, as in Table \ref{tab:MPdecaytimefe}. Post-sample is the coefficient on an indicator for months after the end of the original sample; additional post-publication is the incremental coefficient on an indicator for months after publication. Both are in basis points per month, with standard errors in parentheses. The first block uses the portfolios of the original papers, as assembled by \citet{mclean2016does} and \citet{ChenZimmermann2021}. The second block rebuilds the \citet{ChenZimmermann2021} portfolios under alternative sorting, weighting, and screening choices. The third block rebuilds them as \citet{jensen2022there} style terciles.
 
-The short-dash lines of Figures \ref{fig:pub-vs-dm-controls} and \ref{fig:pub-vs-dm-controls_robust} exclude data-mined predictors that have pairwise correlations of more than 0.10 with the published predictor in question (short-dash). The results are very similar to the main results.
+Post-sample decay is present under every construction. The additional post-publication decay is the more fragile estimate. Adding time fixed effects removes nearly all of it under the alternative \citet{ChenZimmermann2021} constructions of the second block, where the remaining estimates run from $+4.4$ to $-7.0$ bps per month. The \citet{jensen2022there} style terciles are the exception. There, additional post-publication decay falls but survives, at $-18.6$ bps per month for the equal-weighted terciles (Panel J) and $-21.8$ bps per month for the metadata-matched sample (Panel L), the latter more than two standard errors from zero. The \citet{mclean2016does} portfolios of Panel A likewise retain $-22.5$ bps per month, though only an approximate standard error is available there. Whether publication carries information beyond the passage of time therefore depends on how the published portfolios are rebuilt.
+\vspace{2ex}
 
-Figure \ref{fig:decay-unspanned} aims to remove data-mined predictors that are highly correlated with all previously-published predictors, defined by sample end dates. Panel (a) measures this idea using the data-mined return's maximum pairwise correlation with any previously-published predictor. Panel (b) uses the $R^2$ from regressing the data-mined return on the first five factors extracted from previously-published returns via probabilistic principal component analysis (PPCA, \citet{roweis1997algorithms}; \citealt{chen2023missing}). For signals with low correlation, we further separate data-mined returns based on their in-sample t-stats. 
-
-\begin{figure}\caption{Excluding Data-Mined Predictors Correlated with Any Existing Research}
-  \label{fig:decay-unspanned}
-  We compare published predictors (solid) to data-mined predictors made with t-stats $>$ 2.0, but separate predictors by correlation and in-sample t-stats. Panel (a) uses the maximum pairwise correlation with any existing published predictor. Panel (b) uses the $R^2$ from regressing the data-mined return on 5 principal components of existing predictors computed using probabilistic PCA. 
-  
-  \vspace{2 ex}
-  \centering
-  \subfloat[Any Correlation\label{fig:abnormal_published_1}]{
-      \includegraphics[width=0.48\textwidth]{exhibits/Fig_DM_unspan_match_t_g_cor.pdf}
-  }    
-  \subfloat[PPCA\label{fig:abnormal_published_2}]{
-      \includegraphics[width=0.48\textwidth]{exhibits/Fig_DM_unspan_match_t_g_PCA.pdf}
-  }
-\end{figure}
-
-Excluding data-mined predictors that are highly correlated with all previously-published predictors leads to slightly worse post-sample performance. A worsening is natural, as over time the published literature will capture more and more of the strong predictive components of the data, of which there is a finite number (Table \ref{tab:dm-oos}, Panel (b)). The magnitude of the effect is modest, however, and is only noticeable if we focus on data-mined predictors with low in-sample t-stats. Overall, the similarity in post-sample performance of published and data-mined predictors is robust, and holds even if we purposefully make the data-mined predictors less similar to published ones.
-
-An interesting feature of Figure \ref{fig:decay-unspanned} is that the trailing 5-year returns are correlated, even across groups of returns that have low monthly return correlations.  Given the near-zero autocorrelation in monthly returns, this is likely due to slow movements in long-run expected returns like the post-2004 decay in Appendix Table \ref{tab:dm-sum-2004} (see also \citealt{stambaugh2012short}; \citealt{yan2017fundamental}; \citealt{chen2022zeroing}).
+\input{\exhibitspath/TimeFERobustness/timefe-robustness.tex}
+% The generated fragment is a bare longtable with no \caption of its own, so it
+% still steps the table counter. The caption above already claimed this table's
+% number; give the stray increment back so the next float numbers correctly.
+\addtocounter{table}{-1}
+\endgroup
