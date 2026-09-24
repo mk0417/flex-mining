@@ -715,8 +715,10 @@ Last, our study is limited to the peer review process as characterized by the CZ
 \renewcommand*\thetable{\Alph{section}.\arabic{table}}
 \renewcommand*\thefigure{\Alph{section}.\arabic{figure}}
 
-% \hypersetup{bookmarksdepth=1} % use to reset bookmark depth
+\bookmarksetup{startatroot}
+\pdfbookmark[0]{Appendix}{appendix}
 \input{sections/91_appendix}
+\end{appendices}
 
 % References ==============================
 \clearpage
@@ -732,11 +734,6 @@ Last, our study is limited to the peer review process as characterized by the CZ
 \renewcommand{\thesection}{IA.\arabic{section}}
 \renewcommand*\thetable{IA.\arabic{table}}
 \renewcommand*\thefigure{IA.\arabic{figure}}
-
-% Remove appendix formatting - just show section number
-\makeatletter
-\renewcommand{\@seccntformat}[1]{\csname the#1\endcsname\quad}
-\makeatother
 
 % Fix pdf bookmarks
 \renewcommand{\theHsection}{IA.\arabic{section}}
