@@ -5,11 +5,9 @@ private/
 /Data/
 /Results/
 
-# Agent guidelines are local only.
-/CLAUDE.md
-/AGENTS.md
-code/CLAUDE.md
-code/AGENTS.md
+# Agent guidelines are local only, at any depth.
+AGENTS.md
+CLAUDE.md
 
 .env
 .DS_Store
