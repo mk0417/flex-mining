@@ -5,7 +5,8 @@
 # Inputs:  ../Data/Processed/dmcomp_sumstats.RDS
 #          ../Data/Processed/<dataVersion> LongShort.RData
 #          cleaned published-signal inputs
-# Outputs: ../Results/InspectMatch.xlsx and inspect-*.tex
+# Outputs: ../Results/InspectMatch.xlsx, inspect-*.tex (per-finding tables), and
+#          inspect-summary.tex (summary table)
 
 # Setup -------------------------------------------------------------------------
 source("0_Environment.R")
@@ -274,3 +275,65 @@ tab = readxl::read_xlsx(paste0(outpath,'InspectMatch.xlsx'), sheet = 'realestate
 write_tex_from_tab(tab, id1 = 1:10, id2 = 101:105, 
                    signalnamelong = 'Real Estate (Tuzel 2010)',
                    filename = 'inspect-realestate.tex')
+
+# Summary table: top matches and counts for the renowned findings ------------------
+# Output: inspect-summary.tex, the body of a tabular with columns
+#   Rank | Signal | Sign | In-sample t-stat | In-sample mean | Post-sample mean
+
+write_tex_summary = function(
+    pubs = list(
+      BMdec  = 'Book / Market (Fama-French 1992)',
+      Mom12m = '12-Month Momentum (Jegadeesh-Titman 1993)',
+      Size   = 'Size (Banz 1981)'
+    ),
+    ntop = 4, filename = 'inspect-summary.tex'
+){
+  fmt = function(x) sprintf('%0.2f', x)
+  row = function(...) paste0(paste(..., sep = ' & '), ' \\\\ \n')
+  panel_letters = LETTERS[seq_along(pubs)]
+  avg = list(pub = NULL, dm = NULL)
+  tex = ''
+
+  for (i in seq_along(pubs)){
+    tab = readxl::read_xlsx(paste0(outpath, 'InspectMatch.xlsx'), sheet = names(pubs)[i])
+    periods = names(tab)[5:6]
+    tab = tab %>% rename(r_is = 5, r_oos = 6)
+    pub = tab %>% filter(source == '1_pub')
+    dm  = tab %>% filter(source == '2_dm') %>% arrange(id)
+    dmmean = tab %>% filter(source == '3_dm_mean')
+    top = dm %>% head(ntop) %>% 
+      mutate(signal = str_replace_all(signal, '&', '\\\\&'))
+
+    avg$pub = rbind(avg$pub, c(pub$t_insamp, pub$r_is, pub$r_oos))
+    avg$dm  = rbind(avg$dm, c(dmmean$t_insamp, dmmean$r_is, dmmean$r_oos))
+
+    tex = paste0(tex,
+      if (i > 1) '\\midrule \n' else '',
+      '\\multicolumn{6}{l}{\\textbf{Panel ', panel_letters[i], ': ', pubs[[i]], '}} \\\\ \n',
+      '\\multicolumn{6}{l}{\\textit{In-Sample ', periods[1], ', Post-Sample ', periods[2], '}} \\\\ \n',
+      '\\midrule \n',
+      row('', 'Peer-Reviewed', pub$sign, fmt(pub$t_insamp), fmt(pub$r_is), fmt(pub$r_oos)),
+      '\\addlinespace \n',
+      paste0(row(top$id, top$signal, top$sign, fmt(top$t_insamp), fmt(top$r_is), fmt(top$r_oos)),
+             collapse = ''),
+      '\\addlinespace \n',
+      row('', paste0('Mean of All ', nrow(dm), ' Data-Mined'), '', 
+          fmt(dmmean$t_insamp), fmt(dmmean$r_is), fmt(dmmean$r_oos))
+    )
+  }
+
+  # average across the renowned findings
+  pubavg = colMeans(avg$pub); dmavg = colMeans(avg$dm)
+  tex = paste0(tex,
+    '\\midrule \n',
+    '\\multicolumn{6}{l}{\\textbf{Panel ', LETTERS[length(pubs) + 1], 
+    ': Average Across Panels}} \\\\ \n',
+    '\\midrule \n',
+    row('', 'Peer-Reviewed', '', fmt(pubavg[1]), fmt(pubavg[2]), fmt(pubavg[3])),
+    row('', 'Data-Mined', '', fmt(dmavg[1]), fmt(dmavg[2]), fmt(dmavg[3]))
+  )
+
+  cat(tex, file = paste0(outpath, filename))
+}
+
+write_tex_summary()

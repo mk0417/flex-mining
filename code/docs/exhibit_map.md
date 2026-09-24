@@ -128,6 +128,7 @@ Abbreviations used below to keep the columns narrow:
 | §4 Tab 5    | Predictor counts by theory/journal    | ApproachVsJournalsPart1/2/3.tex           | S4a_DataCounts.R              | yes    |
 | §4 Tab 6    | Factor adjustment by theory/model       | Table_FactorAdjusted_TimeVarying_ff4_t2.tex | S4b_RVsDM_ByGroup.R           | yes    |
 | §4 Tab 7    | Factor adjustment by discipline/journal | Table_*_DisciplineJournal_ff4_t2.tex      | S4b_RVsDM_ByGroup.R           | yes    |
+| §5 summary  | Top matches for B/M, momentum, size   | inspect-summary.tex                       | S5a_InspectTables.R           | yes    |
 | §5 Tab 8    | Matched DM for book-to-market         | inspect-BMdec.tex                         | S5a_InspectTables.R           | yes    |
 | §5 Tab 9    | Matched DM for momentum               | inspect-Mom12m.tex                        | S5a_InspectTables.R           | yes    |
 | §5 Tab 10   | Matched DM for size                   | inspect-Size.tex                          | S5a_InspectTables.R           | yes    |
