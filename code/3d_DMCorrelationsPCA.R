@@ -124,7 +124,7 @@ if (TG2Set == 'Matches') {
   
   # Compute rolling t-stats
   dt[, ret_30y_l := data.table::shift(frollmean(ret, 12*30, NA)), by = .(dmname, sweight)]
-  dt[, t_30y_l   := data.table::shift(frollapply(ret, 12*30, f.custom.t, fill = NA)), by = .(dmname, sweight)]
+  dt[, t_30y_l   := data.table::shift(frollapply(ret, 12*30, f.custom.t, fill = NA_real_)), by = .(dmname, sweight)]
   
   
   # Find share of each DM strategies with t-stat greater 2

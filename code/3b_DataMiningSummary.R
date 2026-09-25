@@ -102,7 +102,9 @@ for (var_type in var_types) {
   
   yz_dt[, ret_30y_l := data.table::shift(frollmean(ret, 12*30, NA)), by = dmname]
   
-  yz_dt[, t_30y_l   := data.table::shift(frollapply(ret, 12*30, f.custom.t, fill = NA)), by = dmname]
+  # The first strategy can have fewer than 360 months. An all-NA logical
+  # result would make data.table coerce later numeric t-statistics to TRUE.
+  yz_dt[, t_30y_l   := data.table::shift(frollapply(ret, 12*30, f.custom.t, fill = NA_real_)), by = dmname]
   
   yz_dt[, head(month(date))]
   
