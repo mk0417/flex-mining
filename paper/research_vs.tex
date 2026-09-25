@@ -153,12 +153,12 @@ Yan and Zheng reject the null of no predictability based on both bootstrap and o
 More broadly, the literature on data mining goes back to \citet{Jensen1970Random}. Earlier studies focused on statistical theory (\citealt{Lo1990Data}) or market timing (\citeauthor{sullivan1999data} \citeyear{sullivan1999data}, \citeyear{sullivan2001dangers}), and found mixed results regarding effectiveness. Other recent studies examine cross-sectional predictability indirectly, using published predictors. Most of these studies find that data mining biases are small (\citealt{mclean2016does}; \citealt{chen2020publication}; \citealt{Jacobs2020Anomalies}; \citealt{jensen2022there};  \citealt{chen2025t}), though a few argue for sizeable biases (\citealt{harvey2016and}; \citealt{hasler2023looking}). By directly examining data-mined predictors, we obtain cleaner inferences. Following up on our paper, \citet{chen2023high} and \citet{marrow2024real} use empirical Bayes to mine data more rigorously.
 
 % since this implication is very in-your-face, carefully walk through the logic.
-\hl{tbc: consider cutting this or moving into risk-vs}
+\hl{tbc: adapt to new model.}
 \textit{3. Predictive Content of Empirical vs Theoretical Evidence.}
 While the peer-reviewed predictors are supported by modern empirical and theoretical evidence, the data-mined predictors combine modern empirical evidence with the most basic of financial theories: that accounting ratios may predict firm performance. This idea goes back to the 1930s (\citealt{horrigan1968short}),%
 \footnote{% highlight the conceptual contrast
   Some accounting ratios go back to the 1890s, but \citet{horrigan1968short} credits \citet{wall1919credit} for inspiring a ``virtual explosion of publications on the subject of ratio analysis.'' By the 1930s, there were several studies of ratios' predictive content, including \citepos{smith1935changes} study of 21 ratios.} %
-decades before the modern theories that inform the peer-reviewed predictors. Comparing the post-sample performance of peer-reviewed and data-mined predictors, then, gives a sense of the relative importance of the two types of evidence. We provide a model of this comparison in Appendix \ref{sec:app-model}.
+decades before the modern theories that inform the peer-reviewed predictors. Comparing the post-sample performance of peer-reviewed and data-mined predictors, then, gives a sense of the relative importance of the two types of evidence. 
 
 A priori, the importance of empirics vs theory is unclear. Some argue that theory is important (\citealt{cochrane2009asset}; \citealt{harvey2017presidential}; \citealt{fama2018choosing}), motivated by concerns about data mining bias. This concern is compelling given the volatility of stock returns and the vast number of potential predictors. However, the flexibility of theory and ``model dredging'' may limit the helpfulness of theory (\citealt{sonnenschein1972market}; \citealt{fama1991efficient}). Even if theory does identify true predictors, it may identify unstable disequilibrium phenomena that decay with investor learning (\citealt{cochrane1999portfolio}; \citealt{mclean2016does}). These previous works discuss the question theoretically, but they do not empirically compare predictors with varying amounts of theoretical support.
 
@@ -387,7 +387,9 @@ We decompose expected returns into three terms:
 where
 \begin{enumerate}
     \item $\mu_{i,0}$ is the expected return before learning and other effects.
-    \item $A_{i,t}$ is the effect that academics have on expected returns in month $t$. We typically think of $A_{i,t}<0$ for $t\in\text{Post-Pub}$, with the idea that the publication teaches investors about mispricing. But in principle, we could have $A_{i,t}>0$ for $t\in\text{Post-Pub}$, as publication could also teach investors about risk (Section \ref{sec:hetero}).
+
+    % tbc: cite the risk vs mispricing paper when it is posted.
+    \item $A_{i,t}$ is the effect that academics have on expected returns in month $t$. We typically think of $A_{i,t}<0$ for $t\in\text{Post-Pub}$, with the idea that the publication teaches investors about mispricing. But in principle, we could have $A_{i,t}>0$ for $t\in\text{Post-Pub}$, as publication could also teach investors about risk.
 
     \item $Z_{i,t}$ is a residual: it captures all other effects on expected returns that do not originate from academics. For example, improvements in information technology allow investors to more quickly impound information into prices, weakening predictability (\citealt{Chordia2014Have}).
 \end{enumerate}
