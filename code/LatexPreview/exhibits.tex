@@ -136,28 +136,7 @@
 \previewtable{Table 3}{Table_MPStyleRegsNoTimeFE.tex}
 \previewtable{Table 4}{Table_MPStyleRegsTimeFE.tex}
 
-\exhibitgroup{Table 5}
-\previewfile{ApproachVsJournalsPart1/2/3.tex}
-\begin{center}
-\footnotesize
-\begin{tabular}{lrrrrr}
-  \toprule
-  \textbf{Category} & \multicolumn{5}{c}{\textbf{Journal Category}} \\
-  \cmidrule(lr){2-6}
-  & Any & JF, JFE, RFS & AR, JAE, JAR & Finance & Accounting \\
-  \midrule
-  \multicolumn{6}{l}{\textbf{Theoretical Explanation}} \\
-  \input{\exhibitspath/ApproachVsJournalsPart1.tex}
-  \multicolumn{6}{l}{\textbf{Equilibrium Modeling}} \\
-  \input{\exhibitspath/ApproachVsJournalsPart2.tex}
-  \midrule
-  \input{\exhibitspath/ApproachVsJournalsPart3.tex}
-  \bottomrule
-\end{tabular}
-\end{center}
-
-\previewtable{Table 6}{Table_FactorAdjusted_TimeVarying_ff4_t2.tex}
-\previewtable{Table 7}{Table_FactorAdjusted_TimeVarying_DisciplineJournal_ff4_t2.tex}
+\previewtable{Section 4: Journal ranking}{Table_FactorAdjusted_TimeVarying_DisciplineJournal_ff4_t2.tex}
 
 \newcommand{\inspecttable}[4]{%
   \exhibitgroup{#1}%
@@ -178,9 +157,7 @@
   \end{center}
 }
 
-\inspecttable{Table 8}{inspect-BMdec.tex}{1963--1990}{1991--2023}
-\inspecttable{Table 9}{inspect-Mom12m.tex}{1964--1989}{1990--2023}
-\inspecttable{Table 10}{inspect-Size.tex}{1926--1975}{1976--2023}
+\previewtable{Section 4: Summary of renowned matches}{inspect-summary.tex}
 
 \previewsection{Appendix B}
 
@@ -239,40 +216,17 @@
 \previewtable{Table IA.4}{theme_ez_decayinSampEnd2000.tex}
 \previewtable{Table IA.5}{theme_ez_decayinSampEnd2010.tex}
 
-\previewtable{Table IA.5b: Top DM themes vs.\ published predictors}{theme_corr_academic.tex}
-
 % Time-FE robustness. Opt-in appendix, built by
 % Appendices/TimeFERobustness/run.R into ../Results/TimeFERobustness. The
 % generated file is a complete longtable, so it is included with \previewinput
 % rather than \previewtable (which would wrap it in a center/\small it fights).
 \previewinput{Table IA.6}{TimeFERobustness/timefe-robustness.tex}
 
-\previewfigure{Figure IA.1}{Fig_DecayVsWords_Names2.pdf}
+\previewtable{Structural-break sample splits}{samp_split_summary.tex}
+\previewfigure{Structural-break dates}{break_vs_sampend.pdf}
 
-\exhibitgroup{Figure IA.2}
-\begin{center}
-  \previewpanel[.42\textwidth]{Fig_Risk_via_CAPM.pdf}\hfill
-  \previewpanel[.42\textwidth]{Fig_Risk_via_FF3.pdf}\par\smallskip
-  \previewpanel[.42\textwidth]{Fig_Risk_via_FF5.pdf}
-\end{center}
-
-\exhibitgroup{Table IA.7}
-\previewfile{SignalsByTheoryAndJournal.tex}
-\begin{center}
-\begin{tabular}{lrrr}
-  \toprule
-  & Agnostic & Mispricing & Risk \\
-  \midrule
-  \input{\exhibitspath/SignalsByTheoryAndJournal.tex}
-  \bottomrule
-\end{tabular}
-\end{center}
-
-\previewfigure{Figure IA.3}{Fig_DecayVsJournal_Means.pdf}
-
-% Table IA.8 is defined inline in the paper and has no generated Results file.
-\previewtable{Table IA.9}{Table_FactorAdjusted_TimeVarying_AnyModelVsNoModel_ff4_t2.tex}
-\previewtable{Table IA.10}{samp_split_summary.tex}
-\previewfigure{Figure IA.4}{break_vs_sampend.pdf}
+\inspecttable{Book-to-market}{inspect-BMdec.tex}{1963--1990}{1991--2023}
+\inspecttable{Momentum}{inspect-Mom12m.tex}{1964--1989}{1990--2023}
+\inspecttable{Size}{inspect-Size.tex}{1926--1975}{1976--2023}
 
 \end{document}

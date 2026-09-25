@@ -6,8 +6,7 @@
 # Outputs: appendix PDFs and TeX under ../Results
 #
 # Appendix variants emitted alongside a main-text exhibit remain owned by that
-# main-text chapter and are not rerun here. The slow SA11 correlation/PCA
-# robustness scripts run from SA_AppendicesPCA.R instead.
+# main-text chapter and are not rerun here. SA11 spanning plots read caches from Chapter 3.
 
 settings_env <- new.env(parent = globalenv())
 sys.source("config.R", envir = settings_env)
@@ -18,6 +17,7 @@ required_files <- c(
   "../Data/Processed/ret_for_plot0.RDS",
   "../Data/Processed/dmcomp_sumstats.RDS",
   "../Data/Processed/raw_dm_benchmarks.RDS",
+  "../Data/Processed/dm_span_analysis.RDS",
   paste0(version_prefix, " LongShort.RData")
 )
 rm(settings_env)
@@ -41,12 +41,8 @@ run_script <- function(path) {
   }
 }
 
-run_script("Appendices/SA01_RiskVsMispricingPlots.R")
-run_script("Appendices/SA02_RegDecayTable.R")
 run_script("Appendices/SA03_StructuralBreak.R")
-run_script("Appendices/SA04_DecayVsWordcountPlot.R")
-run_script("Appendices/SA05_DecayVsModelcountPlot.R")
-run_script("Appendices/SA06_DecayVsJournal.R")
+run_script("Appendices/SA11_DMSpanPCAPlots.R")
 run_script("Appendices/SA12_EZThemesRobustness.R")
 run_script("Appendices/SA13_MPStyleRegsIndividualDM.R")
 run_script("Appendices/SA14_MPStyleRegsAccountingOnly.R")

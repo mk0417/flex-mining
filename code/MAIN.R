@@ -15,14 +15,11 @@
 #   exhibits
 #     S2_ResearchVsDataMining Introduction and Section 2 exhibits.
 #     S3_Learning             Section 3 regression tables.
-#     S4_Heterogeneity        Section 4 exhibits.
-#     S5_BestPredictors       Section 5 exhibits.
-#     SA_Appendices           Appendix-only exhibits, excluding SA11.
+#     S4_Quality              Section 4 journal and renowned-match exhibits.
+#     SA_Appendices           Appendix-only exhibits, including SA11 plots.
 #     9_ExportDataToCsv       Shared-data CSV exports.
-#   appendices_pca
-#     SA_AppendicesPCA        Appendix SA11 correlation/PCA; about an hour.
 #   time_fe_robustness
-#     TimeFERobustness        Large, opt-in time-FE robustness appendix.
+#     TimeFERobustness        Large time-FE robustness appendix.
 #
 # Iterating on one exhibit normally means running its driver directly, e.g.
 #   Rscript S3_Learning.R
@@ -39,7 +36,7 @@
 # Inputs:  ../Data/Raw (re-created when run_download_and_clean = TRUE)
 # Outputs: ../Data/Processed, ../Data/Export, ../Results
 #
-# Paper contract: S2 through S5 and SA rebuild paper exhibits from upstream caches.
+# Paper contract: S2 through S4 and SA rebuild paper exhibits from upstream caches.
 # S3 renders the cached MP regressions, including the Section 3 presentation
 # tables, directly from R.
 # See docs/exhibit_map.md for the script -> exhibit map.
@@ -82,18 +79,9 @@ if (runStages$precompute) {
 if (runStages$exhibits) {
   run_script("S2_ResearchVsDataMining.R")
   run_script("S3_Learning.R")
-  run_script("S4_Heterogeneity.R")
-  run_script("S5_BestPredictors.R")
+  run_script("S4_Quality.R")
   run_script("SA_Appendices.R")
   run_script("9_ExportDataToCsv.R")
-}
-
-# Appendix SA11: correlation and PCA robustness ---------------------------
-# Separate from the other appendix exhibits because it dominates appendix
-# runtime and memory; see docs/runtimes_and_ram.md.
-
-if (runStages$appendices_pca) {
-  run_script("SA_AppendicesPCA.R")
 }
 
 # Time-fixed-effects robustness appendix ---------------------------------

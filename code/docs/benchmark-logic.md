@@ -148,7 +148,7 @@ scripts implement the following benchmarks:
 - **D2. Top 5% ticker.** Defined using `SelectDMStrats()`; saved as
    `raw_dm_benchmarks.RDS$ticker_top5`.
     - Figure 2(d): top-5% ticker-mining series.
-- **D3. Spanning splits.** Defined in `SA11_DMSpanPCAPrep.R`; saved as
+- **D3. Spanning splits.** Defined in `3e_DMSpanPCA.R`; saved as
     `dm_span_analysis.RDS`.
     - Figure B.1(a): principal-component spanning splits.
     - Figure B.1(b): correlation spanning splits.
@@ -162,7 +162,7 @@ scripts implement the following benchmarks:
 The 10% t-stat and mean-return tolerances are defaults of
 `select_matched_dm_pairs()` and therefore apply whenever A3 or A4 is
 constructed. `select_matched_dm_pairs()` is also the selector used by
-`S5a_InspectTables.R` to build the Section 5 example-match tables, so those
+`S4b_RenownedMatches.R` to build the Section 4 renowned-match tables, so those
 tables draw on the same gated A3 universe. Some older variables named `matchRet` refer instead to benchmark
 A1, D1, or D2; the name alone does not imply matched statistics.
 `ret_for_plot0.RDS` and `ret_for_plot1.RDS` are compatibility artifacts; new
