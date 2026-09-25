@@ -4,7 +4,7 @@
 #   by 0_Environment.R (so every chapter script inherits globalSettings) and by
 #   MAIN.R (which reads runStages to decide which stages to run). The two
 #   drivers that only need a versioned path (3_Precompute.R,
-#   S5_BestPredictors.R) source it directly to read
+#   S4_Quality.R) source it directly to read
 #   globalSettings$universe$dataVersion.
 # Inputs:  none.
 # Outputs: defines globalSettings, runStages; sets the RNG seed.
@@ -27,10 +27,9 @@
 runStages <- list(
   download_and_clean  = FALSE,  # Re-pull ../Data/Raw; changes the vintage
   data_mining         = FALSE,  # Chapter 2; ~4 hours
-  precompute          = TRUE,   # Chapter 3; ~40-55 min of reusable analysis
-  exhibits            = TRUE,   # S2-S5, SA_Appendices, 9_Export; ~10 min total
-  appendices_pca      = TRUE,   # Appendix SA11 correlation/PCA; ~1 hour
-  time_fe_robustness  = TRUE   # Large optional appendix; may need WRDS
+  precompute          = TRUE,   # Chapter 3; ~1h45 including correlation/PCA
+  exhibits            = TRUE,   # S2-S4, SA_Appendices, 9_Export; ~10 min total
+  time_fe_robustness  = TRUE   # Large appendix; may need WRDS
 )
 
 # Data vintage and mined-universe construction (Chapter 2) -----------------
@@ -82,7 +81,7 @@ inclusionSettings <- list(
 #   D1  Top 5% accounting               t_rankpct_min, set locally (see below)
 #   D2  Top 5% ticker                   t_rankpct_min, set locally (see below)
 #   D3  Spanning splits                 thresholds hardcoded in
-#                                       Appendices/SA11_DMSpanPCAPrep.R
+#                                       3e_DMSpanPCA.R
 benchmarkSettings <- list(
   # Common accounting-ratio gates, applied to every mined ratio before any
   # benchmark-specific screen. These correspond one-to-one with the "Common

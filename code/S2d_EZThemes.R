@@ -2,7 +2,7 @@
 #
 # How to run: normally run through S2_ResearchVsDataMining.R from flex-mining/.
 # Inputs:  cleaned published returns and chapter-2 mined strategies
-# Outputs: ../Results/theme_ez_decay.tex and supporting diagnostics
+# Outputs: ../Results/theme_ez_decay.tex
 # Setup --------------------------------------------------------
 
 rm(list = ls())
@@ -245,15 +245,12 @@ tab2 = tab1 %>%
   select(-litcat) %>% 
   print(n=Inf)
 
-# export to temp.tex
-tab2 %>% 
-  kable('latex', booktabs = T, linesep='', escape=F, digits=2) %>% 
-  cat(file='../Results/temp.tex')
+# format TeX in memory
+tex = capture.output(cat(kable(tab2, 'latex', booktabs = T, linesep='', escape=F, digits=2)))
 
 # Make it beautiful ----------------------------------------
 
 # setup
-tex = readLines('../Results/temp.tex')
 mcol = function(x) paste0('\\multicolumn{1}{c}{', x, '}')
 strsamp = paste0(year(insamp$start), '-', year(insamp$end))
 stroos1 = paste0(year(oos1$start), '-', year(oos1$end))
@@ -312,103 +309,3 @@ for (i in 1:length(subheadrow)){
 
 
 writeLines(tex1, '../Results/theme_ez_decay.tex')
-
-
-# Make table for slides ----------------------------------------
-
-# sketch table
-tab1 = groupsum %>% 
-  arrange(-tstat) %>%
-  head(20) %>% 
-  mutate(blank1 = '') %>% 
-  left_join(groupsumcat %>% select(signal_form, v1, litcat)
-    , by = c('signal_form', 'v1')) %>% 
-  transmute(litcat
-    , group = paste0(numer, ' (', sweight, ')')
-    , pctshort = round(pctshort, 0)
-    , tstat = round(tstat, 1))%>% 
-  arrange(litcat, -tstat) %>% 
-  print(n=Inf)
-
-# add blank rows for litcats
-tab2 = tab1 %>% 
-  bind_rows(
-    tab1 %>% distinct(litcat) %>% mutate(tstat = Inf, group = litcat)
-  ) %>% 
-  arrange(litcat, -tstat) %>% 
-  select(-litcat) %>% 
-  print(n=Inf)  
-
-# export to temp.tex
-tab2 %>% 
-  kable('latex', booktabs = T, linesep='', escape=F, digits=2) %>% 
-  cat(file='../Results/temp.tex')
-
-# Make it beautiful ----------------------------------------
-
-# setup
-tex = readLines('../Results/temp.tex')
-mcol = function(x) paste0('\\multicolumn{1}{c}{', x, '}')
-strsamp = paste0(year(insamp$start), '-', year(insamp$end))
-stroos1 = paste0(year(oos1$start), '-', year(oos1$end))
-stroos2 = paste0(year(oos2$start), '-', year(oos2$end))
-lhead = function(x) paste0('\\multicolumn{', ncol(tab2), '}{l}{', x, '} \\\\ \\hline')
-
-# expand the header
-tex = tex %>% append('', after=4) 
-
-tex[4] = paste(
-  '\\multirow{2}{*}{Numerator (Stock Weight)}'
-  , mcol('Pct'), '\\multirow{2}{*}{t-stat} \\\\ '
-  , sep = ' & '
-)
-
-tex[6] = paste(
-  ''
-  , mcol('Short'), '  \\\\ \\midrule '
-  , sep = ' & '
-)
-
-# create second header (will be second column)
-tex = tex %>% append('', after=19) %>% append('', after=19) %>% 
-  append('', after=19) 
-
-tex[20] = ' \\bottomrule \\\\ \\toprule '
-tex[21] = paste(
-  '\\multirow{2}{*}{Numerator (Stock Weight)}'
-  , mcol('Pct'), '\\multirow{2}{*}{t-stat} \\\\ '
-  , sep = ' & '
-)
-
-tex[22] = paste(
-  ''
-  , mcol('Short'), '  \\\\ \\midrule '
-  , sep = ' & '
-)
-
-
-# add litcat subheaders
-subheadstr = list(
-  'Investment (Titman, Wei, Xie 2004)'
-  , 'Ext Financing (Spiess/Affleck-Graves 1999)'
-  , 'Accruals (Sloan 1996; Thomas-Zhang 2002)'
-  , 'Earnings Surprise (Foster et. al 1984)'
-  , 'Debt Structure (Valta 2016)'
-)
-
-# find subhead rows
-tex1 = tex
-subheadrow = which(grepl('NA & Inf', tex1))
-for (i in 1:length(subheadrow)){
-  tex1[subheadrow[i]] = lhead(subheadstr[i])
-
-  # extra spacing
-  if (i > 1 & i != 3){
-    j = subheadrow[i]-1
-    n = nchar(tex1[j])
-    tex1[j] = paste0(substr(tex1[j], 1, (n-2)), ' \\bigstrut[b] \\\\ ')
-  }
-}
-
-
-writeLines(tex1, '../Results/theme_ez_slides.tex')

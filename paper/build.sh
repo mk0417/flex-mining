@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Build the research-vs paper.
 # Run: ./build.sh
-# Inputs: risk_vs.tex and its local dependencies in this directory
-# Outputs: risk_vs.pdf and exhibit-number comments
+# Inputs: research_vs.tex and its local dependencies in this directory
+# Outputs: research_vs.pdf and exhibit-number comments
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -36,5 +36,5 @@ build_one() {
   touch "$main.pdf"
 }
 
-build_one . risk_vs
+build_one . research_vs
 python3 "$ROOT/update_exhibit_numbers.py" research-vs --from-aux

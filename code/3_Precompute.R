@@ -45,3 +45,5 @@ run_script <- function(path) {
 run_script("3a_PrepDMBenchmarks.R")
 run_script("3b_DataMiningSummary.R")
 run_script("3c_FactorAdjustedDMPrep.R")
+run_script("3d_DMCorrelationsPCA.R")
+run_script("3e_DMSpanPCA.R")

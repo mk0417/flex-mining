@@ -1,0 +1,676 @@
+%% LyX 2.3.6.1 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing
+\documentclass[12pt,english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{setspace}
+\usepackage{makecell}
+\usepackage{placeins}
+
+% \input{} does not work after 2020 in tabular environments. Workaround from https://tex.stackexchange.com/questions/611786/
+\ExplSyntaxOn
+% Only define if not already defined (arXiv's TeX Live 2025 has it built-in)
+\cs_if_exist:NF \expandableinput
+  {
+    \cs_new:Npn \expandableinput #1
+      { \use:c { @@input } { \file_full_name:n {#1} } }
+  }
+\AddToHook{env/tabular/begin}
+  { \cs_set_eq:NN \input \expandableinput }
+\ExplSyntaxOff
+
+\onehalfspacing
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\usepackage{zimstyle}
+\addbibresource{bib_research_vs.bib}
+
+\makeatother
+\usepackage{babel}
+
+
+% Each paper owns its exhibits/ folder. Refresh it from ../Results after
+% regenerating results in flex-mining.
+\newcommand{\exhibitspath}{exhibits}
+% \newcommand{\exhibitspath}{../Results}
+
+
+\begin{document}
+
+\title{\Large Does Peer-Reviewed Research Help Predict Stock Returns?
+  \footnotetext{First posted to arxiv.org: December 2022. E-mails: andrew.y.chen@frb.gov, Alejandro.Lopez-Lira@warrington.ufl.edu, tom.zimmermann@uni-koeln.de. Code: \url{https://github.com/chenandrewy/flex-mining}.  Data: \url{https://sites.google.com/site/chenandrewy/}.  We thank Alec Erb for excellent research assistance. Initial drafts of this paper relied on data provided by Sterling Yan and Lingling Zheng, to whom we are grateful. For helpful comments, we thank discussants: Leland Bybee, Yufeng Han, Theis Jensen, Jeff Pontiff, Shri Santosh, and Yinan Su. For helpful comments we also thank Svetlana Bryzgalova, Charlie Clarke, Mike Cooper, Albert Menkveld, Ben Knox, Emilio Osambela, Dino Palazzo, Matt Ringgenberg,  Dacheng Xiu, Lingling Zheng, and seminar participants at Auburn, Baruch, Emory, the Fed Board, Georgetown, Louisiana State, Universitat Pompeu Fabra, University of Kentucky, University of Utah, University of Wisconsin-Milwaukee, Virginia Tech,  MSU FCU, AFA, Arrowstreet Capital, NBER SI, and Stanford.  The views in this paper are not necessarily those of the Federal Reserve Board or the Federal Reserve System.}
+}
+\author[1]{\normalsize Andrew Y. Chen}
+\author[2]{\normalsize  Alejandro Lopez-Lira}
+\author[3]{\normalsize Tom Zimmermann}
+
+\affil[1]{Federal Reserve Board}
+\affil[2]{University of Florida}
+\affil[3]{University of Cologne and Centre for Financial Research}
+
+% % anon version
+% \title{Does Peer-Reviewed Research Help Predict the Cross-Section of Stock Returns?}
+% \author[1]{} 
+
+\date{\normalsize September 2026}
+
+\maketitle
+\thispagestyle{empty}
+
+\setcounter{page}{0}
+\begin{abstract}
+  \singlespacing \noindent \small Mining 29,000 accounting ratios for t-statistics $> 2.0$ leads to cross-sectional return predictability similar to the peer review process. For both, $\approx50\%$ of predictability remains after the original sample periods. This finding holds for many categories of research, including research with risk or equilibrium foundations. Only research agnostic about the theoretical explanation for predictability shows signs of outperformance. Our results imply that inferences about post-sample performance depend little on whether the predictor is peer-reviewed or data mined. They also have implications for the importance of empirical vs theoretical evidence, investors' learning from academic research, and the effectiveness of data mining.
+\end{abstract}
+
+\noindent  JEL Classification: B4, G0, G1
+
+\noindent Keywords: peer review, data mining, stock market anomalies, economic theory
+
+\pagebreak{}
+
+
+\section{Introduction}\label{sec:intro}
+
+% set the stage
+Arguably the most robust finding in cross-sectional return predictability is that performance decays after predictors are published. The standard interpretation is that the glass is half-full: the literature documents real predictability, but dissemination of predictabilty leads to investor learning, weakening performance post-publication. \citet{mclean2016does} provide compelling evidence for this hypothesis by showing that publication leads to return decay, and that this return decay is stronger than can be explained by statistical biases.\footnote{tbc: cite papers documenting robustness.} Critically, about 50\% of predictability remains post-publication, implying that the literature is documenting real phenomena, though the phenomena seems to be weaker after investors learn from academics.
+
+% argue for a new benchmark
+In this paper, we show that this half-full interpretation is due to a weak benchmark. It implicitly compares research-identified predictability to zero: to not looking for predictability at all. This weak benchmark means that the remaining 50\% embeds not only the information in the research, but also information one would have withoug access to the reseaerch at all. It also means that the decay around publication may not be due to publication at all, but to channels that affect all predictors, published or not. Put another way, without a good control group, we cannot know the effect that research has on predictability, and on investor learning.
+
+% explain our benchmark
+Instead of comparing peer-reviewed predictors to zero, we compare them to predictors constructed by naive data mining. We search 29,000 accounting ratios for statistical evidence of predictive power. These ratios are naive: they include all simple ratios and scaled first differences of variables that satisfy data availability requirements. This benchmark is inspired by \citet{yan2017fundamental}, though our simple ratios can be motivated without the modern predictability literature. Our ratios can be motivated by the simple idea that accounting ratios may predict firm performance---an idea that dates back to the 1930s (\citealt{horrigan1968short}), decades before the modern theories of risk, psychology, and frictions that inform the published predictors.
+
+% hint at the main result
+% note: YZ also document these themes, but it's buried on page 21, and they do not show that data mining could have uncovered them before publication.
+Naive data mining uncovers many of the same themes as peer-reviewed research. Mining the 1963-1980 sample, the most statistically-significant accounting ratios are related to investment (\citealt{titman2004capital}), debt issuance (\citealt{spiess1999long}), equity issuance (\citealt{loughran1995new}), accruals (\citealt{sloan1996stock}), inventory growth (\citealt{thomas2002inventory}), and earnings surprise (\citealt{watts1978systematic}). Notably, data mining could have uncovered most of these themes before they were published, sometimes long before.
+
+
+% Finally, explain fig:intro
+For a rigorous comparison, we construct data-mined benchmarks that control for sample periods and details of the performance measurement. Figure \ref{fig:intro} illustrates the result. The solid line plots the trailing 5-year long-short returns of published predictors from the \citet{ChenZimmermann2021} (CZ) dataset in event time, where the event is the end of the original sample period. The long-dash line plots data-mined benchmarks. All strategies are normalized to have 100 bps mean return in the original samples, so both lines  hover around 100 before the original samples end.
+
+% EXHIBIT-NUMBER: Figure 1
+\begin{figure}[!h]
+  \caption{Does Peer-Reviewed Research Help Predict Returns?}
+  % Shaded area shows one standard error, clustered by calendar time and predictor.
+  \label{fig:intro}
+  \vspace{0.00in}
+  \centering
+  \includegraphics[width=0.7\textwidth]{\exhibitspath/Fig_DM_t_min_2_se_indicators_calendar.pdf}
+\end{figure}
+
+Post-sample, the performance of both types of predictors decays to about 50\% of the original sample means. Data-mined returns decay a bit more than the published returns but the difference is small, both economically and statistically. For most of the plot, the data-mined benchmark is within one standard error of the published predictors (shaded area, clustered by calendar time and predictor). We find similar results controlling for CAPM and Fama-French 3 (FF3) + momentum exposure, among many other controls. Overall, the post-sample performance of peer-reviewed and data-mined predictors is remarkably similar.
+
+% Offsetting Effects
+The similarity in Figure \ref{fig:intro} could be due to offsetting effect. Perhaps published predictors are pushed down by investor learning more so than statistical biases. Conversely, data-mined benchmarks are pushed down primarily by statistical biases rather than investor learning. This offsetting effects story is a natural interpretation of the predictability literature, which emphasizes learning for academic predictors (\citealt{mclean2016does}) while warning about the dangers of data mining bias (\citealt{sullivan2001dangers}). 
+
+We provide evidence strongly inconsistent with the offsetting effects story. Data-mined benchmarks decay around publication as much as the published predictors---even when the benchmarks are constructed to be uncorrelated with the academic predictor being published. Inded, simply including date fixed effects absorbs the publication effect. These patterns are difficult to explain with the story that investors learn from publications. But they are a natural result of investors and academics simultaneously learning from the data environment.
+
+\hl{tbc: consider adding heterogeneity results back as robustness, including comparisons by academic discipline and journal ranking.}
+
+Additionally, we investigate whether predictability studied in \citet{fama1992cross} (B/M), \citet{jegadeesh1993returns} (momentum), and \citet{banz1981relationship} (size) outperform data mining. These findings are not only among the most renowned, but are arguably the ones with the strongest supporting evidence, both theoretical  (e.g., \citealt{gomes2003equilibrium}; \citealt{hong1999unified}; \citealt{berk1995critique}), and empirical (e.g., \citealt{fama1993common}; \citealt{asness2013value}). Despite this supporting evidence, the post-sample performance of these findings is on average similar to data mining.
+
+The remainder of this section discusses implications and related literature. Section \ref{sec:pubvs} shows peer-reviewed research is similar to data mining in out-of-sample tests. Section \ref{sec:learn} examines learning from academics versus learning from the data, finding little additional post-publication decay relative to data-mined controls.
+
+Section \ref{sec:quality} compares \citet{fama1992cross}, \citet{jegadeesh1993returns}, and \citet{banz1981relationship} with data mining. Section \ref{sec:conclusion} concludes. Robustness is in the Appendix.
+
+
+
+\subsection{old-below}
+
+
+% question is post-sample prediction (1). make question painfully clear (2).
+This paper compares the post-sample performance of peer-reviewed predictors with data-mined benchmarks. Our goal is to estimate
+\begin{equation}
+  \label{eq:painfully_clear}
+  E\left[\text{Post-Sample Performance}
+    \mid
+    \text{In-Sample $t$-stat $>$ 2.0, Predictor Origin, Controls}
+    \right],
+\end{equation}
+and measure how Predictor Origin (e.g. peer-reviewed vs data-mined) affects this conditional expectation. Estimates of Equation \eqref{eq:painfully_clear} are important to investors. They are also important to academics who care about post-sample robustness.
+
+
+
+\subsection*{Implications and Relation to Literature}
+
+% put all of the interpretations here, after we establish the main empirical results
+% focus on lit for likely referees
+The statistical implication is straightforward: Whether a trading strategy is found in a journal or is data mined has little effect on mean inferences about post-sample performance (Equation \eqref{eq:painfully_clear}). A closer look leads to the following implications.
+
+% start with the McLean-Pontiff framework, which it seems is quite agreeable. This is important for this takeaway, since it's quite aggressive.
+\textit{1. Investors' Learning from Academic Research.} Previous papers suggest that investors learn about mispricing from academic research. If this were the case, then investors would respond to academic findings by trading on academic strategies, decreasing predictability post-sample. Consistent with this hypothesis, \citet{mclean2016does} find predictability does decay, and more so than could be explained by statistical artifacts. Post-sample changes in trading activity also support this hypothesis (\citealt{mclean2016does}; \citealt{calluzzo2019anomalies}; \citealt{mclean2020taking}).
+
+Our data-mined controls provide an alternative perspective on this evidence. Published and data-mined predictors exhibit similar post-publication decay, even when their returns have little correlation. This similarity suggests that both academic research and investors are responding to the same fundamentals: the appearance of statistically-significant return predictability in the data. Thus, post-publication decay alone need not imply that investors learn from academic publications. \hl{tbc: time fixed effect results}
+
+\textit{2. Effectiveness of Data Mining.} Our findings imply that data mining is surprisingly effective for identifying true cross-sectional predictability. Indeed, data mining is competitive with the peer-review process in terms of effectiveness.
+
+These results add to the debate that began with \citepos{yan2017fundamental} pioneering study of 18,000 accounting ratios and 4,000 past return signals.\footnote{% begin footnote
+  Earlier studies by \citet{ou1989financial}, \citet{abarbanell1998abnormal}, and \citet{haugen1996commonality} successfully predict cross-sectional returns using many accounting signals. But they consider far fewer signals (up to 68) and do not focus on data mining bias.
+} % end footnote
+Yan and Zheng reject the null of no predictability based on both bootstrap and out-of-sample tests. However, followups to Yan and Zheng come to contradictory conclusions, based on technical statistical methods (\citealt{Chordia2020Anomalies}; \citealt{harvey2020false}; \citealt{chen2024most}; \citealt{gotofalse}). Our simple data mining process and straightforward out-of-sample tests help provide clarity to this debate.
+
+More broadly, the literature on data mining goes back to \citet{Jensen1970Random}. Earlier studies focused on statistical theory (\citealt{Lo1990Data}) or market timing (\citeauthor{sullivan1999data} \citeyear{sullivan1999data}, \citeyear{sullivan2001dangers}), and found mixed results regarding effectiveness. Other recent studies examine cross-sectional predictability indirectly, using published predictors. Most of these studies find that data mining biases are small (\citealt{mclean2016does}; \citealt{chen2020publication}; \citealt{Jacobs2020Anomalies}; \citealt{jensen2022there};  \citealt{chen2025t}), though a few argue for sizeable biases (\citealt{harvey2016and}; \citealt{hasler2023looking}). By directly examining data-mined predictors, we obtain cleaner inferences. Following up on our paper, \citet{chen2023high} and \citet{marrow2024real} use empirical Bayes to mine data more rigorously.
+
+% since this implication is very in-your-face, carefully walk through the logic.
+\hl{tbc: adapt to new model.}
+\textit{3. Predictive Content of Empirical vs Theoretical Evidence.}
+While the peer-reviewed predictors are supported by modern empirical and theoretical evidence, the data-mined predictors combine modern empirical evidence with the most basic of financial theories: that accounting ratios may predict firm performance. This idea goes back to the 1930s (\citealt{horrigan1968short}),%
+\footnote{% highlight the conceptual contrast
+  Some accounting ratios go back to the 1890s, but \citet{horrigan1968short} credits \citet{wall1919credit} for inspiring a ``virtual explosion of publications on the subject of ratio analysis.'' By the 1930s, there were several studies of ratios' predictive content, including \citepos{smith1935changes} study of 21 ratios.} %
+decades before the modern theories that inform the peer-reviewed predictors. Comparing the post-sample performance of peer-reviewed and data-mined predictors, then, gives a sense of the relative importance of the two types of evidence. 
+
+A priori, the importance of empirics vs theory is unclear. Some argue that theory is important (\citealt{cochrane2009asset}; \citealt{harvey2017presidential}; \citealt{fama2018choosing}), motivated by concerns about data mining bias. This concern is compelling given the volatility of stock returns and the vast number of potential predictors. However, the flexibility of theory and ``model dredging'' may limit the helpfulness of theory (\citealt{sonnenschein1972market}; \citealt{fama1991efficient}). Even if theory does identify true predictors, it may identify unstable disequilibrium phenomena that decay with investor learning (\citealt{cochrane1999portfolio}; \citealt{mclean2016does}). These previous works discuss the question theoretically, but they do not empirically compare predictors with varying amounts of theoretical support.
+
+\hl{tbc: cite popper, falsification, argue for the benchmark as scientific progress}
+
+
+% ===================
+
+% ===================
+\section{Research vs Data Mining}\label{sec:pubvs}
+
+We compare the post-sample performance of peer-reviewed predictors to data mining.
+
+\subsection{A Naive Data Mining Procedure}\label{sec:pubvs,data}
+
+We begin with 241 Compustat annual accounting variables used in \citet{yan2017fundamental}. Yan and Zheng select these variables to (1) ensure non-missing values in at least 20 years and (2) that the average number of firms with non-missing values is at least 1,000 per year. We add CRSP market equity, leading to 242 ``ingredient'' variables. A more sophisticated selection would filter on data availability in real time. But given that data availability changes in large, positive, and permanent jumps (\citealt{easterwood2024do}), the more complicated procedure would likely yield similar results.
+
+We then generate 29,315 accounting ratios (signals) using two functional forms: simple ratios ($X/Y$) and first differences scaled by a lagged denominator ($\Delta X / \text{lag}(Y)$). The numerator can use any of the 242 ingredients. The denominator is restricted to the 65 ingredients that are not zero for at least 25\% of firms in 1963 with matched CRSP data. This procedure leads to $\approx 242 \times 65 \times 2 = 31,460$ ratios, but we drop 2,145 ratios that are redundant in ``unsigned'' portfolio sorts.\footnote{For the $65\times65 = 4,225$ ratios where the numerator is also a valid denominator, there are only 65 choose 2 = 2,080 ratios that are in a sense distinct.}
+
+We lag each signal by six months relative to the fiscal year end, and then form long-short decile strategies by sorting stocks on the lagged signals in each June.  Delisting returns and other data handling methods follow \citet{ChenZimmermann2021}.  For further details, please see \url{https://github.com/chenandrewy/flex-mining}.
+
+% motivations
+This procedure aims to be the simplest possible data mining benchmark for peer-reviewed predictors. Accounting data is the modal data source for peer-reviewed predictors, representing roughly 50\% of the CZ dataset. The second most common data source is past returns, which represents only 20\%.  While it is possible to data mine both accounting data and past returns simultaneously (e.g. \citealt{chen2023high}), it requires several additional design choices and significantly complicates the analysis.
+
+Alternatively, one can motivate this procedure as a data mining benchmark that could have been constructed \emph{before} the bulk of the modern literature. The idea that accounting ratios may be informative about firm value goes back to the 1930s: 17 of the 26 chapters on stock selection in \citet{graham1934securityanalysis} focus on accounting statements. \citet{smith1935changes} examine 21 accounting ratios for their ability to predict financial distress (see also \citealt{ramser1931}; \citealt{fitzpatrick1932}; and \citealt{merwin1942}). These works were available decades before \citet{fama1973risk}. By the 50th anniversary of \citet{graham1934securityanalysis}, the book had become quite influential, and was celebrated in Warren \citepos{buffett1984superinvestors} popular speech and article. Thus, one well could have decided to search accounting ratios in 1984, when only 9 of the 212 predictors in the CZ dataset had been published. Indeed, \citet{ou1989financial} propose selecting stocks based on ``a large number of financial statement attributes,'' using a process in which ``[n]o conscious attempt is made to assess predictive ability on the basis of what we think should work.''
+
+Our selection of accounting ratios contrasts with Yan and Zheng \citeyearpar{yan2017fundamental}, who use functional forms inspired, in part, by the asset pricing literature. Our procedure avoids the concern that such inspiration induces look-ahead bias. Nevertheless, previous versions of this paper used Yan and Zheng's data and found similar results.
+
+\subsection{Data Mined Predictability}\label{sec:pubvs,datasum}
+
+Naive data mining generates notable out-of-sample returns, as seen in Panel (a) of Table \ref{tab:dm-oos}.  Each June, we sort the 29,000 accounting ratios into five bins based on their mean long-short returns over the past 30 years (in-sample) and compute the mean return over the next year within each bin (out-of-sample).  We then average these statistics across each year.
+
+% EXHIBIT-NUMBER: Table 1
+\begin{table}[!h]
+    \caption{Descriptive Statistics of Data-Mined Accounting Strategies}
+    \label{tab:dm-oos}
+
+    \begin{singlespace}
+        \noindent The table describes data-mined accounting strategies using ``out-of-sample'' portfolio sorts (Panel (a)) and PCA (Panel (b)). Panel (a) sorts all ratios each June into 5 bins based on past 30-year long-short returns (in-sample) and computes the mean return over the next year within each bin (out-of-sample). Statistics are calculated by strategy, then averaged within bins, then averaged across sorting years. Decay is the percentage decrease in mean return out-of-sample relative to in-sample. We omit decay for bin 4 because the mean return in-sample is negligible.  Panel (b) applies PCA to ratios that have t-statistics greater than 2.0 in at least 10\% of the in-sample periods from Panel (a). Data-mined predictors resemble published ones in terms of in-sample performance, out-of-sample performance, and covariance structure.
+    \end{singlespace}
+    \begin{centering}
+        \vspace{-1ex}
+        \par\end{centering}
+    \centering{}\setlength{\tabcolsep}{0.9ex} \small
+    \begin{center}
+        % ==== begin paste
+        % Table generated by Excel2LaTeX from sheet 'dm summary'
+        \begin{tabular}{crrrrrrrrrrrr} \toprule
+            \multicolumn{13}{c}{Panel (a): ``Out-of-Sample'' Returns of All Ratios 1994-2020}                                                                                                                                                                                                                                                                                                                                                              \\
+            \midrule
+            In-                                                            &  & \multicolumn{5}{c}{Equal-Weighted Long-Short Deciles} &                                                & \multicolumn{5}{c}{Value-Weighted Long-Short Deciles}
+            \\ \cmidrule{3-7}\cmidrule{9-13}Sample &   & \multicolumn{2}{c}{Past 30 Years (IS)} &   & \multicolumn{2}{c}{Next Year (OOS)} &   & \multicolumn{2}{c}{Past 30 Years (IS)} &   & \multicolumn{2}{c}{Next Year (OOS)} \\
+            \cmidrule{3-4}\cmidrule{6-7}\cmidrule{9-10}\cmidrule{12-13}Bin &  & \multicolumn{1}{c}{Return}                            & \multicolumn{1}{c}{\multirow{2}[2]{*}{t-stat}} &                                                       & \multicolumn{1}{c}{Return}   & \multicolumn{1}{c}{Decay} &  & \multicolumn{1}{c}{Return}   & \multicolumn{1}{c}{\multirow{2}[2]{*}{t-stat}} &  & \multicolumn{1}{c}{Return}   & \multicolumn{1}{c}{Decay} \\
+                                                                           &  & \multicolumn{1}{c}{(bps pm)}                          &                                                &                                                       & \multicolumn{1}{c}{(bps pm)} & \multicolumn{1}{c}{(\%)}  &  & \multicolumn{1}{c}{(bps pm)} &                                                &  & \multicolumn{1}{c}{(bps pm)} & \multicolumn{1}{c}{(\%)}  \\
+            \cmidrule{1-1}\cmidrule{3-4}\cmidrule{6-7}\cmidrule{9-10}\cmidrule{12-13}
+            \input{\exhibitspath/dm-sortsFull.tex}
+            \bottomrule\end{tabular}%
+        \vspace{2ex}
+
+        % pca panel
+        \setlength{\tabcolsep}{1.5ex}
+        \input{\exhibitspath/DM_pca.tex}
+
+    \end{center}
+\end{table}
+
+Using equal-weighted strategies, the in-sample returns of the first bin are on average -59 bps per month, with an average t-stat of -4.2.  These statistics are similar to those of the typical published predictor (\citet{ChenZimmermann2021}).  Out-of-sample, the first bin returns -47 bps per month, implying a  decay of only  20\%, once again resembling published predictability (\citet{mclean2016does}).  Since investors can flip the long and short legs of these strategies, these statistics imply substantial out-of-sample returns.  Similar predictability is seen in bin 5, which decays by 32\%.
+
+Out-of-sample predictability is also seen in value-weighted strategies but with smaller magnitudes. Still, the out-of-sample returns monotonically increase in the in-sample return, indicating the presence of true predictability.  Moreover, the roughly  60\% decay is far from 100\%, and is in the ballpark of the post-sample decay for published predictors.  Similarly, out-of-sample predictability is much weaker post-2004, though it still exists (see Appendix Table \ref{tab:dm-sum-2004}). The concentration of predictability in small stocks and the pre-2004 sample is also found in published predictors (\citealt{chen2022zeroing}).
+
+
+Since there are 29,000 data-mined signals, Panel (a) of Table \ref{tab:dm-oos} implies thousands of strategies with notable out-of-sample predictability. But how many distinct themes are in these strategies?
+
+Panel (b) of Table \ref{tab:dm-oos} helps address this question. It applies PCA to the predictive ratios: ratios that have t-statistics greater than 2.0 in at least 10\% of the 30-year in-sample periods from Panel (a).
+
+PCA results in a non-trivial factor structure: the first five PCs explain about 50\% of total variance. However, many dozens of PCs are required to span 80\% of total variance. A similar variance decomposition is seen in published predictors (\citealt{kozak2018interpreting}; \citealt{bessembinder2021time}; \citealt{chen2023missing}). Pairwise correlations lead to a similar conclusion (Internet Appendix Table \ref{tab:dm-cor}).
+
+% named themes methods
+One can alternatively examine the themes by examining the numerators that generate the very largest t-statistics. Table \ref{tab:dm-theme} does this by reporting the 20 numerator and stock weight (equal- or value-) combinations that produce the largest mean t-stats, where the mean is taken across the 65 possible denominators. The table uses the 1963-1980 sample, but similar themes are found in other samples (Internet Appendix \ref{sec:ia-themes}).
+
+% EXHIBIT-NUMBER: Table 2
+\begin{table}
+    \caption{Themes from Mining Accounting Ratios in 1980}\label{tab:dm-theme}
+    \small
+
+    Table reports the 20 accounting ratio numerator and stock weight (equal- or value-) combinations with the largest mean t-stats using returns in the years 1963-1980 (IS). `ew' is equal-weight, `vw' is value-weight. We manually group numerators into themes from the literature. Strategies are signed to have positive mean returns IS. `Pct Short' is the share of strategies that short stocks with high  ratios.  `t-stat' and  `Mean Return' are averages across the 65 possible denominators. `Mean Return' is in bps per month. `Mean return OOS/IS' is the mean in either 1981-2004 or 2005-2022 (OOS),  divided by the mean IS. Data mining can uncover themes from the literature before they are published.
+    \vspace{2ex}
+
+    \centering
+
+    \setlength{\tabcolsep}{2.0ex}
+    \input{\exhibitspath/theme_ez_decay.tex}
+\end{table}
+
+% describe themes
+All of the top 20 numerators fit into themes from the cross-sectional literature.  These themes include investment (\citet{titman2004capital}), debt issuance (\citet{spiess1999long}), share issuance (\citet{loughran1995new}), accruals (\citet{sloan1996stock}),  inventory growth (\citet{thomas2002inventory}), and earnings surprise (\citet{watts1978systematic}). For all of these themes, the sign of predictability obtained from  data mining is the same as the sign from the literature (e.g. short stocks with high investment).  Notably, most of these themes are published after 1980, sometimes long after.
+
+% discuss decay
+The predictive power of these themes persists out-of-sample (``OOS/IS'' columns). All data-mined numerators produce positive mean returns after 1980. In fact, the return decay in the 1981-2004 out-of-sample period is on average zero.
+
+% hint at the main results
+Taken together, these results hint at our main finding. Data-mined predictability resembles that of peer-reviewed research. This resemblance is seen in performance both in- and out-of-sample (Table \ref{tab:dm-oos}, Panel (a)), covariance structure (Table \ref{tab:dm-oos}, Panel (b)), and themes (Table \ref{tab:dm-theme}).
+
+\subsection{Peer-Reviewed Predictor Data and Benchmarks} \label{sec:pubvs,pubdata}
+
+\subsubsection{Peer-Reviewed Predictor Data}
+% see DataCounts.md
+
+Peer-reviewed predictors come from the October 2024 release of the \citet{ChenZimmermann2021}  (CZ) dataset.  This dataset is built from 212 firm-level variables that were shown to predict returns cross-sectionally in academic journals. It covers the vast majority of firm-level predictors that can be created from widely-available data and were published before 2016. The CZ data is a uniquely accurate representation of the literature: unlike other large-scale replications, CZ show that their t-stats are generally a good match for the t-stats in the original papers.
+
+CZ select their predictors to provide comprehensive coverage of predictors examined in previous  meta-studies (\citealt{mclean2016does}; \citealt{harvey2016and}; \citealt{green2017characteristics}; \citealt{Hou2020Replicating}). These meta-studies, in turn, aim for comprehensive coverage of academic cross-sectional stock return predictors.
+
+We drop five predictors that have fewer than 9 years of post-sample returns.  These predictors use specialized data sources that have been discontinued (e.g., the \citet{gompers2003corporate} governance index). This restriction makes our charts easier to interpret. We drop five additional predictors with original-sample mean returns below 15 bps per month. Since each strategy is normalized to a 100 bps mean return in the original sample (Section \ref{sec:pubvs,bench}), these low-return strategies would receive extreme scaling factors.
+
+We drop an additional 29 predictors to ensure each paper is represented by at most 2 predictors. For papers that present more than 2 predictors, we only include the two predictors with the largest in-sample t-statistics. This filter ensures our results are representative of the literature, and do not over-weight papers that present numerous implementations of the same theme (e.g., \citepos{heston2008seasonality} seasonal momentum).\footnote{Previous versions of our study without this filter show very similar results.}
+
+\subsubsection{Data-Mined Benchmarks}\label{sec:pubvs,bench}
+
+We measure performance using the mean long-short return of strategies formed following the ``original paper'' specifications from CZ. These specifications match the original papers' predictability tests in terms of stock weighting and portfolio sorting (e.g., equal-weighted quintiles). We keep only predictors that produce mean long-short return t-stats $>$ 2.0 in the original samples. All strategies are signed to be positive and normalized to have 100 bps mean return in the original samples for ease of interpretation.
+
+For each of these published strategies, we construct a data-mined benchmark by applying the same statistical treatment to the 29,000 accounting ratios. For each ratio, we construct t-stats based on the original papers' stock weighting and sample periods, filter for t-stats $>$ 2.0, sign and normalize to have $+100$ bps mean return in the original samples. Since finding t-stats $>$ 2.0 is rather common (Table \ref{tab:dm-oos}), on average, this process selects roughly 6,000 data-mined strategies for each published predictor. The benchmark return is the average across the selected ratios' returns.
+
+Some tests use variations on this baseline benchmark. One variation filters the data-mined strategies to those that match the published signals in terms of in-sample performance: sample mean returns and t-stats are each within 10\% of those of the published signals. This performance match is applied in place of the $|t|>2.0$ screen. Another variation drops data-mined strategies that have returns that are more than 10\% correlated with the published signals' returns.
+
+\subsection{Post-Sample Performance: Research vs Data Mining}\label{sec:pubvs,results}
+
+We can now answer the question posed on page \pageref{sec:intro}. Does peer-reviewed research help predict cross-sectional returns compared to data mining?
+
+Figure \ref{fig:intro} compares the post-sample performance of the published strategies to their data-mined benchmarks (Section \ref{sec:pubvs,bench}). It plots trailing 5-year mean returns in event time, where the event is the end of the original sample periods.
+
+Post-sample, peer-reviewed (solid line) and data-mined (long-dash) predictors perform similarly. This similarity is seen both in the average post-sample performance, as well as in the event-time decay patterns. This result suggests that peer-reviewed research provides limited additional information about post-sample performance compared to data mining.
+
+% discuss Figure 2 (robustness and its limits)
+Figure \ref{fig:pub-vs-dm-2} explores the robustness of this result. Each panel explores a different kind of robustness.
+
+% 2a: factor adjustments
+Panel (a) shows robustness to factor exposure. We calculate the abnormal return $r^{a}_{i,t}$ of strategy $i$ in month $t$:
+\begin{align}
+    r^{a}_{i,t} = r_{i,t}- \hat{\beta}_{i}^{(s)} f_t,
+    \label{eq:abnormal_return}
+\end{align}
+where $r_{i,t}$ is the raw long-short return, $f_t$ is a vector of factor returns, and $\hat{\beta}_{i}^{(s)}$ is a row vector of betas estimated using sample $s$. The sample $s$ is either the original sample or the post-sample period. We then repeat the test in Figure \ref{fig:intro} using abnormal returns in place of the raw returns. In this test, the data-mined benchmarks are built from the strategies matched on in-sample performance (Section \ref{sec:pubvs,bench}) and filtered on alpha t-stats $>$ 2.0, while published predictors must pass the t-stat $>$ 2.0 filter on both raw returns and alphas.
+
+% EXHIBIT-NUMBER: Figure 2
+\begin{figure}[!htp]
+    \caption{Factor Adjustments and Alternative Data Mining Methods, with Standard Errors}
+    \label{fig:pub-vs-dm-2}
+    The panels repeat the event time tests of Figure \ref{fig:intro} under  alternative specifications. The y-axis shows long-short portfolio performance, normalized so the mean original sample performance is 100 bps per month. Panel (a) uses abnormal returns relative to a factor model, estimated separately in the original sample and post-sample. Panel (b) restricts published predictors to those built from annual Compustat accounting data, or to those published before 2003. Panel (c) excludes data-mined strategies with $>10\%$ correlation with the published counterpart, and additionally keeps only strategies with $|t|$ and $\bar{r}$ within 10\% of the published counterpart. Panel (d) replaces the $|t| >$ 2.0 filter with a screen for the top 5\% of t-stats, mining either accounting ratios or 3,160 ticker-based strategies. Shaded areas show one standard error around each series, clustered by calendar date and predictor. The result in Figure \ref{fig:intro} is robust to many alternative specifications, with the exception of mining ticker symbols instead of accounting ratios.
+
+    \vspace{0.05in}
+
+    \centering
+    \subfloat[Adjusting for Factor Exposure]{%
+        \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig2a_FactorAdj.pdf}
+    }
+    \subfloat[Excluding Non-Accounting or Recent Pubs]{%
+        \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig2b_PubSampleLimits.pdf}
+    }\\
+    \subfloat[Controlling for Sum-Stats, Excluding Corr]{%
+        \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig2c_MatchedExclCorr.pdf}
+    }
+    \subfloat[Alternative Data Mining Methods]{%
+        \includegraphics[width=0.48\textwidth]{\exhibitspath/Fig2d_AltMining.pdf}
+    }
+\end{figure}
+
+Published predictors exhibit some outperformance relative to data-mined benchmarks in terms of CAPM-adjusted returns. However, the outperformance is modest. Post-sample, published predictors retain 60\% of their original-sample performance, compared to 52\% for data-mined benchmarks. Panel (a) shows that the same holds if we measure abnormal returns relative to the Fama-French three factors + momentum, where published predictors outperform by only 4 bps per month. Overall, our main result is robust to adjustments for factor exposure.
+
+% 2b dropping certain pubs
+Panel (b) drops published predictors that are arguably difficult to evaluate in our tests. Since our data mining process uses only annual accounting data, one might argue that we should not use it to evaluate published predictors that use other data types. One might also worry that published predictors with shorter post-publication samples may lead to noisy artifacts for trailing returns far from the original sample. The panel addresses the first concern by restricting to the 66 published predictors built from annual Compustat data, and the second by restricting to the 61 predictors published before 2003, which have at least two decades of post-publication returns. In both subsets, published and data-mined predictors track each other post-sample, leading to similar results as in Figure \ref{fig:intro}. In each case the data-mined benchmark is the baseline construction (Section \ref{sec:pubvs,bench}) restricted to the corresponding subset of published predictors.
+
+% 2c controlling for sum-stats, excluding corr
+One might also worry that we should not compare published and data-mined strategies that differ strongly in in-sample performance. Panel (c) addresses this concern by requiring data-mined strategies to have at least 60 original-sample months and to match the published signals within 10\% on both t-statistics and mean returns (Section \ref{sec:pubvs,bench}). This filter has little effect on our main result.
+
+Perhaps the similar post-sample performance is due to data mining picking up the same, or very similar, signals as the  research process? The short dash line in Panel (c) shows this is not the case. It imposes the in-sample performance match \emph{and} drops data-mined strategies that are more than 10\% correlated with the published signals (Section \ref{sec:pubvs,bench}).
+
+% 2d alt mining methods
+Panel (d) examines alternative data mining methods. Instead of filtering for $|t|>2.0$, we screen for the top 5\% of t-stats in the original sample periods. Screening accounting ratios this way still leads to very similar returns to research.
+
+% 2d cont: ticker mining
+In our last robustness test, we examine whether mining tickers instead of accounting ratios leads to similar post-sample returns. We use the data mining method proposed in \citet{harvey2017presidential}. Harvey asks his research assistant to ``form portfolios based on the first, second, and third letters of the ticker symbol,'' leading to 3,160 long-short portfolios. We interpret his instructions as follows:  Generate 26 portfolios by going long all stocks with a  first ticker letter of ``A,'' ``B,'' ``C,'' ..., and ``Z.''  Generate 26 portfolios by doing the same for the second ticker letter, and add a 27th portfolio for tickers that have no second ticker letter.  Apply the same to the third ticker.  This process results in $26 + 27 + 27 = 80$ long portfolios.  Finally, form $\binom{80}{2} = 3,160$ long-short portfolios by selecting all distinct pairs of the 80 long portfolios.
+
+Data mining fails this last robustness result. Post-sample, published returns far outperform  data mining ticker symbols---at least mining tickers following \citet{harvey2017presidential}. Indeed, the mean return from mining tickers is approximately zero.
+
+% takeaways from fig 2
+Overall, Figure \ref{fig:pub-vs-dm-2} shows our finding is robust. Factor exposures, stricter restrictions on the published signals, controlling for data-mined performance, excluding correlated signals, alternative t-stat screens: they all have little effect on our main result. However, there are limits: data mining is not so effective that it obtains research-level performance from ticker symbols.
+
+% further robustness
+Appendix \ref{sec:robust,research-vs} reports additional checks, including excluding with 
+
+
+on data-mined predictors' correlation with existing research, journal discipline and ranking, regression samples, and portfolio construction.
+
+\providecommand{\Cor}{\text{Cor}}
+
+% Section 4
+\section{Learning from Academics or Learning from the Data?}\label{sec:learn}
+
+This section explores the drivers of our main result. We present a model of return decay, map it to two interpretations, and examine evidence that helps distinguish the two.
+
+% Section 4.1
+\subsection{A Model of Learning and Data Mining Bias}\label{sec:learn,model}
+
+Academic signal $i$ is selected in an original sample and published later. We use the notation
+\begin{equation}
+    t\in\text{Sample},\quad t\in\text{Between},\quad t\in\text{Post-Pub},\label{eq:sample,def}
+\end{equation}
+to denote months $t$ in the original sample, between sample and publication, and after publication by respectively.
+
+The return on $i$ in month $t+1$ is decomposed as:
+\begin{equation}
+    r_{i,t+1}=E_{t}\left(r_{i,t+1}\right)+\varepsilon_{i,t+1}.\label{eq:model,ret}
+\end{equation}
+where $E_{t}\left(r_{i,t+1}\right)$ is the expected return conditional on information at time $t$ and $\varepsilon_{i,t+1}$ is mean zero, unpredictable noise. Academics select $i$ to have a high sample mean return, leading to data-mining (a.k.a. statistical) bias:
+\begin{equation}
+    b_{i}\equiv-E\left(\varepsilon_{i,t+1}\mid t\in\text{Sample}\right)<0.\label{eq:model,bias}
+\end{equation}
+We define $b_{i}$ with a negative sign so that it has the same sign as the decay effects we descibe below.\footnote{%
+    More formally, Equation \eqref{eq:model,bias} should condition on $\{t,t+1\} \in \text{Sample}$. But we use $t \in \text{Sample}$ to keep the notation simple.
+}% end footnote
+
+We decompose expected returns into three terms:
+\begin{equation}
+    E_{t}\left(r_{i,t+1}\right)=\mu_{i,0}+A_{i,t}+Z_{i,t},\label{eq:model,mean}
+\end{equation}
+where
+\begin{enumerate}
+    \item $\mu_{i,0}$ is the expected return before learning and other effects.
+
+    % tbc: cite the risk vs mispricing paper when it is posted.
+    \item $A_{i,t}$ is the effect that academics have on expected returns in month $t$. We typically think of $A_{i,t}<0$ for $t\in\text{Post-Pub}$, with the idea that the publication teaches investors about mispricing. But in principle, we could have $A_{i,t}>0$ for $t\in\text{Post-Pub}$, as publication could also teach investors about risk.
+
+    \item $Z_{i,t}$ is a residual: it captures all other effects on expected returns that do not originate from academics. For example, improvements in information technology allow investors to more quickly impound information into prices, weakening predictability (\citealt{Chordia2014Have}).
+\end{enumerate}
+
+The return on the data-mined benchmark for signal $i$ is $r_{i,t+1}^{DM}$. This return is decomposed following Equations \eqref{eq:model,ret}-\eqref{eq:model,mean}:
+\begin{align}
+    r_{i,t+1}^{DM}
+               & =E_{t}\left(r_{i,t+1}^{DM}\right)+\varepsilon_{i,t+1}^{DM}\label{eq:dm,ret}              \\
+    b_{i}^{DM} & \equiv-E\left(\varepsilon_{i,t+1}^{DM}\mid t\in\text{Sample}\right)<0.\label{eq:dm,bias} \\
+    E_{t}\left(r_{i,t+1}^{DM}\right)
+               & =\mu_{i,0}^{DM}+A_{i,t}^{DM}+Z_{i,t}^{DM}\label{eq:dm,mean}
+\end{align}
+The data-mined benchmark is selected to have large positive sample mean $r_{i,t+1}^{DM}$, leading to Equation \eqref{eq:dm,bias}. Expected returns can change because of academics ($A_{i,t}^{DM}$), or for other reasons ($Z_{i,t}^{DM}$, a residual). Since $r_{i,t+1}^{DM}$ represents a data-mined signal, not a published one, $A_{i,t}^{DM}$ is a spillover effect: academics writing about signal $i$ leads investors to learn about other signals.
+
+To exclude trivial spillover effects, we impose
+\begin{equation}
+    \widehat{\Cor}\left(r_{i,t+1}^{DM},r_{i,t+1}\right)<0.10\label{eq:assump,corr}
+\end{equation}
+where $\widehat{\Cor}$ is the in-sample correlation, as in Section \ref{sec:pubvs,bench}.
+
+We apply normalizations for ease of interpretation. For $t\in\text{Sample}$, $A_{i,t}=Z_{i,t}=A_{i,t}^{DM}=Z_{i,t}^{DM}=0$, and
+\begin{equation}
+    E\left(r_{i,t+1}^{DM}\mid t\in\text{Sample}\right)\approx E\left(r_{i,t+1}\mid t\in\text{Sample}\right).\label{eq:assump,match}
+\end{equation}
+These normalizations imply $\mu_{i,0}$ and $\mu_{i,0}^{DM}$ are expected returns in the original sample, and $A_{i,t}$, $Z_{i,t}$, $A_{i,t}^{DM}$, and $Z_{i,t}^{DM}$ measure deviations relative to this baseline. Equation \eqref{eq:assump,match} also matches our empirical implementation.
+
+% Section 4.2
+\subsection{Two Interpretations}
+
+Combining Equations \eqref{eq:model,ret}-\eqref{eq:model,mean} and
+\eqref{eq:dm,ret}-\eqref{eq:dm,bias}, the normalization of expected return effects, and the matching condition \eqref{eq:assump,match}, our headline result can be decomposed as follows:
+\begin{align}
+    0\approx E(r_{i,t+1}-r_{i,t+1}^{DM}\mid t\not\in\text{Sample}) & \approx E(A_{i,t}-A_{i,t}^{DM}\mid t\not\in\text{Sample})\nonumber \\
+                                                                   & \quad+E(Z_{i,t}-Z_{i,t}^{DM}\mid t\not\in\text{Sample})\nonumber   \\
+                                                                   & \quad+(b_{i}-b_{i}^{DM}).\label{eq:decomp,post-samp}
+\end{align}
+Thus, there are three drivers of the post-sample outperformance
+\begin{enumerate}
+    \item Differences in learning from academics $E(A_{i,t}-A_{i,t}^{DM}\mid t\not\in\text{Sample})$,
+    \item Differences in other effects $E(Z_{i,t}-Z_{i,t}^{DM}\mid t\not\in\text{Sample})$,
+    \item Differences in data-mining bias $b_{i}-b_{i}^{DM}$,
+\end{enumerate}
+and our headline result may be due to offsetting effects. Indeed, the standard, ``\emph{Learning-from-Academics}'' view involves offsetting effects. We offer an alternative ``\emph{Learning-from-Data}'' view.
+
+The \emph{Learning-from-Academics} view: The standard interpretation of post-publication decay is that investors learn about mispricing from academics (\citealt{mclean2016does}), implying $E(A_{i,t}-A_{i,t}^{DM}\mid t\not\in\text{Sample})<0$. At the same time, the standard view of atheoretical data mining is that it should exhibit substantial data-mining bias (\citealt{harvey2016and}), implying $(b_{i}-b_{i}^{DM})>0$. These effects offset, leading to the observed $0\approx E(r_{i,t+1}-r_{i,t+1}^{DM}\mid t\not\in\text{Sample})$ in Figure \ref{fig:intro}.
+
+The \emph{Learning-from-Data} view: An alternative interpretation says that all learning about expected returns comes from the empirical evidence in the data environment. There is no learning from academics, so $E(A_{i,t}-A_{i,t}^{DM}\mid t\not\in\text{Sample})\approx 0$. There is nothing special about signal $i$ beyond the fact that it has empirical support, so $E(Z_{i,t}-Z_{i,t}^{DM}\mid t\not\in\text{Sample})\approx 0$ and $b_i - b_i^{DM} \approx 0$.
+
+
+% Section 4.3
+\subsection{Separating the Two Interpretations}\label{sec:learn,interp}
+
+MP's insight provides a way to separate the two interpretations: Since the idiosyncratic terms $\varepsilon_{i,t}$ and $\varepsilon_{i,t}^{DM}$ vanish out of sample (in expectation), additional decay following publication cannot be driven by data-mining biases.
+
+To formalize MP's insight, define $\Delta_{P}E(\cdot)$ as an operator for the change in expectations just following publication:
+\begin{equation}
+    \Delta_{P}E\left(X_{i,t}\right)
+    \equiv E(X_{i,t}\mid t\in\text{Post-Pub})-E(X_{i,t}\mid t\in\text{Between}).\label{eq:reg,delta}
+\end{equation}
+Then applying $\Delta_{P}E(\cdot)$ to the published signal's outperformance gives
+\begin{align}
+    \Delta_{P}E(r_{i,t+1}-r_{i,t+1}^{DM})
+     & =\Delta_{P}E(A_{i,t}-A_{i,t}^{DM})+\Delta_{P}E(Z_{i,t}-Z_{i,t}^{DM}).
+    \label{eq:decomp,post-pub}
+\end{align}
+since $\Delta_{P}E(\cdot)$  removes $\varepsilon_{i,t}$ and $\varepsilon_{i,t}^{DM}$, with $b_i$ and $b_i^{DM}$ playing no role in the result. [tbc: explain better]
+
+\emph{Learning-from-Academics} implies Equation \eqref{eq:decomp,post-pub} is negative, driven by $\Delta_{P}E(A_{i,t}-A_{i,t}^{DM})<0$. Here, publication should have stronger learning effects on the published signal compared to the data-mined counterpart.
+
+In contrast, \emph{Learning-from-Data} implies Equation \eqref{eq:decomp,post-pub} is approximately zero, driven by  $Z_{i,t}\approx Z_{i,t}^{DM}$. Here, learning comes from past statistical evidence, and there is no special learning effect for published signals.
+
+
+
+% Section 4.4
+\subsection{Regression Evidence}\label{sec:learn,regs}
+
+We bring evidence to Equation  \eqref{eq:decomp,post-pub} using regressions of the form
+\begin{equation}
+    y_{i,t}=\alpha_{i}+\gamma_{t}+\beta_{S}\,S_{i,t}+\beta_{P}\,P_{i,t}+u_{i,t},\label{eq:mp-reg}
+\end{equation}
+where $y_{i,t}$ is the dependent variable of interest (e.g. $r_{i,t}^{DM}$), $\alpha_{i}$ is a signal fixed effect, $\gamma_{t}$ is a time fixed effect, $S_{i,t}=1$ if $t\notin\text{Sample}$ and 0 otherwise, and $P_{i,t}=1$ if $t\in\text{Post-Pub }$ and 0 otherwise. The coefficient $\beta_{S}$ maps to Equation \eqref{eq:decomp,post-samp} and $\beta_P$ maps to Equation \eqref{eq:decomp,post-pub}. $u_{i,t}$ is a mean zero residual. This method follows MP's Tables II and III closely.
+
+Table \ref{tab:MPdecaymain} shows regressions of the form \eqref{eq:mp-reg}, without time fixed effects.
+
+% EXHIBIT-NUMBER: Table 3
+\begin{table}
+    \caption{Regression of Signal Returns on Post-Sample and Post-Publication Indicators}\label{tab:MPdecaymain}
+    \small
+
+    The table reports regressions of long-short returns on sample indicators (Equation \eqref{eq:mp-reg}). The returns use either academic predictors, aggregated data mining benchmarks, or the difference between the two. ``Post-Sample'' is one after the end of the original sample and zero otherwise. ``Post-Pub (Add'l)'' is one after publication and zero otherwise. We drop data-mined strategies with $> 10\%$ correlation with the academic counterpart, then equally weight the survivors into one aggregated benchmark per academic predictor.  Panel (a) scales all strategies to 100 bps per month in the original sample (Figure \ref{fig:pub-vs-dm-2} (c), dash). Panel (b) keeps only data-mined strategies with $|t|$ and $\bar{r}$ within 10\% of the academic counterpart and leaves returns unscaled (Figure \ref{fig:pub-vs-dm-2} (c), long-dash). Standard errors (parentheses) are clustered by predictor and calendar month. Academic outperformance relative to data mining is little-changed post-publication, which is at odds with the \emph{Learning-from-Academics} view, but is consistent with the \emph{Learning-from-Data} view (Equation \eqref{eq:decomp,post-pub}).
+
+    \vspace{2ex}
+
+    \centering
+
+    \setlength{\tabcolsep}{2.0ex}
+    \input{\exhibitspath/Table_MPStyleRegsNoTimeFE.tex}
+\end{table}
+
+% === Notes on MP ===
+% MP specs are Table II (1) and Table III (4). They seem to have a typo in the table caption, and the proper definitions are in Equation (1). Post-Sample Dummy = 1 if after sample but before pub. Post-Pub = 1 if month is post-pub.
+% MP numbers: Post-samp coef = -0.150 or -0.179 (time f.e.), mean in-sample = 0.582, decay = -0.150 or -0.179/0.582 = 26 or 31\%
+% MP post-pub coeff: -0.337 or -0.310 (time f.e.), decay = 58\% or 53\%. Additional decay = 58 - 26 = 32\% or 52 - 31 = 21\%
+
+% Explain main result
+Column (3) shows the main result of this section. The Post-Pub (Add'l) coefficient is a small -6.5 bps per month, less than one standard error from zero. In other words, the publication of a signal pushes down the signal's return by only 6.5 bps more than a data-mined benchmark, even though the data-mined benchmark return is less than 10\% correlated with the academic return.
+
+From the \emph{Learning-from-Academics} view, this is puzzling: why are investors learning from publications about data-mined strategies that are uncorrelated with the publication's idea? For this story to make sense, one would need incredibile learning spillovers that stretch the notion of ``learning from academics.''
+
+But a lack of publication effect is entirely logical from the perspective of \emph{Learning-from-Data}. If investors are learning directly from the data environment, then statistically-significant signals decay over time, regardless of whether they are published or not. Publication simply marks the passage of time since a statistically-significant sample.
+
+% break it down to understand the components
+Columns (1) and (2) decompose the main result by examining the decay of the academic and data mined signals separately. The academic signal estimates replicate MP's headline finding closely: performance decays by 26.5\% after the original sample ends, and then by an additional 24.2 p.p. after publication. Strikingly, the data-mined benchmarks have a similar pattern, with 40.4\% decay post-sample and an additional 17.7 p.p. decay post-publication. These coefficients differ slightly from those in column (1), but the difference is not statistically significant, as seen in Column (3).
+
+% it's robust to unscaled returns.
+Columns (4)-(6) repeat the analysis using unscaled returns, for robustness. The patterns are similar. Publication has the same effect on academic signals and uncorrelated data-mined benchmarks.
+
+% Introduce time fixed effects table
+A simple form of \emph{Learning-from-Data} is that, as aggregate information technology improves, investors are able to more quickly impound information into prices. One can absorb this story by using time fixed effects, as in Table \ref{tab:MPdecaytimefe}.
+
+% EXHIBIT-NUMBER: Table 4
+\begin{table}
+    \caption{Regressions on Sample Indicators, Controlling for Time Effects}\label{tab:MPdecaytimefe}
+    \small
+
+    The table reports regressions of long-short returns on sample indicators (Equation \eqref{eq:mp-reg}), following Table \ref{tab:MPdecaymain} but adding time fixed effects. Benchmarks, scaling, and samples are unchanged from Table \ref{tab:MPdecaymain}: we drop data-mined strategies with $> 10\%$ correlation with the academic counterpart, Panel (a) scales all strategies to 100 bps per month in the original sample, and Panel (b) keeps only data-mined strategies with $|t|$ and $\bar{r}$ within 10\% of the academic counterpart and leaves returns unscaled. ``Post-Sample'' is one after the end of the original sample and zero otherwise. ``Post-Pub (Add'l)'' is one after publication and zero otherwise. Standard errors (parentheses) are clustered by predictor and calendar month. Controlling for time fixed effects, publication has little effect on predictor returns, whether academic or data-mined. Aggregate improvements in technology are a simple explanation for the post-publication predictability decay.
+
+    \vspace{2ex}
+
+    \centering
+
+    \setlength{\tabcolsep}{2.0ex}
+    \input{\exhibitspath/Table_MPStyleRegsTimeFE.tex}
+\end{table}
+
+Table \ref{tab:MPdecaytimefe} shows that, once time fixed effects are included, publication has little-to-no additional effect on returns, whether academic or data-mined. This result suggests that publication is simply a marker of the passage of time, and that the research put out by academics, plays no role in predictor decay.
+
+% reconcile with MP
+% tbc: is this too soft?
+This result may seem to conflict  with \citet{mclean2016does}. They  find time fixed effects have little impact, saying the ``estimated coefficients are very close to those [without time effects]. In particular, predictor returns are 17.9 bps lower out-of-sample and 31.0 bps lower post-publication, both significant at the 5\% level.''
+
+However, these 31.0 bps is not the \emph{additional} decay  post-publication, but the total decay include both post-sample and post-publication effects. To obtain the additional post-publication decay one must subtract 31.0 - 17.9 = 13.1 bps, which is not far from MP's standard error on the post-publication coefficient of 12.2 bps. Thus, like our Table \ref{tab:MPdecaytimefe}, the additional effect of publication is insignificant, once one controls for aggregate changes in the economy.\footnote{%
+    MP contains two definitions of the Post-Sample and Post-Publication indicators. We use the interpretation around Equation (1), which is consistent with the way they discuss their estimates in the text.
+}% 
+
+% circle back to model to conclude
+Through the lens of our model, we find that the LHS of Equation \eqref{eq:decomp,post-pub} is approximately zero. Thus, it must be that
+\begin{align}
+    \Delta_{P}E\left(A_{i,t}-A_{i,t}^{DM}\right)+\Delta_{P}E\left(Z_{i,t}-Z_{i,t}^{DM}\right)
+    \approx 0.
+    \label{eq:reg,bp}
+\end{align}
+This result is at odds with \emph{Learning-from-Academics}, which implies that $\Delta_{P}E\left(A_{i,t}-A_{i,t}^{DM}\right)<0$. In contrast, it is quite consistent with \emph{Learning-from-Data}, which implies $A_{i,t}\approx A_{i,t}^{DM}\approx 0$ and $Z_{i,t}\approx Z_{i,t}^{DM}$.
+
+
+
+% ==============================
+\section{Highest Quality Research vs Data Mining}\label{sec:quality}
+
+% motivate
+Our main results treat all peer-reviewed research alike, but research varies in quality. This section examines the possibility that the highest quality research outperforms.
+
+\subsection{Journal Rankings}\label{sec:quality,journal}
+
+Table \ref{tab:hetero-byjournal} cuts the data by discipline and journal ranking. Finance predictors outperform accounting predictors post-sample, earning 59 to 78 bps per month compared to 43 to 48 bps. Relative to data mining, however, the outperformance is modest. Finance predictors beat data mining by 11 to 15 bps per month, while accounting predictors underperform it. The top 3 finance journals (JF, JFE, RFS) look similar to finance overall, beating data mining by 10 to 17 bps, with only the CAPM comparison significant at the 5\% level.
+
+
+% EXHIBIT-NUMBER: Table 5
+\begin{table}[!h]
+   \caption{Post-Sample Outperformance by Discipline and Journal Ranking}
+   \label{tab:hetero-byjournal}
+
+   \begin{singlespace}
+   \noindent Strategies are normalized to have 100 bps per month performance in-sample. `Post-Sample' is the performance of predictor-papers in bps per month. `Versus Data Mining' is `Post-Sample' minus the performance of data-mined benchmarks. `Discipline' categorizes the journal of publication. `JF,' `JFE,' and `RFS' includes papers in the Journal of Finance, Journal of Financial Economics, and Review of Financial Studies. `AR,' `JAR,' and `JAE' includes papers in the Accounting Review, Journal of Accounting Research, and Journal of Accounting and Economics. CAPM and FF3 + momentum alphas use regressions specific to the sample periods (in-sample or post-sample). Standard errors (parentheses) are clustered by calendar month and predictor. Finance, and particularly top-ranked finance journals show some signs of outperformance relative to data mining, but the improvement is modest.
+   \end{singlespace}
+   \begin{centering}
+   \vspace{0ex}
+   \par\end{centering}
+   \centering{}\setlength{\tabcolsep}{1.2ex} \small
+   \begin{center}
+   \input{\exhibitspath/Table_FactorAdjusted_TimeVarying_DisciplineJournal_ff4_t2.tex}
+   \end{center}
+\end{table}
+
+Journal rankings are surely an imperfect measure of quality. Nevertheless, Table \ref{tab:hetero-byjournal} provides evidence that even the highest quality research performs similarly to data-mining, post-sample.
+
+\subsection{Size, B/M, and Momentum}\label{sec:quality,famous}
+
+B/M (\citealt{fama1992cross}), momentum (\citealt{jegadeesh1993returns}), and size (\citealt{banz1981relationship}) are perhaps the most famous predictors in asset pricing research. These predictors have an immense amount of supporting evidence, both theoretical and empirical. 
+
+Theoretical foundations for B/M and size include \citet{berk1995critique}, \citet{berk1999optimal}, \citet{gomes2003equilibrium}, \citet{campbell2004bad}, \citet{zhang2005value}, and \citet{lettau2007long}. Theoretical foundations for momentum include \citet{hong1999unified}, \citet{brav2002competing}, \citet{holden2002news}, and \citet{da2014frog}.\footnote{% 
+Other theoretical foundations for B/M and size include \citet{gabaix2008variable}, \citet{papanikolaou2011investment}, and \citet{chen2018general}. For other theoretical foundations for momentum, see \citealt{subrahmanyam2018equity}.
+} % end footnote
+Most of these theories provide equilibrium foundations, and their multiplicity can be viewed as robustness, much as core results in physics and statistics can be derived from multiple perspectives.\footnote{% begin footnote
+Thermodynamic phenomena (e.g. ideal gas law) can be derived from the laws of thermodynamics,  classical mechanics, or quantum mechanics. Core statistical formulas (e.g. regression coefficients), can be derived from method of moments, maximum likelihood, Bayesian assumptions, or data fitting. 
+} % end footnote
+The empirical evidence is also robust (e.g., \citealt{fama1993common}; \citealt{lakonishok1994contrarian}; \citealt{chan1996momentum}; \citealt{asness2013value}).
+
+Table \ref{tab:closer-summary} compares these findings to data-mined accounting ratios with t-stats and mean returns within 10\% of the originals, using the original papers' stock weighting and sample periods. For each finding, it lists the four most similar ratios and the mean across all similar ratios.
+% EXHIBIT-NUMBER: Table 6
+\begin{table}[!htp]
+\caption{Renowned Findings vs Data-Mined Accounting Ratios}
+\label{tab:closer-summary}
+
+\begin{singlespace}
+\noindent Each panel compares a renowned finding to data-mined accounting ratios that performed similarly in the original paper's sample period, defined as having t-stats and mean returns each within 10\% of the original finding. `Peer-Reviewed' is the original finding. Rows 1--4 are the four most similar data-mined ratios, ranked by the absolute difference in in-sample mean return. `Mean of All' averages across all similar ratios, whose number is given in the row label. Sign = -1 indicates that a high signal implies a lower mean return in-sample. Panel D averages across Panels A--C. Internet Appendix Tables \ref{tab:closer_bmdec}--\ref{tab:closer_size} list more of the similar ratios.
+\end{singlespace}
+\centering{}\setlength{\tabcolsep}{0.6ex} \footnotesize
+\begin{center}
+\begin{tabular}{rlrrrr} \toprule 
+& & & \multicolumn{1}{c}{In-Sample} & \multicolumn{2}{c}{Mean Return (\% p.m.)} \\ \cmidrule(lr){5-6}
+\multicolumn{1}{c}{Rank} & Signal & \multicolumn{1}{c}{Sign} & \multicolumn{1}{c}{t-stat} & \multicolumn{1}{c}{In-Sample} & \multicolumn{1}{c}{Post-Sample} \\
+\midrule
+\input{\exhibitspath/inspect-summary.tex}
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+% walk through the table
+Panel A shows that 51 data-mined ratios performed similarly to B/M in the 1963-1990 sample. The most similar, $\Delta \text{[PPE net]} / \text{lag [Common equity]}$, is an investment measure that earned 95 bps per month in-sample (vs 96 bps for B/M) and 66 bps post-sample (vs 61 bps). Other matches relate to asset growth and equity issuance (Internet Appendix Table \ref{tab:closer_bmdec}). On average, the matches earn 81 bps post-sample, outperforming B/M.
+
+Data mining underperforms momentum (Panel B), earning 17 bps vs 72 bps, though only 4 matches are found. It outperforms size (Panel C), earning 36 bps vs 15 bps. Averaging across the three findings (Panel D), data mining earns 45 bps per month post-sample, compared to 49 bps for the renowned findings. Though the samples are small, they suggest that even the best research does not notably outperform data mining.
+
+% ===================
+\section{Conclusion and Limitations}\label{sec:conclusion}
+
+We show that the post-sample performance of published cross-sectional return predictors is remarkably similar to that of data-mined benchmarks. This result holds for most types of research we examine, including research that is risk-based or includes the support of a mathematical equilibrium model. Research that is agnostic about the theoretical foundation for predictability shows some signs of outperformance, but the magnitude is modest. The statistical implication is that whether a predictor is found in a journal or is data mined has little effect on mean inferences about post-sample performance (Equation \eqref{eq:painfully_clear}).
+
+Beyond statistical inference, our findings suggest four deeper implications about cross-sectional stock return predictability: (1) empirical evidence is more informative than theoretical evidence for post-sample prediction, (2) investors do not learn about risk from academic research, (3) data mining is effective, and (4) mispricing is the primary driver. These implications come from analyzing the theoretical foundations of published predictors and their relationship with post-sample performance.
+
+A limitation of our study is that we cannot identify the economic mechanism behind the lack of outperformance. The noisiness of predictor returns makes it difficult to determine the exact timing of decay, and thus makes it hard to separate publication effects (\citealt{mclean2016does}) from technological changes (\citealt{Chordia2014Have}). We illustrate this difficulty in the Internet Appendix \ref{sec:ia-decay}.
+
+A second limitation is that we study single-predictor strategies. For strategies that use many predictors, the factor structure and spanning are central questions. Table \ref{tab:dm-theme} suggests that data-mined accounting predictors are to a significant extent spanned by the ideas in the CZ dataset, but a more systematic investigation is needed. 
+
+Last, our study is limited to the peer review process as characterized by the CZ dataset. This dataset is composed of papers that study cross-sectional return predictability, published between the years 1973 and 2016. Each literature has its own norms and practices, which evolve over time. The extent to which our findings generalize is an important question for future research.
+
+\clearpage
+
+\clearpage{}
+\newpage{}
+
+
+\begin{appendices}
+
+
+% Appendix ==============================
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\renewcommand*\thetable{\Alph{section}.\arabic{table}}
+\renewcommand*\thefigure{\Alph{section}.\arabic{figure}}
+
+\bookmarksetup{startatroot}
+\pdfbookmark[0]{Appendix}{appendix}
+\input{sections/91_appendix}
+\end{appendices}
+
+% References ==============================
+\clearpage
+\pdfbookmark[0]{References}{References}
+\printbibliography
+
+
+% Internet Appendix ==============================
+\newpage
+\setcounter{section}{0}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\renewcommand{\thesection}{IA.\arabic{section}}
+\renewcommand*\thetable{IA.\arabic{table}}
+\renewcommand*\thefigure{IA.\arabic{figure}}
+
+% Fix pdf bookmarks
+\renewcommand{\theHsection}{IA.\arabic{section}}
+\renewcommand{\theHsubsection}{IA.\arabic{section}.\arabic{subsection}}
+
+
+% Add parent bookmark and shift section depth
+% \bookmark[dest=\@currentHref, level=0]{Internet Appendix}
+\bookmarksetup{startatroot}
+\pdfbookmark[0]{Internet Appendix}{internet-appendix}
+
+\input{sections/92_internet_appendix}
+
+\end{document}

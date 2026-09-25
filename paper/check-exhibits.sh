@@ -20,7 +20,7 @@ paper=.
   used=$(mktemp); have=$(mktemp)
 
   # Strip LaTeX comments, then collect exhibit paths.
-  sed -E 's/(^|[^\\])%.*/\1/' "$paper"/risk_vs.tex "$paper"/sections/*.tex \
+  sed -E 's/(^|[^\\])%.*/\1/' "$paper"/research_vs.tex "$paper"/sections/*.tex \
     | grep -oE '(\\exhibitspath|exhibits)/[^}]*' \
     | sed -E 's#^(\\exhibitspath|exhibits)/##' \
     | while read -r r; do case "$r" in *.tex|*.pdf) echo "$r";; *) echo "$r.pdf";; esac; done \
