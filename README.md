@@ -11,7 +11,7 @@ The origins of predictability and quotes are found in [code/DataInput/SignalsThe
 
 This project uses the active R installation's default library paths and does not manage a project-local package environment.
 
-Current results were produced with **R 4.5.3** and packages from the Posit P3M snapshot dated **2026-07-15**, plus `pcaMethods` from Bioconductor. See [code/docs/environment.md](code/docs/environment.md) for the package versions and how to regenerate the list.
+Current results were produced with **R 4.5.3** and packages installed from the Posit P3M snapshot dated **2026-07-15** (for example, data.table 1.18.4), plus `pcaMethods` from Bioconductor. See [code/docs/environment.md](code/docs/environment.md) for the package versions and how to regenerate the list.
 
 ### Pipeline
 
@@ -33,9 +33,10 @@ for each data stage and paper section:
 9. `Appendices/TimeFERobustness/run.R` rebuilds the time-fixed-effects
    robustness appendix from its external inputs.
 
-Chapter 3 now runs `3d_DMCorrelationsPCA.R` and `3e_DMSpanPCA.R` after the
-other cache builders. The former feeds Section 2 Table 1 panel (b) through
-`S2c_DMCorrelationsPCATables.R`; the latter feeds the appendix spanning plots.
+The precompute stage (`3_Precompute.R`) runs `3d_DMCorrelationsPCA.R` and
+`3e_DMSpanPCA.R` after the other cache builders. The former feeds Section 2
+Table 1 panel (b) through `S2c_DMCorrelationsPCATables.R`; the latter feeds the
+appendix spanning plots.
 
 Steps 4-8 share the single `exhibits` switch in `runStages`; the slow or
 externally sourced stages keep their own. Any driver above can be run on its
@@ -46,7 +47,6 @@ figure or table change, run only the corresponding section. Chapter 1 overwrites
 `../Data/Raw` with a new, non-recoverable WRDS/Google Drive vintage, so its
 `MAIN.R` switch is off by default and should be enabled deliberately.
 
-The time-FE robustness stage is enabled in `config.R` and requires its pinned
-inputs. See
+The time-FE robustness stage is enabled in `config.R`. See
 `code/Appendices/TimeFERobustness/README.md` for its pinned inputs, storage
 layout, commands, and WRDS warning.
